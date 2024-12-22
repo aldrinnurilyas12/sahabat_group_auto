@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+    <div class="container">
+
+        <h4>Yth.{{$data['name']}}</h4>
+
+        <p>Permohonan permintaan Jual Unit Kendaraan {{ $data['brand_name'] . ' ' . $data['vehicle_type'] . ' ' . $data['vehicle_year']  }}.</p>
+
+        <ul>
+            <li><strong>Unit Kendaraan :</strong> {{$data['vehicle_type']}}</li>
+            <li><strong>Merk Kendaraan :</strong> {{$data['brand_name']}}</li>
+            <li><strong>Tahun Kendaraan :</strong> {{$data['vehicle_year']}}</li>
+            <li><strong>Warna Kendaraan :</strong> {{$data['vehicle_color']}}</li>
+        </ul>
+
+        <p class="text-success"><strong>Status : {{$data['status']}}</strong></p>
+        <p style="font-style:italic;">Informasi :<strong>{{$data['description']}}</strong></p>
+
+        
+        <p>Terima kasih atas permintaan Jual Unit Kendaraan pada PT Sahabat Group Auto.</p>
+
+        <div class="footer">
+
+            <p>Jika Anda memiliki pertanyaan, silakan hubungi kami di <a href="mailto:support@example.com">sahabatgroupauto.helpdesk.com</a>.</p>
+
+            <p>&copy; {{ date('Y') }} PT Sahabat Group Auto. Semua hak dilindungi.</p>
+
+        </div>
+
+    </div>
+</body>
+
+<style>
+
+    body {
+
+        font-family: Arial, sans-serif;
+
+        background-color: #f4f4f4;
+
+        margin: 0;
+
+        padding: 20px;
+
+    }
+
+    .container {
+
+        max-width: 600px;
+
+        margin: auto;
+
+        background: #ffffff;
+
+        padding: 20px;
+
+        border-radius: 8px;
+
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    }
+
+    h4 {
+
+        color: #333333;
+
+    }
+
+    p {
+
+        color: #555555;
+
+        line-height: 1.6;
+
+    }
+
+    .footer {
+
+        margin-top: 20px;
+
+        text-align: center;
+
+        font-size: 12px;
+
+        color: #888888;
+
+    }
+
+    .highlight {
+
+        font-weight: bold;
+
+        color: #007BFF;
+
+    }
+
+</style>
+</html>
