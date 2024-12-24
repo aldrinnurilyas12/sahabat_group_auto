@@ -24,10 +24,10 @@ This project start build at september 10,2024 until now for development, Using L
 - Employee Master Data
 - Department Master Data
 - Job Position Master Data
-- Employee Attendance Master Data *(Under Development)
+- Employee Attendance Master Data **(Under Development)*
 - Agenda Master Data
-- Blog Master Data *(Under Development)
-- Maintenence Unit Master Data *(Under Development)
+- Blog Master Data **(Under Development)*
+- Maintenence Unit Master Data **(Under Development)*
 - User Information Profile
 
 - **>>> TRANSACTION <<<**
