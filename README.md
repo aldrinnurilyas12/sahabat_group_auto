@@ -14,7 +14,8 @@ This project start build at september 10,2024 until now for development, Using L
 ## Feature in this Information System
 
 # ADMIN PANEL :
-  - **Master Data :**
+  - **MASTER DATA :**
+    
 - Login and Register User Account (Admin & Superadmin)
 - Analytics Dashboard
 - Vehicle Master Data
