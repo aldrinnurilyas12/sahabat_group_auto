@@ -14,7 +14,7 @@ This project start build at september 10,2024 until now for development, Using L
 ## Feature in this Information System
 
 # ADMIN PANEL :
-  - **Master Data**
+  - **Master Data :**
 - Login and Register User Account (Admin & Superadmin)
 - Analytics Dashboard
 - Vehicle Master Data
@@ -29,7 +29,7 @@ This project start build at september 10,2024 until now for development, Using L
 - Maintenence Unit Master Data *(Under Development)
 - User Information Profile
 
-   - **TRANSACTION**
+   - **TRANSACTION :**
 - Appointment
 - Customer Vehicle Request
 - Customer Vehicle Sale Request
@@ -39,6 +39,7 @@ This project start build at september 10,2024 until now for development, Using L
 - Appointment
 - Customer Vehicle Request
 - Customer Vehicle Sale Request
+- Show Vehicle Catalog
 
 
 ## LIBRARY 
