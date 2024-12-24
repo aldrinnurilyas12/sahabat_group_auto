@@ -369,8 +369,9 @@ class EmployeeController extends Controller
             'signature' => 'required|image|mimes:jpeg,png,jpg,gif|max:10048'
         ]);
 
-        $signature_id = EmployeeSignature::find($employee_id);
+        $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
 
+        $signatureId = EmployeeSignature::find($employee_id);
 
         if ($request->hasFile('signature')) {
             $signature = $request->file('signature');
@@ -384,23 +385,23 @@ class EmployeeController extends Controller
             ]);
         }
 
-        if ($signature_id->signature) {
-            $oldsignature = public_path('storage/' . $signature_id->signature);
+        if ($signatureId->signature) {
+            $oldsignature = public_path('storage/' . $signatureId->signature);
             if (file_exists($oldsignature)) {
                 unlink($oldsignature);
             }
         }
-
-
 
         $this->insertLogActivityUsers(__METHOD__);
         session()->flash('message_success', 'Signature berhasil disimpan!');
         return redirect()->route('profile', ['nik' => auth()->user()->nik]);
     }
 
-    public function delete_signature($id)
+    public function delete_signature($employee_id)
     {
-        $emplooyee_sign =  EmployeeSignature::find($id);
+        $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
+        $emplooyee_sign =  EmployeeSignature::find($employee_id);
+
 
         if ($emplooyee_sign) {
             $emplooyee_sign->delete();
@@ -408,6 +409,7 @@ class EmployeeController extends Controller
             if (file_exists($dropSignature)) {
                 unlink($dropSignature);
             }
+
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('delete_success', 'Berhasil hapus data!');
             return redirect()->back();

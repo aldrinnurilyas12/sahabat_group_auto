@@ -90,7 +90,7 @@
                                             <br>
                                             <br>
                                             <button class="btn btn-primary">Upload</button>
-                                            <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteSignature">Hapus</a>
+                                            {{-- <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteSignature">Hapus</a> --}}
                                         </form>
                                     </div>
 
@@ -308,7 +308,7 @@
   
   </style>
 
-@if (Session::has('message_success'))
+    @if (Session::has('message_success'))
     <script>
         Swal.fire({
             title: 'Berhasil',
@@ -321,13 +321,25 @@
         
     @endif
 
+    @if (Session::has('delete_success'))
+    <script>
+        Swal.fire({
+            title: 'Berhasil',
+            text: "{{ Session::get('delete_success') }}",
+            icon: 'error',
+            timer:2000,
+            confirmButtonText: 'OK'
+        });
+    </script>
+        
+    @endif
 
     @if (Session::has('nik_uknown'))
     <script>
         Swal.fire({
             title: 'UKNOWN NIK!',
             text: "{{ Session::get('nik_uknown') }}",
-            icon: 'danger',
+            icon: 'error',
             timer:2000,
             confirmButtonText: 'OK'
         });

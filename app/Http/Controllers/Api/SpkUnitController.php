@@ -225,8 +225,27 @@ class SpkUnitController extends Controller
     {
 
         $spk_data = DB::table('v_spk')->where('id', $id)->get()->toArray();
+        $head_branch_signature = DB::table('employee as e')
+            ->select('nik', 'name', 'position_name', 'signature')
+            ->leftJoin('branch as b', 'e.branch_id', '=', 'b.id')
+            ->leftJoin('job_position as jp', 'e.job_position', '=', 'jp.id')
+            ->join('employee_signature as es', 'e.id', '=', 'es.employee_id')
+            ->where('b.location_name', '=', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
+            ->where('jp.position_name', 'Head of Branch Operations');
 
-        $pdf = Pdf::loadView('layouts.pdf.spk', ['spk_data' => $spk_data]);
+        $sales_manager_signature = DB::table('employee as e')
+            ->select('nik', 'name', 'position_name', 'signature')
+            ->leftJoin('branch as b', 'e.branch_id', '=', 'b.id')
+            ->leftJoin('job_position as jp', 'e.job_position', '=', 'jp.id')
+            ->join('employee_signature as es', 'e.id', '=', 'es.employee_id')
+            ->where('b.location_name', '=', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
+            ->where('jp.position_name', 'Sales Manager');
+
+        $pdf = Pdf::loadView('layouts.pdf.spk', [
+            'spk_data' => $spk_data,
+            'head_branch_signature' => $head_branch_signature,
+            'sales_manager_signature' => $sales_manager_signature
+        ]);
 
         return $pdf->download();
     }

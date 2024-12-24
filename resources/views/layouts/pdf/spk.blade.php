@@ -64,25 +64,27 @@
         
 
         <hr>
-        <div  class="signature-approval">
-            <div class="head-branch">
-               <p><strong>Head Branch</strong></p> 
-                <img width="80" height="80" src="{{asset('assets/images/test.png')}}" alt="">
+        <div style="margin-bottom: 70px;"  class="signature-approval">
+            <div style="float: left; margin-right: 5rem;" class="head-branch">
+               <p style="font-size: 13px;"><strong>Kepala Cabang</strong></p> 
+                <img width="80" height="80" src="{{ public_path('storage/' . $head_branch_signature->first()->signature) }}" alt="">
                 <br>
-                Antony Salim
-
-
-                <p><strong>Head Branch</strong></p> 
-                <img width="80" height="80" src="{{asset('assets/images/test.png')}}" alt="">
-                <br>
-                Joana Siska
+                <p style="font-size: 13px;">{{$head_branch_signature->first()->name}}</p> 
             </div>
 
-             <div class="customer-signature">
-                
-                 <img width="80" height="80" src="{{asset('assets/images/test.png')}}" alt="">
-                 <br>
-                 <p>{{$spk->customer}}</p>
+            <div style="float: left;margin-right: 9rem;" class="sales-manager">
+                <p style="font-size: 13px;"><strong>Sales Manager</strong></p> 
+                <img width="80" height="80" src="{{ public_path('storage/' . $sales_manager_signature->first()->signature) }}" alt="">
+                <br>
+               <p style="font-size: 13px;">{{$sales_manager_signature->first()->name}}</p>  
+            </div>
+
+             <div style="margin-top: 10px;"  class="customer-signature">
+                <br>
+                <br>
+                <p style="margin-bottom: 5px;font-size:12px;" class="text-secondary">Materai</p>
+                <br>
+                 <p style="font-size: 13px;">{{$spk->customer}}</p>
              </div>
     
         </div>

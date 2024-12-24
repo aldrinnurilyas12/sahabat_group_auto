@@ -146,7 +146,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/export_employee', [EmployeeController::class, 'employee_export'])->name('export_employee');
     Route::post('upload_signature', [EmployeeController::class, 'upload_employee_signature'])->name('upload_signature');
     Route::put('upload_update_signature/{employee_id}', [EmployeeController::class, 'update_signature'])->name('upload_update_signature');
-    Route::delete('delete_signature/{id}', [EmployeeController::class, 'delete_signature'])->name('delete_signature');
+    Route::delete('delete_signature/{employee_id}', [EmployeeController::class, 'delete_signature'])->name('delete_signature');
 
 
     // ROUTE FOR API employee
