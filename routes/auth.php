@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\MasterVehicleData;
 use App\Http\Controllers\Api\VerifyEmailController;
 use App\Http\Controllers\Api\MasterAppointment;
 use App\Http\Controllers\Api\DepartmentController;
+use App\Http\Controllers\Api\MaintenanceUnitController;
 use App\Http\Controllers\Api\SpkUnitController;
 use App\Http\Controllers\Api\VehicleSalesRequest;
 use App\Http\Controllers\ProfileController;
@@ -265,4 +266,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/get_unit/{vehicleId}', [SpkUnitController::class, 'getUnit']);
     Route::put('confirmed_status_spk/{id}', [SpkUnitController::class, 'confirmedSpkUnit'])->name('confirmed_status_spk');
     Route::get('get_pdf/{id}', [SpkUnitController::class, 'download_spk'])->name('get_pdf');
+
+    // Maintenence Unit
+    Route::apiResource('master_maintenance_unit', App\Http\Controllers\Api\MaintenanceUnitController::class);
+    Route::get('maintenance_unit_create', [MaintenanceUnitController::class, 'maintenance_layout'])->name('maintenance_unit_create');
+    Route::get('maintenance_unit_edit/{id}', [MaintenanceUnitController::class, 'maintenance_edit_layout'])->name('maintenance_unit_edit');
+    Route::put('maintenance_update/{id}', [MaintenanceUnitController::class, 'update'])->name('maintenance_update');
 });

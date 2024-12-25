@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 use App\Models\User;
+use Psy\Readline\Hoa\Console;
 
 class LoginAdminController extends Controller
 {
@@ -31,7 +32,7 @@ class LoginAdminController extends Controller
         ]);
     }
 
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request)
     {
         $request->validate([
             'nik' => 'required|max:6'
@@ -44,6 +45,24 @@ class LoginAdminController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        $credentials = $request->only('nik', 'password');
+
+        if (!$token = auth()->guard('api')->attempt($credentials)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nik atau password salah'
+            ]);
+        }
+
+        // $dataResponseToken =  response()->json([
+        //     'success' => true,
+        //     'user'    => auth()->guard('api')->user(),
+        //     'token'   => $token
+        // ], 200);
+
+        // return $dataResponseToken;
+
         $this->insertLogActivityUsers(__METHOD__);
         User::where('nik', Auth::user()->nik)->update(['last_seen' => now()]);
         return redirect()->intended(route('dashboard', absolute: false));
