@@ -136,7 +136,7 @@ class MasterVehicleAdvertisement extends Controller
 
         // execute just a year for all data
         if ($tahun === 'alldata') {
-            $vehicle_data = DB::table('v_vehicle_advertisement')->whereRaw('YEAR(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
+            $vehicle_data = DB::table('v_vehicle_advertisement')->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
         }
 
         if ($bulan) {

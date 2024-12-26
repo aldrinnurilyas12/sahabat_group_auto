@@ -272,4 +272,6 @@ Route::middleware('auth')->group(function () {
     Route::get('maintenance_unit_create', [MaintenanceUnitController::class, 'maintenance_layout'])->name('maintenance_unit_create');
     Route::get('maintenance_unit_edit/{id}', [MaintenanceUnitController::class, 'maintenance_edit_layout'])->name('maintenance_unit_edit');
     Route::put('maintenance_update/{id}', [MaintenanceUnitController::class, 'update'])->name('maintenance_update');
+    Route::get('filter_maintenance', [MaintenanceUnitController::class, 'filter_maintenance'])->name('filter_maintenance');
+    Route::post('maintenance_export', [MaintenanceUnitController::class, 'download_excel'])->name('maintenance_export');
 });

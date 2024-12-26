@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\MaintenanceExport;
 use App\Http\Controllers\Controller;
 use App\Models\MaintenanceUnit;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\MasterMainMenuController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
 
 class MaintenanceUnitController extends Controller
 {
@@ -21,16 +23,36 @@ class MaintenanceUnitController extends Controller
         $this->MasterMainMenuController = $MasterMainMenuController;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
+        $months = DB::table('months')->get();
+        $years = [
+            '2020',
+            '2021',
+            '2022',
+            '2023',
+            '2024',
+            '2025',
+            '2026',
+            '2027',
+            '2028'
+        ];
+
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+
+
+
         $maintenance_data = DB::table('maintenance_unit as mtc')
             ->select('mtc.id', 'vehicle_id', 'unit', 'maintenance_type', 'cost', 'maintenance_date', 'maintenance_detail', 'mechanic_name', 'foto', 'mtc.created_at', 'mtc.created_by', 'mtc.updated_at', 'mtc.created_by', 'mtc.updated_by')
-            ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')->get();
-        return view('layouts.admin_views.maintenance_unit.maintenance', compact('maintenance_data', 'grouped_sub_menu', 'sidebar_menu'));
+            ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')
+            ->where('location_name', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
+            ->get();
+        return view('layouts.admin_views.maintenance_unit.maintenance', compact('maintenance_data', 'grouped_sub_menu', 'sidebar_menu', 'bulan', 'tahun', 'months', 'years'));
     }
 
     /**
@@ -59,7 +81,7 @@ class MaintenanceUnitController extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        $vehicle_data = DB::table('v_vehicle')
+        $maintenance_data = DB::table('v_vehicle')
             ->where('location_name', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
             ->whereNotIn('category_name', ['Unit Terjual', 'Unit Booked'])
             ->get();
@@ -122,7 +144,7 @@ class MaintenanceUnitController extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        $vehicle_data = DB::table('v_vehicle')
+        $maintenance_data = DB::table('v_vehicle')
             ->where('location_name', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
             ->whereNotIn('category_name', ['Unit Terjual', 'Unit Booked'])
             ->get();
@@ -134,7 +156,8 @@ class MaintenanceUnitController extends Controller
 
         $maintenance_data = DB::table('maintenance_unit as mtc')
             ->select('mtc.id', 'vehicle_id', 'unit', 'maintenance_type', 'cost', 'maintenance_date', 'maintenance_detail', 'mechanic_name', 'foto', 'mtc.created_at', 'mtc.created_by', 'mtc.updated_at', 'mtc.created_by', 'mtc.updated_by')
-            ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')->where('mtc.id', $request->id)->get();
+            ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')
+            ->where('mtc.id', $request->id)->get();
 
         $maintenance_category = DB::table('maintenance_category')->get();
         return view('layouts.admin_views.maintenance_unit.edit.maintenance_edit', compact('maintenance_data', 'vehicle_data', 'mechanic', 'maintenance_category', 'grouped_sub_menu', 'sidebar_menu'));
@@ -171,6 +194,101 @@ class MaintenanceUnitController extends Controller
             session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->route('master_maintenance_unit.index');
         }
+    }
+
+    public function filter_maintenance(Request $request)
+    {
+
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+
+        $months = DB::table('months')->get();
+        $years = [
+            '2020',
+            '2021',
+            '2022',
+            '2023',
+            '2024',
+            '2025',
+            '2026',
+            '2027',
+            '2028'
+        ];
+
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+
+
+
+
+        // execute just a month for all data
+        if ($bulan === 'alldata') {
+            $maintenance_data = DB::table('maintenance_unit as mtc')
+                ->select('mtc.id', 'vehicle_id', 'unit', 'maintenance_type', 'cost', 'maintenance_date', 'maintenance_detail', 'mechanic_name', 'foto', 'mtc.created_at', 'mtc.created_by', 'mtc.updated_at', 'mtc.created_by', 'mtc.updated_by')
+                ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')
+                ->where('location_name', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
+                ->whereRaw('YEAR(mtc.created_at) = ?', [$tahun])->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        // execute just a year for all data
+        if ($tahun === 'alldata') {
+            $maintenance_data = DB::table('maintenance_unit as mtc')
+                ->select('mtc.id', 'vehicle_id', 'unit', 'maintenance_type', 'cost', 'maintenance_date', 'maintenance_detail', 'mechanic_name', 'foto', 'mtc.created_at', 'mtc.created_by', 'mtc.updated_at', 'mtc.created_by', 'mtc.updated_by')
+                ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')
+                ->where('location_name', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
+                ->whereRaw('MONTH(mtc.created_at) = ?', [$bulan])->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        if ($bulan) {
+            $maintenance_data = DB::table('maintenance_unit as mtc')
+                ->select('mtc.id', 'vehicle_id', 'unit', 'maintenance_type', 'cost', 'maintenance_date', 'maintenance_detail', 'mechanic_name', 'foto', 'mtc.created_at', 'mtc.created_by', 'mtc.updated_at', 'mtc.created_by', 'mtc.updated_by')
+                ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')
+                ->where('location_name', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
+                ->whereRaw('MONTH(mtc.created_at) = ?', [$bulan])->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        if ($tahun) {
+            $maintenance_data = DB::table('maintenance_unit as mtc')
+                ->select('mtc.id', 'vehicle_id', 'unit', 'maintenance_type', 'cost', 'maintenance_date', 'maintenance_detail', 'mechanic_name', 'foto', 'mtc.created_at', 'mtc.created_by', 'mtc.updated_at', 'mtc.created_by', 'mtc.updated_by')
+                ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')
+                ->where('location_name', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
+                ->whereRaw('YEAR(mtc.created_at) = ?', [$tahun])->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        if ($bulan && $tahun) {
+            $maintenance_data = DB::table('maintenance_unit as mtc')
+                ->select('mtc.id', 'vehicle_id', 'unit', 'maintenance_type', 'cost', 'maintenance_date', 'maintenance_detail', 'mechanic_name', 'foto', 'mtc.created_at', 'mtc.created_by', 'mtc.updated_at', 'mtc.created_by', 'mtc.updated_by')
+                ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')
+                ->where('location_name', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
+                ->whereRaw('MONTH(mtc.created_at) = ?', [$bulan])->whereRaw('YEAR(mtc.created_at) = ?', [$tahun])->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        if ($tahun === 'alldata' && $bulan === 'alldata') {
+            $maintenance_data = DB::table('maintenance_unit as mtc')
+                ->select('mtc.id', 'vehicle_id', 'unit', 'maintenance_type', 'cost', 'maintenance_date', 'maintenance_detail', 'mechanic_name', 'foto', 'mtc.created_at', 'mtc.created_by', 'mtc.updated_at', 'mtc.created_by', 'mtc.updated_by')
+                ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')
+                ->where('location_name', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        return view('layouts.admin_views.maintenance_unit.maintenance', compact('maintenance_data', 'grouped_sub_menu', 'sidebar_menu', 'bulan', 'tahun', 'months', 'years'));
+    }
+
+
+    public function download_excel(Request $request)
+    {
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+
+        $fileName = 'Data_Maintenance_Unit' . '-' . $bulan . '-' . $tahun . '.xlsx';
+        return Excel::download(new MaintenanceExport($bulan, $tahun), $fileName);
     }
 
     /**
