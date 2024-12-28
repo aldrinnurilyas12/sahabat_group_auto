@@ -110,3 +110,68 @@
     box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
 }
 
+
+
+
+#loadingSpinnerWrapper {
+    position: fixed; /* Fix posisi spinner */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none; /* Spinner disembunyikan saat halaman dimuat */
+    justify-content: center; /* Horizontal center */
+    align-items: center; /* Vertical center */
+    background-color: rgba(0, 0, 0, 0.517); /* Background semi-transparan */
+    z-index: 9999; /* Pastikan spinner berada di atas konten lainnya */
+  }
+  
+  .spinner-border {
+    color: yellow;
+    width: 3rem;
+    height: 3rem; /* Pastikan tinggi spinner diatur */
+  }
+
+
+  .modal-new {
+display: none; /* Sembunyikan modal secara default */
+position: fixed; /* Tetap di tempat */
+z-index: 1; /* Di atas elemen lain */
+left: 0;
+top: 0;
+width: 100%; /* Lebar penuh */
+height: 100%; /* Tinggi penuh */
+overflow: auto; /* Aktifkan scroll jika diperlukan */
+background-color: rgb(0,0,0); /* Warna latar belakang */
+background-color: rgba(0,0,0,0.4); /* Latar belakang transparan */
+}
+
+
+        
+
+        /* Konten Modal */
+.modal-content-new {
+background-color: #fff;
+margin: 15% auto;
+padding: 20px;
+border: 1px solid #888;
+width: 80%;
+max-width: 500px;
+border-radius: 10px;
+  }
+
+  /* Tombol Tutup */
+  .close {
+color: #aaa;
+float: right;
+font-size: 28px;
+font-weight: bold;
+cursor: pointer;
+  }
+
+  .close:hover,
+  .close:focus {
+color: black;
+text-decoration: none;
+cursor: pointer;
+  }

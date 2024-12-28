@@ -126,6 +126,68 @@
                         </div>
                     </div>
                 </div>
+
+                <div style="color: black;" class="form-group">
+                    <form  action="{{route('filter_analytics')}}" method="GET">
+
+                        <div style="display: flex;gap:10px;" class="grouped-container">
+                            
+                            <div style="display: block" class="select-group">
+                            <label for="">Bulan</label>
+                            <select class="form-control" name="bulan" id="status">
+                                <option value="">--- Pilih Bulan ---</option>
+                                <option value="alldata">Semua Bulan</option>
+                                @foreach($months as $month)
+                                    <option value="{{$month->id}}">{{$month->month_list}}</option>
+                                @endforeach
+                               
+                            </select>
+                            @if ($errors->has('year'))
+                            <span class="text-danger">{{ $errors->first('year') }}</span>
+                            @endif
+                            </div>
+                            
+                            <div style="display: block" class="select-group">
+                                <label for="">Tahun</label>
+                                <select class="form-control" name="tahun" id="status">
+                                    <option value="">--- Pilih Tahun ---</option>
+                                    <option value="alldata">Semua Tahun</option>
+                                    @foreach($years as $yrs)
+                                        <option value="{{$yrs}}">{{$yrs}}</option>
+                                    @endforeach
+                                   
+                                </select>
+                                @if ($errors->has('year'))
+                                <span class="text-danger">{{ $errors->first('year') }}</span>
+                                @endif
+                                </div>
+
+                            <button style="height: 40px; align-self:end;" type="submit" class="btn btn-dark">Pilih</button>
+                            <a href="{{route('master_vehicle_advertisement.index')}}" style="height: 40px; align-self:end;" class="btn btn-secondary">Reset</a>
+                        </div>
+                        &nbsp;
+                     
+                    </form>
+                    <div style="font-size:14px;" class="result-selected">
+                           
+                                <strong>
+                                    Data terpilih:
+                                </strong>
+                                <br>
+                                <!-- Memastikan bahwa $month adalah objek dan mengakses propertinya, misalnya 'name' -->
+                                <div style="width: 50%;" class="alert alert-warning">
+                                    Bulan :  {{$bulan}}
+                                    <br>
+                                    Tahun : {{$tahun}}
+                                    <!-- Menampilkan tahun yang dipilih dari array $year -->
+                                     </div>
+
+
+                     </div> 
+                    
+                    
+
+                </div>
                 
                     {{-- area charts --}}
                     <div class="row">
@@ -273,7 +335,7 @@
 </body>
 
 <script>
-    
+    // total clicked chart
     fetch('/get_clicked_data').then(response => response.json())
     .then(data => {
       var options = {
@@ -301,7 +363,7 @@
     });
 
 
-
+    // brand total chart
     fetch('/get_brand_total').then(response => response.json())
     .then(data => {
       var options = {
@@ -330,6 +392,50 @@
       var piechart = new ApexCharts(document.querySelector("#piechart"), options);
       piechart.render();
     });
+    
+
+    // revenue chart
+    fetch('/get_revenue')
+    .then(response => response.json())
+    .then(data => {
+        var options = {
+            series: [{
+                name: "Revenue",
+                data: data.price
+            }],
+            chart: {
+                height: 350,
+                type: 'line',
+                zoom: {
+                    enabled: false
+                }
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'straight' // Mengubah menjadi 'smooth' untuk tampilan yang lebih baik
+            },
+            title: {
+                text: 'Revenue',
+                align: 'left'
+            },
+            grid: {
+                row: {
+                    colors: ['#f3f3f3', 'transparent'], // Mengatur warna baris
+                    opacity: 0.5
+                },
+            },
+            xaxis: {
+                categories: data.month_list // Menggunakan daftar bulan dari server
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#revenueChart"), options);
+        chart.render();
+    })
+    .catch(error => console.error('Error fetching revenue data:', error)); // Menangani error
+
     
 
 </script>

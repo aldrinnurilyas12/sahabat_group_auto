@@ -9,6 +9,9 @@
 <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
 <title>Edit data Karyawan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
 
 <body>
     <div id="wrapper">
@@ -21,8 +24,6 @@
             <div style="background: white;">
                 @include('layouts.admin_views.header')
                 <h4 style="text-align:center;color:black;font-weight:bold;">Profil Pengguna [{{app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->nik . ' - ' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name}}]</h4>
-                
-                
                 <div style="display: flex; flex-wrap:wrap;gap:30px;justify-content:center;width:100%;" class="form-group-content">
 
                     <div style="width: 320px; height:max-content; padding:8px;" class="card shadow mb-4">
@@ -44,16 +45,19 @@
                             <h4 style="font-size: 14px;color:rgb(0, 0, 0);text-align:center;font-style:italic;">{{app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name}}</h4>
                             <hr>
                            @if($user_picture->isNotEmpty())
-                            <form action="{{route('update_picture',$employee->first()->id)}}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                @method('PUT')
-                                <label style="color: black;" for=""><strong>Ubah Foto</strong></label>
-                                <input type="text" name="user_id" value="{{app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id}}" hidden>
-                                <input type="file" name="users_foto">
-                                <br>
-                                <br>
-                                <button type="submit" class="btn btn-primary">Simpan Foto</button>
-                            </form>
+                            <div style="display: block; gap:10px;" class="button-component">
+                                <form action="{{route('update_picture',$employee->first()->id)}}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    @method('PUT')
+                                    <label style="color: black;" for=""><strong>Ubah Foto</strong></label>
+                                    <input type="text" name="user_id" value="{{app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id}}" hidden>
+                                    <input type="file" name="users_foto">
+                                    <br>
+                                    <br>
+                                    <button type="submit" class="btn btn-primary">Simpan Foto</button>
+                                    <button type="button" id="deleteFoto" class="btn btn-danger">Hapus</button>
+                                </form>
+                            </div>
                             @else
                             <form action="{{route('users_picture')}}" method="POST" enctype="multipart/form-data">
                                 @csrf
@@ -68,7 +72,6 @@
                             @endif
                             <br>
                             <hr>
-                            
                             <div class="signature-img">
                                 @if($signature_employee->isNotEmpty())
                                 <div style="display: flex;justify-content:center;" class="center-signature">
@@ -90,7 +93,7 @@
                                             <br>
                                             <br>
                                             <button class="btn btn-primary">Upload</button>
-                                            {{-- <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteSignature">Hapus</a> --}}
+                                            <a class="btn btn-danger" href="#" data-toggle="modal" data-target="#deleteSignature">Hapus</a>
                                         </form>
                                     </div>
 
@@ -109,7 +112,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div style="width:70%; color:black;" class="container-content">
                         <div style="padding:8px;width:100%;" class="card shadow mb-4">
                             <div class="card-header py-3">
@@ -229,33 +231,40 @@
                                 </div>
                         </div>
                     </div>
-            
                 </div>
-
-                
             </div>
 
-            {{-- <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('layouts.admin_views.update-password-form')
-                </div>
-            </div> --}}
+            {{-- modal hapus foto --}}
 
-            {{-- <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('layouts.admin_views.delete-user-form')
+            <div id="myModal" class="modal-new"> <!-- Tambahkan style display: none untuk menyembunyikan modal saat pertama kali dimuat -->
+                <div class="modal-content-new">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteSignatures">Hapus foto profile?</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span class="close" id="closeModalBtn">&times;</span>
+                        </button>
+                    </div>
+            
+                    <br>
+                    <form method="POST" action="{{ route('delete_foto', $employee->first()->id) }}">
+                        @csrf
+                        @method('DELETE')
+                        <br>
+                        <button type="submit" class="btn btn-danger">Hapus</button>
+                    </form>
                 </div>
-            </div> --}}
+            
+            </div>
             @include('layouts.admin_views.footer')
         </div>
 
-          {{-- modal change status --}}
-          <div class="modal fade" id="deleteSignature" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+          {{-- modal delete signature --}}
+          <div class="modal fade" id="deleteSignature" tabindex="-1" role="dialog" aria-labelledby="deleteSignatures"
           aria-hidden="true">
-          <div class="modal-dialog" role="document">
+          <div class="modal-dialog" role="signature">
               <div class="modal-content">
                   <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalLabel">Hapus tanda tangan digital</h5>
+                      <h5 class="modal-title" id="deleteSignatures">Hapus tanda tangan digital</h5>
                       <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">×</span>
                       </button>
@@ -272,41 +281,16 @@
           </div>
           {{-- end --}}
 
-
     </div>
 
-{{-- spinner --}}
-<div id="loadingSpinnerWrapper">
-    <div class="spinner-border" role="status">
+    {{-- spinner --}}
+    <div id="loadingSpinnerWrapper">
+        <div class="spinner-border" role="status">
+        </div>
     </div>
-  </div>
 </body>
   
-  <style>
-    #loadingSpinnerWrapper {
-    position: fixed; /* Fix posisi spinner */
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: none; /* Spinner disembunyikan saat halaman dimuat */
-    justify-content: center; /* Horizontal center */
-    align-items: center; /* Vertical center */
-    background-color: rgba(0, 0, 0, 0.517); /* Background semi-transparan */
-    z-index: 9999; /* Pastikan spinner berada di atas konten lainnya */
-  }
-  
-  .spinner-border {
-    color: yellow;
-    width: 3rem;
-    height: 3rem; /* Pastikan tinggi spinner diatur */
-  }
 
-
-
-  
-  
-  </style>
 
     @if (Session::has('message_success'))
     <script>
@@ -326,7 +310,7 @@
         Swal.fire({
             title: 'Berhasil',
             text: "{{ Session::get('delete_success') }}",
-            icon: 'error',
+            icon: 'success',
             timer:2000,
             confirmButtonText: 'OK'
         });
@@ -359,21 +343,37 @@
     window.addEventListener('load', function() {
        var loadingSpinnerWrapper = document.getElementById('loadingSpinnerWrapper');
    
-       // Log elemen untuk memastikan spinner ditemukan
-         // Cek apakah elemen ditemukan
-   
        if (loadingSpinnerWrapper) {
-           // Menampilkan spinner saat halaman dimuat
            loadingSpinnerWrapper.style.display = 'flex';
-          
-   
-           // Menyembunyikan spinner setelah 2 detik (2000ms)
            setTimeout(function() {
-               
                loadingSpinnerWrapper.style.display = 'none';  // Sembunyikan spinner setelah 2 detik
            }, 1000);  // 2000ms = 2 detik
        } else {
            console.log("Elemen spinner tidak ditemukan!");
        }
    });
-   </script>
+
+    //    script for modal
+
+    document.addEventListener("DOMContentLoaded", function() {
+    var modal = document.getElementById("myModal");
+    var btn = document.getElementById("deleteFoto");
+    var span = document.getElementById("closeModalBtn");
+
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    });
+</script>
+

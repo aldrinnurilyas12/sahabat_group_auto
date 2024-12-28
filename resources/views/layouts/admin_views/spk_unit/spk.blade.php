@@ -65,7 +65,7 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Aksi</th>
+                                            <th>PDF</th>
                                             <th>Unit</th>
                                             <th>Lokasi Unit</th>
                                             <th>Metode Bayar</th>
@@ -82,23 +82,26 @@
                                             <th>Created By</th>
                                             <th>Updated At</th>
                                             <th>Updated By</th>
-                                           
                                         </tr>
                                     </thead>
                                    
                                     <tbody>
-                                        <?php $no = 1;  ?>
+                                        <?php $no = 1;
+                                        ?>
                                         @foreach($spk_data as $spk)
                                         <tr style="width: 200px;">
                                             <td><?php echo $no++ ?></td>
                                             <td><div style="display:flex; justify-content:center;gap:8px; " class="action">
-                                                <a href=""><i class="fa fa-file"></i></a>
-                                                <a href="{{route('spk_edit',['id'=> $spk->id])}}"><i class="fas fa-edit"></i></a>
+                                                @if($spk->approval_by_head_branch == 'Y' && $spk->approval_by_sales_manager == 'Y')
+                                                <a href="{{route('get_pdf', $spk->id)}}"><i class="fa fa-file"></i></a>
+                                                @else
+                                                <p class="text-secondary">SPK belum dikonfirmasi</p>
+                                                @endif
                                             </td>
                                             <td>{{$spk->unit}}</td>
                                             <td>{{$spk->location_unit}}</td>
                                             <td>{{$spk->payment_method}}</td>
-                                            <td>{{$spk->price}}</td>
+                                            <td>{{"Rp " .number_format($spk->price)}}</td>
                                             <td>{{$spk->price_nominal}}</td>
                                             <td>{{$spk->down_payment}}</td>
                                             <td>{{$spk->customer}}</td>

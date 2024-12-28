@@ -400,7 +400,7 @@ class EmployeeController extends Controller
     public function delete_signature($employee_id)
     {
         $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
-        $emplooyee_sign =  EmployeeSignature::find($employee_id);
+        $emplooyee_sign =  EmployeeSignature::where('employee_id', $employee_id)->first();
 
 
         if ($emplooyee_sign) {
@@ -415,6 +415,28 @@ class EmployeeController extends Controller
             return redirect()->back();
         }
     }
+
+
+    public function delete_foto($employee_id)
+    {
+        $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
+        $users_picture =  UsersPicture::where('user_id', $employee_id)->first();
+
+
+        if ($users_picture) {
+            $users_picture->delete();
+            $dropPicture = public_path('storage/' . $users_picture->users_foto);
+            if (file_exists($dropPicture)) {
+                unlink($dropPicture);
+            }
+
+            $this->insertLogActivityUsers(__METHOD__);
+            session()->flash('delete_success', 'Berhasil hapus data!');
+            return redirect()->back();
+        }
+    }
+
+
 
     /**
      * Remove the specified resource from storage.

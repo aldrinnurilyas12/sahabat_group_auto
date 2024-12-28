@@ -50,11 +50,12 @@ class SpkUnitController extends Controller
 
         if ($plaza_auto) {
             if ($branch_role || $sales_manager_role) {
-                $spk_data = DB::table('v_spk')->where('location_unit', 'PLAZA_AUTO')->orderBy('created_at', 'DESC')->get();
+                $spk_data = DB::table('v_spk')->where('location_unit', 'PLAZA AUTO')->orderBy('created_at', 'DESC')->get();
                 $all_spk_data = DB::table('v_spk')->where('location_unit', 'PLAZA AUTO')->where('approval_by_head_branch', 'Y')->where('approval_by_sales_manager', 'Y')->orderBy('created_at', 'DESC')->get();
                 return view('layouts.admin_views.spk_unit.spk_branch', compact('spk_data', 'all_spk_data', 'grouped_sub_menu', 'sidebar_menu'));
             } else {
-                $spk_data = DB::table('v_spk')->where('location_unit', 'PLAZA_AUTO')->orderBy('created_at', 'DESC')->get();
+                $spk_data = DB::table('v_spk')->where('location_unit', 'PLAZA AUTO')->orderBy('created_at', 'DESC')->get();
+                return view('layouts.admin_views.spk_unit.spk', compact('spk_data', 'grouped_sub_menu', 'sidebar_menu'));
             }
         } elseif ($permata_abadi_motor) {
             if ($branch_role || $sales_manager_role) {
@@ -174,7 +175,7 @@ class SpkUnitController extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($insertTime >= 7 && $insertTime <= 22) {
 
             if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations') {
                 $updateDataHeadBranch = DB::table('spk_unit')->where('id', $request->id)->update([

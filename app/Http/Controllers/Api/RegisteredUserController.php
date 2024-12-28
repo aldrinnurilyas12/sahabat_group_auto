@@ -85,7 +85,7 @@ class RegisteredUserController extends Controller
             'employee_id' => 'unique:users'
         ]);
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($insertTime >= 7 && $insertTime <= 22) {
             $user = User::create([
                 'employee_id' => $request->employee_id,
                 'nik' => $validate['nik'],

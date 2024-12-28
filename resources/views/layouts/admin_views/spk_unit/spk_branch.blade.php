@@ -151,7 +151,7 @@
                                                         <td>{{$spk->unit}}</td>
                                                         <td>{{$spk->location_unit}}</td>
                                                         <td>{{$spk->payment_method}}</td>
-                                                        <td>{{$spk->price}}</td>
+                                                        <td>{{"Rp " .number_format($spk->price)}}</td>
                                                         <td>{{$spk->price_nominal}}</td>
                                                         <td>{{$spk->down_payment}}</td>
                                                         <td>{{$spk->customer}}</td>
@@ -232,7 +232,7 @@
                                                         <td>{{$spk->unit}}</td>
                                                         <td>{{$spk->location_unit}}</td>
                                                         <td>{{$spk->payment_method}}</td>
-                                                        <td>{{$spk->price}}</td>
+                                                        <td>{{"Rp " .number_format($spk->price)}}</td>
                                                         <td>{{$spk->price_nominal}}</td>
                                                         <td>{{$spk->down_payment}}</td>
                                                         <td>{{$spk->customer}}</td>

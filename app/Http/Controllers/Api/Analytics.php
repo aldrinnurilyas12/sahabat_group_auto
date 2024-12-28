@@ -19,12 +19,35 @@ class Analytics extends Controller
     }
 
 
-    public function index(): View
+    public function index(Request $request): View
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $employee = DB::table('v_employee')->get();
+
+        $months = DB::table('months')->get();
+        $years = [
+            '2020',
+            '2021',
+            '2022',
+            '2023',
+            '2024',
+            '2025',
+            '2026',
+            '2027',
+            '2028'
+        ];
+
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+
+        $head_finance = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name = 'Head of Finance Operation';
+        $head_business_development = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name = 'Head of Business Development';
+        $head_marketing = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name = 'Head of Marketing';
+        $sales_manager = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name = 'Sales Manager';
+        $head_of_branch = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name = 'Head of Branch Operations';
+        $finanee_staff = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name = 'Finance Staff';
 
         $vehicle_brand = DB::table('vehicle_brand as vb')
             ->join('vehicle as v', 'vb.id', '=', 'v.brand')
@@ -41,12 +64,14 @@ class Analytics extends Controller
 
         $total_clicked = $vehicle_total_clicked->values();
 
+        $revenue = $this->get_revenue($request);
+
         $vehicle_ads = DB::table('vehicle_advertisement')->where('is_active', 'Y')->count();
         $appointment_total = DB::table('appointment')->count();
         $unit_request = DB::table('customer_vehicle_request')->count();
         $sale_unit_request = DB::table('vehicle_sale_request')->count();
 
-        return view('layouts.admin_views.analytics.analytics', compact('employee', 'grouped_sub_menu', 'sidebar_menu', 'appointment_total', 'unit_request', 'sale_unit_request', 'vehicle_ads', 'vehicle_total_clicked', 'vehicle_total', 'vehicle_brand'));
+        return view('layouts.admin_views.analytics.analytics', compact('revenue', 'employee', 'grouped_sub_menu', 'sidebar_menu', 'appointment_total', 'unit_request', 'sale_unit_request', 'vehicle_ads', 'vehicle_total_clicked', 'vehicle_total', 'vehicle_brand', 'years', 'months', 'bulan', 'tahun'));
     }
 
     public function get_total_vehicle_ads()
@@ -79,6 +104,42 @@ class Analytics extends Controller
             'brand_total' => $brand_total
         ]);
     }
+
+
+
+    public function get_revenue(Request $request)
+    {
+
+
+
+        // Fetching total revenue for each month
+        $revenue_by_month = DB::table('v_spk')
+            ->select(DB::raw('MONTH(created_at) as month'), DB::raw('SUM(price) as total_revenue'))
+            ->groupBy(DB::raw('MONTH(created_at)'))
+            ->orderBy('month') // Menambahkan urutan berdasarkan bulan
+            ->get();
+
+        // Mengambil daftar bulan
+        $month_list = DB::table('months')->pluck('month_list'); // Menggunakan pluck untuk mendapatkan array
+
+        // Menyiapkan data untuk dikirim ke frontend
+        $revenue_data = [];
+        foreach ($revenue_by_month as $revenue) {
+            $revenue_data[$revenue->month] = $revenue->total_revenue;
+        }
+
+        // Mengisi data revenue dengan 0 untuk bulan yang tidak ada
+        $total_revenue = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $total_revenue[] = $revenue_data[$i] ?? 0; // Menggunakan null coalescing operator
+        }
+
+        return response()->json([
+            'price' => $total_revenue,
+            'month_list' => $month_list
+        ]);
+    }
+
 
     /**
      * Show the form for creating a new resource.
