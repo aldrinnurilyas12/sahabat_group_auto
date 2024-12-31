@@ -174,7 +174,7 @@
                                                 <a style="size: 12px;" href="#" data-toggle="modal" data-target="#deleteEmployee{{$emp->id}}"><i class="fas fa-trash"></i></a>
                                             </td>
                                             <td>{{$emp->nik}}</td>
-                                            <td>{{$emp->name}}</td>
+                                            <td>{{ Str::upper($emp->name)}}</td>
                                             <td>{{$emp->address}}</td>
                                             <td>{{$emp->age}}</td>
                                             <td>{{$emp->phone_number}}</td>

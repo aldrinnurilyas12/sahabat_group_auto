@@ -32,18 +32,18 @@
                 
                     </div>
                     <div class="form-group">
-                        <label>Nama Karyawan</label>
+                        <label>Nama Karyawan <span style="color: red">*</span> </label>
                         <input type="text" class="form-control" name="name" value="{{$emp->name}}" autocomplete="off">
                         @if ($errors->has('name'))
                         <span class="text-danger">{{ $errors->first('name') }}</span>
                         @endif
                     </div>
                     <div class="form-group">
-                        <label>Alamat</label>
+                        <label>Alamat <span style="color: red">*</span> </label>
                         <input type="text" class="form-control" name="address" value="{{$emp->address}}"  autocomplete="off">
                     </div>
                     <div class="form-group">
-                    <label for="">No.Telepon</label>
+                    <label for="">No.Telepon <span style="color: red">*</span> </label>
                     <div class="input-group mb-2">
                         <div class="input-group-prepend">
                         <div class="input-group-text">+62</div>
@@ -52,12 +52,12 @@
                     </div>
                     </div>
                     <div class="form-group">
-                        <label>Email</label>
+                        <label>Email <span style="color: red">*</span> </label>
                         <input type="text" class="form-control" name="email" value="{{$emp->email}}" autocomplete="off">
                     </div>
 
                     <div class="form-group">
-                        <label for="">Kantor Cabang</label>
+                        <label for="">Kantor Cabang <span style="color: red">*</span> </label>
                     <small> <p style="color: gray; font-style:italic;font-size:12px;">*pilih kantor cabang jika ingin merubah</p></small>
                             <select class="form-control" name="branch_id" id="branchSelected">
                                 @foreach($branch as $cabang)
@@ -67,13 +67,30 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="">Posisi Pekerjaan</label>
+                        <label for="">Posisi Pekerjaan <span style="color: red">*</span> </label>
                     <small><p style="color: gray; font-style:italic;font-size:12px;">*pilih posisi jika ingin merubah</p></small>
                             <select class="form-control" name="job_position" id="jobSelected">
                                 @foreach($job_position as $job)
                                 <option value="{{$job->id}}" {{$job->position_name == $emp->job_position ? 'selected' : '' }}>{{$job->position_name}}</option>
                                 @endforeach
                             </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="">Bank</label>
+                    
+                            <select class="form-control" name="bank_id" id="">
+                                <option value="">=== Pilih Bank ===</option>
+                                @foreach($banks as $bank)
+                                <option value="{{$bank->id}}" {{$bank->bank == $emp->bank ? 'selected' : '' }} >{{$bank->bank}}</option>
+                                @endforeach
+                            </select>
+                        
+                    </div>
+
+                    <div class="form-group">
+                        <label >Nomor Rekening Karyawan</span></label>
+                        <input type="text" class="form-control" value="{{$emp->bank_account}}" name="bank_account" autocomplete="off">
                     </div>
                     
                     <div class="form-group">

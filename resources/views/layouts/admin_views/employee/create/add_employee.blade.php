@@ -31,67 +31,90 @@
                         <x-input-error :messages="$errors->get('nik')" class="mt-2" />
                     </div>
                     <div class="form-group">
-                        <label >Nama Karyawan</label>
+                        <label >Nama Karyawan <span style="color: red">*</span></label>
                         <input type="text" class="form-control" name="name"  placeholder="Masukan nama karyawan" autocomplete="off">
+                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
                     </div>
                     <div class="form-group">
-                        <label>Alamat</label>
+                        <label>Alamat <span style="color: red">*</span></label>
                         <input type="text" class="form-control" name="address"  placeholder="Masukan alamat" autocomplete="off">
+                        <x-input-error :messages="$errors->get('address')" class="mt-2" />
                     </div>
                     <div class="form-group">
-                        <label for="">No.Telepon</label>
+                        <label for="">No.Telepon <span style="color: red">*</span></label>
                         <div class="input-group mb-2">
                             <div class="input-group-prepend">
                             <div class="input-group-text">+62</div>
                             </div>
                             <input type="text" class="form-control" name="phone_number" placeholder="Masukan nomor telepon/hp karyawan" autocomplete="off">
+                            <x-input-error :messages="$errors->get('phone_number')" class="mt-2" />
                         </div>
                         </div>
                     <div class="form-group">
-                        <label >Email</label>
+                        <label >Email <span style="color: red">*</span></label>
                         <input type="text" class="form-control" name="email"  placeholder="Masukan email" autocomplete="off">
+                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
                     <div class="form-group">
-                        <label for="">Cabang</label>
+                        <label for="">Cabang <span style="color: red">*</span></label>
                     
                             <select class="form-control" name="branch_id" id="">
                                 <option value="">--- pilih cabang ---</option>
                                 @foreach($branch as $cabang)
                                 <option value="{{$cabang->id}}">{{$cabang->location_code . " - " .$cabang->location_name}}</option>
                                 @endforeach
+                                <x-input-error :messages="$errors->get('branch_id')" class="mt-2" />
                             </select>
                         
                     </div>
                     <div class="form-group">
-                        <label for="">Posisi Pekerjaan</label>
+                        <label for="">Posisi Pekerjaan <span style="color: red">*</span></label>
                     
                             <select class="form-control" name="job_position" id="">
                                 <option value="">--- pilih posisi pekerjaan---</option>
                                 @foreach($job_position as $job)
                                 <option value="{{$job->id}}">{{$job->position_name}}</option>
                                 @endforeach
+                                <x-input-error :messages="$errors->get('job_position')" class="mt-2" />
+                            </select>
+                        
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="">Bank</span></label>
+                    
+                            <select class="form-control" name="bank_id" id="">
+                                <option value="">--- pilih Bank ---</option>
+                                @foreach($banks as $bank)
+                                <option value="{{$bank->id}}">{{$bank->bank}}</option>
+                                @endforeach
                             </select>
                         
                     </div>
 
                     <div class="form-group">
-                        <label >Tanggal Lahir</label>
+                        <label >Nomor Rekening Karyawan</label>
+                        <input type="text" class="form-control" name="bank_account" placeholder="Masukan No.Rekening Karyawan" autocomplete="off">
+                    </div>
+                   
+
+                    <div class="form-group">
+                        <label >Tanggal Lahir <span style="color: red">*</span></label>
                         <input type="date" class="form-control" name="birth_date" autocomplete="off">
                     </div>
                     <div class="form-group">
-                        <label >Tanggal Mulai Bekerja</label>
+                        <label >Tanggal Mulai Bekerja <span style="color: red">*</span></label>
                         <input type="date" class="form-control" name="start_date" autocomplete="off">
                     </div>
                     <div class="form-group">
-                    <label>Aktif?</label>
+                    <label>Aktif? <span style="color: red">*</span></label>
                     <select class="form-control" name="is_active" id="">
                         <option value="Y">Ya</option>
                         <option value="N">Tidak</option>
                     </select>
                     </div>
 
-                
-                    
                     <button type="submit" class="btn btn-primary">Simpan</button>
                 </form> 
             

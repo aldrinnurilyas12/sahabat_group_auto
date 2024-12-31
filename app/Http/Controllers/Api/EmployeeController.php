@@ -21,6 +21,7 @@ use function Laravel\Prompts\table;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\Cast\Array_;
 use App\Http\Resources\EmployeeResource;
+use App\Models\EmployeeBankAccount;
 use App\Models\EmployeeSignature;
 
 class EmployeeController extends Controller
@@ -111,7 +112,8 @@ class EmployeeController extends Controller
         $main_menu = DB::table('v_main_menu')->get();
         $job_position = JobPositionModel::all();
         $branch = DB::table('branch')->get();
-        return view('layouts.admin_views.employee.create.add_employee', compact('employee', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu'));
+        $banks = DB::table('bank')->get();
+        return view('layouts.admin_views.employee.create.add_employee', compact('employee', 'banks', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
 
@@ -121,10 +123,14 @@ class EmployeeController extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
 
-        $validate =  Validator::make($request->all(), [
+        $request->validate([
             'nik' => 'required|unique:employee',
-            'name'  => 'required'
-
+            'name'  => 'required',
+            'address' => 'required',
+            'phone_number' => 'required|unique:employee',
+            'email' => 'required|unique:employee',
+            'job_position' => 'required',
+            'branch_id' => 'required'
         ]);
 
         if ($insertTime >= 7 && $insertTime <= 18) {
@@ -140,8 +146,17 @@ class EmployeeController extends Controller
                 'birth_date' => $request->birth_date,
                 'start_date' => $request->start_date,
                 'resign_date' => $request->resign_date,
-                'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+            ]);
+
+            EmployeeBankAccount::create([
+                'nik' => $request->nik,
+                'bank_id' => $request->bank_id,
+                'bank_account' => $request->bank_account,
+                'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+
             ]);
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
@@ -225,7 +240,8 @@ class EmployeeController extends Controller
         $main_menu = DB::table('v_main_menu')->get();
         $job_position = DB::table('job_position')->get();
         $branch = DB::table('branch')->get();
-        return view('layouts.admin_views.employee.edit.edit_employee', compact('employee', 'start_date', 'birth_date', 'resign_date', 'branch', 'job_position', 'main_menu', 'grouped_sub_menu', 'sidebar_menu'));
+        $banks = DB::table('bank')->get();
+        return view('layouts.admin_views.employee.edit.edit_employee', compact('employee', 'banks', 'start_date', 'birth_date', 'resign_date', 'branch', 'job_position', 'main_menu', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
 
@@ -234,6 +250,7 @@ class EmployeeController extends Controller
     {
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $checkingBankAccount = DB::table('employee_bank_account')->where('nik', $request->nik)->first();
 
         if ($insertTime >= 7 && $insertTime <= 18) {
 
@@ -252,6 +269,25 @@ class EmployeeController extends Controller
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                 'updated_at' => now()
             ]);
+
+            if ($checkingBankAccount === null) {
+                EmployeeBankAccount::create([
+                    'nik' => $request->nik,
+                    'bank_id' => $request->bank_id,
+                    'bank_account' => $request->bank_account,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]);
+            } else {
+                DB::table('employee_bank_account')->where('nik', $request->nik)->update([
+                    'bank_id' => $request->bank_id,
+                    'bank_account' => $request->bank_account,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+
+                ]);
+            }
+
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
             return redirect()->route('master_employee.index');

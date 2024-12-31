@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\VerifyEmailController;
 use App\Http\Controllers\Api\MasterAppointment;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\MaintenanceUnitController;
+use App\Http\Controllers\Api\PayrollController;
 use App\Http\Controllers\Api\SpkUnitController;
 use App\Http\Controllers\Api\VehicleSalesRequest;
 use App\Http\Controllers\ProfileController;
@@ -277,4 +278,9 @@ Route::middleware('auth')->group(function () {
     Route::put('maintenance_update/{id}', [MaintenanceUnitController::class, 'update'])->name('maintenance_update');
     Route::get('filter_maintenance', [MaintenanceUnitController::class, 'filter_maintenance'])->name('filter_maintenance');
     Route::post('maintenance_export', [MaintenanceUnitController::class, 'download_excel'])->name('maintenance_export');
+
+    // ROUTES MASTER PAYROLL
+    Route::apiResource('master_payroll', App\Http\Controllers\Api\PayrollController::class);
+    Route::get('get_payroll_detail/{id}', [PayrollController::class, 'payrol_detail_layout'])->name('get_payroll_detail');
+    Route::get('get_attendance/{id}', [PayrollController::class, 'get_attendance'])->name('get_attendance');
 });

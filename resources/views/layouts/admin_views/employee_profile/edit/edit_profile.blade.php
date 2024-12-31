@@ -10,7 +10,7 @@
 <title>Edit data Karyawan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
 
 
 <body>
@@ -173,11 +173,22 @@
                                     </div>
 
                                     <div class="form-group">
+                                        <label>Bank</label>
+                                        <input type="text" class="form-control" value="{{$emp->bank}}" autocomplete="off" readonly>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Rekening Akun Bank</label>
+                                        <input type="text" class="form-control" value="{{$emp->bank_account}}" autocomplete="off" readonly>
+                                    </div>
+
+                                    <div class="form-group">
                                         <label>Tanggal Mulai Bekerja</label>
                                         <input type="text" class="form-control" id="start_date" value="{{ old('start_date', $emp->start_date ? $start_date->format('Y-m-d'):null) }}" autocomplete="off" readonly>
                                     </div>
-                                
-                                    
+                                    <span class="text-secondary">*Jika anda ingin merubah seluruh data, maka lakukan perubahan di <a style="text-decoration: underline;" href="{{route('edit_employee', $emp->id)}}"> Data Master Karyawan</a></span>
+                                    <br>
+                                    <br>
                                     <button type="submit" class="btn btn-primary">Ubah</button>
                                 </form> 
                                 @endforeach

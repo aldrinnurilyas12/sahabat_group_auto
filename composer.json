@@ -11,7 +11,8 @@
         "laravel/tinker": "^2.9",
         "maatwebsite/excel": "^3.1",
         "ramsey/uuid": "^4.7",
-        "twbs/bootstrap": "4.0.0"
+        "twbs/bootstrap": "4.0.0",
+        "tymon/jwt-auth": "2.1.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
