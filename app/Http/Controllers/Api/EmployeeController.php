@@ -41,12 +41,13 @@ class EmployeeController extends Controller
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
-        $employee = DB::table('v_employee')->get();
+        $employee = DB::table('v_employee')->where('is_active', 'Ya')->get();
+        $employee_resign = DB::table('v_employee')->where('is_active', 'Tidak')->get();
         $office = DB::table('branch')->get();
         $department = DB::table('department')->get();
         $offices = $request->office;
         $departments = $request->department;
-        return view('layouts.admin_views.employee.employee_data', compact('employee', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'department', 'departments'));
+        return view('layouts.admin_views.employee.employee_data', compact('employee', 'employee_resign', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'department', 'departments'));
     }
 
     public function getEmployee($id = null)
@@ -184,7 +185,8 @@ class EmployeeController extends Controller
 
     public function filter_employee(Request $request)
     {
-        $employee = DB::table('v_employee')->get();
+        $employee = DB::table('v_employee')->where('is_active', 'Ya')->get();
+        $employee_resign = DB::table('v_employee')->where('is_active', 'Tidak')->get();
         $office = DB::table('branch')->get();
         $department = DB::table('department')->get();
         $offices = $request->office;
@@ -192,24 +194,28 @@ class EmployeeController extends Controller
 
 
         if ($offices && $departments) {
-            $employee = DB::table('v_employee')->where('department_name', $departments)->where('location_name', $offices)->get();
+            $employee = DB::table('v_employee')->where('is_active', 'Ya')->where('department_name', $departments)->where('location_name', $offices)->get();
+            $employee_resign = DB::table('v_employee')->where('is_active', 'Tidak')->where('department_name', $departments)->where('location_name', $offices)->get();
         }
 
         if ($offices === 'alldata') {
-            $employee = DB::table('v_employee')->where('department_name', $departments)->get();
+            $employee = DB::table('v_employee')->where('is_active', 'Ya')->where('department_name', $departments)->get();
+            $employee_resign = DB::table('v_employee')->where('is_active', 'Tidak')->where('department_name', $departments)->get();
         }
 
         if ($departments === 'alldata') {
-            $employee = DB::table('v_employee')->where('location_name', $offices)->get();
+            $employee = DB::table('v_employee')->where('is_active', 'Ya')->where('location_name', $offices)->get();
+            $employee_resign = DB::table('v_employee')->where('is_active', 'Tidak')->where('location_name', $offices)->get();
         }
         if ($offices === 'alldata' && $departments === 'alldata') {
-            $employee = DB::table('v_employee')->get();
+            $employee = DB::table('v_employee')->where('is_active', 'Ya')->get();
+            $employee_resign = DB::table('v_employee')->where('is_active', 'Tidak')->get();
         }
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
-        return view('layouts.admin_views.employee.employee_data', compact('employee', 'grouped_sub_menu', 'sidebar_menu', 'office', 'department', 'offices', 'departments'));
+        return view('layouts.admin_views.employee.employee_data', compact('employee', 'employee_resign', 'grouped_sub_menu', 'sidebar_menu', 'office', 'department', 'offices', 'departments'));
     }
 
     public function employee_export(Request $request)
@@ -533,5 +539,48 @@ class EmployeeController extends Controller
             ->leftJoin('employee as e', 'se.employee_id', '=', 'e.id')->where('nik', $nik)->get();
         $user = app('App\Http\Controllers\Api\LoginAdminController')->getUsers();
         return view('layouts.admin_views.employee_profile.edit.edit_profile', compact('employee', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu', 'user', 'start_date', 'birth_date', 'user_picture', 'signature_employee'));
+    }
+
+    // RESIGN EMPLOYEE
+
+    public function employee_resign_layout(Request $request, $employee_id): View
+    {
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+
+        $emp = EmployeeModel::find($employee_id);
+        $start_date = Carbon::parse($emp->start_date);
+
+        $employee = DB::table('v_employee')->where('id', $request->id)->get();
+        $main_menu = DB::table('v_main_menu')->get();
+        return view('layouts.admin_views.employee.edit.employee_resign', compact('employee', 'start_date', 'grouped_sub_menu', 'sidebar_menu'));
+    }
+
+    public function resign_approval(Request $request)
+    {
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+
+        $request->validate([
+            'resign_reasons' => 'required',
+            'resign_date'   => 'required'
+        ]);
+
+        if ($insertTime >= 7 && $insertTime <= 18) {
+            DB::table('employee')->where('id', $request->id)->update([
+                'resign_reasons' => $request->resign_reasons,
+                'is_active' => $request->is_active,
+                'resign_date' => $request->resign_date,
+                'updated_at' => now(),
+                'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+            ]);
+            $this->insertLogActivityUsers(__METHOD__);
+            session()->flash('message_success', 'Data Berhasil disimpan!');
+            return redirect()->route('master_employee.index');
+        } else {
+            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 wib - 18.00 wib');
+            return redirect()->route('master_employee.index');
+        }
     }
 }

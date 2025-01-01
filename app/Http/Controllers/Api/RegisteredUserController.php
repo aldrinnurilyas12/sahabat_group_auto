@@ -53,6 +53,7 @@ class RegisteredUserController extends Controller
             ->select('employee.id', 'employee.nik', 'name', 'users.is_active')
             ->leftJoin('users', 'employee.id', '=', 'users.employee_id')
             ->where('users.is_active', null)
+            ->where('employee.is_active', 'Y')
             ->get();
         return view('layouts.admin_views.users_admin.create.users_create', compact('roles', 'employees', 'grouped_sub_menu', 'sidebar_menu'));
     }

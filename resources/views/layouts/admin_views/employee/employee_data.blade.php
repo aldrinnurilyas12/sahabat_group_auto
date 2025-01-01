@@ -133,76 +133,211 @@
 
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table style="font-size: 14px; color:black;" class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Aksi</th>
-                                            <th>NIK</th>
-                                            <th>Nama</th>
-                                            <th>Alamat</th>
-                                            <th>Usia</th>
-                                            <th>Telepon</th>
-                                            <th>Email</th>
-                                            <th>Posisi</th>
-                                            <th>Department</th>
-                                            <th>Kantor</th>
-                                            <th>Gaji Pokok</th>
-                                            <th>Tunjangan Transport</th>
-                                            <th>Tunjangan Kesehatan</th>
-                                            <th>Tunjangan Lainnya</th>
-                                            <th>Total Gaji</th>
-                                            <th>Status Aktif</th>
-                                            <th>Tanggal Mulai</th>
-                                            <th>Tanggal Resign</th>
-                                            <th>Created at</th>
-                                            <th>Created by</th>
-                                            <th>Updated at</th>
-                                            <th>Updated by</th>
-                                        </tr>
-                                    </thead>
-                                   
-                                    <tbody>
-                                        <?php $no = 1;  ?>
-                                        @foreach($employee as $emp)
-                                        <tr>
-                                            <td><?php echo $no++ ?></td>
-                                            <td><div style="display:flex; justify-content:center;gap:8px; " class="action">
-                                                <a href="{{route('edit_employee', $emp->id)}}"><i class="fas fa-edit"></i></a>
-                                                <a style="size: 12px;" href="#" data-toggle="modal" data-target="#deleteEmployee{{$emp->id}}"><i class="fas fa-trash"></i></a>
-                                            </td>
-                                            <td>{{$emp->nik}}</td>
-                                            <td>{{ Str::upper($emp->name)}}</td>
-                                            <td>{{$emp->address}}</td>
-                                            <td>{{$emp->age}}</td>
-                                            <td>{{$emp->phone_number}}</td>
-                                            <td>{{$emp->email}}</td>
-                                            <td>{{$emp->job_position}}</td>
-                                            <td>{{$emp->department_name}}</td>
-                                            <td>{{$emp->location_name}}</td>
-				                            <td>{{"Rp ". number_format($emp->salary)}}</td>
-                                            <td>{{"Rp ". number_format($emp->tunjangan_transport)}}</td>
-                                            <td>{{"Rp ". number_format($emp->tunjangan_kesehatan)}}</td>
-                                            <td>{{"Rp ". number_format($emp->tunjangan_lainnya)}}</td>
-                                            <td>{{"Rp ". number_format($emp->salary_total)}}</td>
-                                            <td>{{$emp->is_active}}</td>
-                                            <td>{{ old('start_date', $emp->start_date ? \Carbon\Carbon::parse($emp->start_date)->format('d-m-Y'): '') }}</td>
-                                            <td>{{ old('resign_date', $emp->resign_date ? \Carbon\Carbon::parse($emp->resign_date)->format('d-m-Y'): '') }}</td>
-                                            <td>{{$emp->created_at}}</td>
-                                            <td>{{$emp->created_by}}</td>
-                                            <td>{{$emp->updated_at}}</td>
-                                            <td>{{$emp->updated_by}}</td>
-                                            
-                                        </tr>
 
-                                        @endforeach
-                                     
-                                    </tbody>
-                                </table>
+                        <ul class="nav nav-tabs mb-3" id="ex1" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a
+                                    data-mdb-tab-init
+                                    class="nav-link active"
+                                    id="ex1-tab-1"
+                                    href="#ex1-tabs-1"
+                                    role="tab"
+                                    aria-controls="ex1-tabs-1"
+                                    aria-selected="true"
+                                >Data Karyawan</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a
+                                    data-mdb-tab-init
+                                    class="nav-link"
+                                    id="ex1-tab-2"
+                                    href="#ex1-tabs-2"
+                                    role="tab"
+                                    aria-controls="ex1-tabs-2"
+                                    aria-selected="false"
+                                >Data Karyawan Resign</a>
+                            </li>
+                        </ul>
+
+
+                        <div class="tab-content" id="ex1-content">
+                            <div
+                                class="tab-pane fade show active"
+                                id="ex1-tabs-1"
+                                role="tabpanel"
+                                aria-labelledby="ex1-tab-1">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table style="font-size: 14px; color:black;" class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Aksi</th>
+                                                    <th>NIK</th>
+                                                    <th>Nama</th>
+                                                    <th>Alamat</th>
+                                                    <th>Usia</th>
+                                                    <th>Telepon</th>
+                                                    <th>Email</th>
+                                                    <th>Posisi</th>
+                                                    <th>Department</th>
+                                                    <th>Kantor</th>
+                                                    <th>Gaji Pokok</th>
+                                                    <th>Tunjangan Transport</th>
+                                                    <th>Tunjangan Kesehatan</th>
+                                                    <th>Tunjangan Lainnya</th>
+                                                    <th>Total Gaji</th>
+                                                    <th>Status Aktif</th>
+                                                    <th>Tanggal Mulai</th>
+                                                    <th>Tanggal Resign</th>
+                                                    <th>Created at</th>
+                                                    <th>Created by</th>
+                                                    <th>Updated at</th>
+                                                    <th>Updated by</th>
+                                                </tr>
+                                            </thead>
+                                           
+                                            <tbody>
+                                                <?php $no = 1;  ?>
+                                                @foreach($employee as $emp)
+                                                <tr>
+                                                    <td><?php echo $no++ ?></td>
+                                                    <td><div style="display:flex; justify-content:center;gap:8px; " class="action">
+                                                        <a href="{{route('edit_employee', $emp->id)}}"><i class="fas fa-edit"></i></a>
+                                                        <a style="size: 12px;" href="#" data-toggle="modal" data-target="#deleteEmployee{{$emp->id}}"><i class="fas fa-trash"></i></a>
+                                                    </td>
+                                                    <td>{{$emp->nik}}</td>
+                                                    <td>{{ Str::upper($emp->name)}}</td>
+                                                    <td>{{$emp->address}}</td>
+                                                    <td>{{$emp->age}}</td>
+                                                    <td>{{$emp->phone_number}}</td>
+                                                    <td>{{$emp->email}}</td>
+                                                    <td>{{$emp->job_position}}</td>
+                                                    <td>{{$emp->department_name}}</td>
+                                                    <td>{{$emp->location_name}}</td>
+                                                    <td>{{"Rp ". number_format($emp->salary)}}</td>
+                                                    <td>{{"Rp ". number_format($emp->tunjangan_transport)}}</td>
+                                                    <td>{{"Rp ". number_format($emp->tunjangan_kesehatan)}}</td>
+                                                    <td>{{"Rp ". number_format($emp->tunjangan_lainnya)}}</td>
+                                                    <td>{{"Rp ". number_format($emp->salary_total)}}</td>
+                                                    <td>{{$emp->is_active}}</td>
+                                                    <td>{{ old('start_date', $emp->start_date ? \Carbon\Carbon::parse($emp->start_date)->format('d-m-Y'): '') }}</td>
+                                                    <td>
+                                                    @if($emp->resign_date == null)
+                                                    <a style="text-decoration: underline;" href="{{route('resign_employee', $emp->id)}}">Ajukan Resign</a>
+                                                    @else
+                                                    {{ old('resign_date', $emp->resign_date ? \Carbon\Carbon::parse($emp->resign_date)->format('d-m-Y'): '') }}</td>
+                                                
+                                                    @endif
+                                                    <td>{{$emp->created_at}}</td>
+                                                    <td>{{$emp->created_by}}</td>
+                                                    <td>{{$emp->updated_at}}</td>
+                                                    <td>{{$emp->updated_by}}</td>
+                                                    
+                                                </tr>
+        
+                                                @endforeach
+                                             
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                              
                             </div>
+                            {{-- credit simulation --}}
+                            <div class="tab-pane fade" id="ex1-tabs-2" role="tabpanel" aria-labelledby="ex1-tab-2">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table style="font-size: 14px; color:black;" class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Aksi</th>
+                                                    <th>Status</th>
+                                                    <th>NIK</th>
+                                                    <th>Nama</th>
+                                                    <th>Alamat</th>
+                                                    <th>Usia</th>
+                                                    <th>Telepon</th>
+                                                    <th>Email</th>
+                                                    <th>Posisi</th>
+                                                    <th>Department</th>
+                                                    <th>Kantor</th>
+                                                    <th>Gaji Pokok</th>
+                                                    <th>Tunjangan Transport</th>
+                                                    <th>Tunjangan Kesehatan</th>
+                                                    <th>Tunjangan Lainnya</th>
+                                                    <th>Total Gaji</th>
+                                                    <th>Status Aktif</th>
+                                                    <th>Tanggal Mulai</th>
+                                                    <th>Tanggal Resign</th>
+                                                    <th>Alasan Resign</th>
+                                                    <th>Created at</th>
+                                                    <th>Created by</th>
+                                                    <th>Updated at</th>
+                                                    <th>Updated by</th>
+                                                </tr>
+                                            </thead>
+                                           
+                                            <tbody>
+                                                <?php $no = 1;  ?>
+                                                @foreach($employee_resign as $emp_rsn)
+                                                <tr>
+                                                    <td><?php echo $no++ ?></td>
+                                                    <td><div style="display:flex; justify-content:center;gap:8px; " class="action">
+                                                        <a href="{{route('edit_employee', $emp_rsn->id)}}"><i class="fas fa-edit"></i></a>
+                                                        <a style="size: 12px;" href="#" data-toggle="modal" data-target="#deleteEmployee{{$emp_rsn->id}}"><i class="fas fa-trash"></i></a>
+                                                    </td>
+                                                    <td>
+                                                        @if($emp_rsn->is_active == 'Tidak')
+                                                        <p class="text-danger">Resign</p>
+                                                        @else
+                                                        @endif
+                                                    <td>{{$emp_rsn->nik}}</td>
+                                                    <td>{{ Str::upper($emp_rsn->name)}}</td>
+                                                    <td>{{$emp_rsn->address}}</td>
+                                                    <td>{{$emp_rsn->age}}</td>
+                                                    <td>{{$emp_rsn->phone_number}}</td>
+                                                    <td>{{$emp_rsn->email}}</td>
+                                                    <td>{{$emp_rsn->job_position}}</td>
+                                                    <td>{{$emp_rsn->department_name}}</td>
+                                                    <td>{{$emp_rsn->location_name}}</td>
+                                                    <td>{{"Rp ". number_format($emp_rsn->salary)}}</td>
+                                                    <td>{{"Rp ". number_format($emp_rsn->tunjangan_transport)}}</td>
+                                                    <td>{{"Rp ". number_format($emp_rsn->tunjangan_kesehatan)}}</td>
+                                                    <td>{{"Rp ". number_format($emp_rsn->tunjangan_lainnya)}}</td>
+                                                    <td>{{"Rp ". number_format($emp_rsn->salary_total)}}</td>
+                                                    <td>{{$emp_rsn->is_active}}</td>
+                                                    <td>{{ old('start_date', $emp_rsn->start_date ? \Carbon\Carbon::parse($emp_rsn->start_date)->format('d-m-Y'): '') }}</td>
+                                                    <td>
+                                                    @if($emp_rsn->resign_date == null)
+                                                    <a style="text-decoration: underline;" href="{{route('resign_employee', $emp_rsn->id)}}">Ajukan Resign</a>
+                                                    @else
+                                                    {{ old('resign_date', $emp_rsn->resign_date ? \Carbon\Carbon::parse($emp_rsn->resign_date)->format('d-m-Y'): '') }}</td>
+                                                
+                                                    @endif
+                                                    <td>{{$emp_rsn->resign_reasons}}</td>
+                                                    <td>{{$emp_rsn->created_at}}</td>
+                                                    <td>{{$emp_rsn->created_by}}</td>
+                                                    <td>{{$emp_rsn->updated_at}}</td>
+                                                    <td>{{$emp_rsn->updated_by}}</td>
+                                                    
+                                                </tr>
+        
+                                                @endforeach
+                                             
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                           
+                            
+
                         </div>
+
+
+                        
                     </div>
 
                 </div>
@@ -365,5 +500,33 @@
            console.log("Elemen spinner tidak ditemukan!");
        }
    });
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Select all tab links
+        const tabLinks = document.querySelectorAll('.nav-link');
+
+        // Add click event to each tab link
+        tabLinks.forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent default anchor behavior
+
+                // Remove active class from all links and hide all tab content
+                tabLinks.forEach(item => {
+                    item.classList.remove('active');
+                    item.setAttribute('aria-selected', 'false');
+                });
+                document.querySelectorAll('.tab-pane').forEach(content => {
+                    content.classList.remove('show', 'active');
+                });
+
+                // Add active class to the clicked link and show corresponding tab content
+                this.classList.add('active');
+                this.setAttribute('aria-selected', 'true');
+                const target = this.getAttribute('href');
+                document.querySelector(target).classList.add('show', 'active');
+            });
+        });
+    });
    </script>
 </html>

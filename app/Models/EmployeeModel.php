@@ -22,6 +22,7 @@ class EmployeeModel extends Model
         'birth_date',
         'start_date',
         'resign_date',
+        'resign_reasons',
         'tunjangan_transport',
         'tunjangan_kesehatan',
         'tunjangan_lainnya',

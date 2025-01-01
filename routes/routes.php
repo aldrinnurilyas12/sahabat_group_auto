@@ -150,6 +150,8 @@ Route::middleware('auth')->group(function () {
     Route::put('upload_update_signature/{employee_id}', [EmployeeController::class, 'update_signature'])->name('upload_update_signature');
     Route::delete('delete_signature/{employee_id}', [EmployeeController::class, 'delete_signature'])->name('delete_signature');
     Route::delete('delete_foto/{employee_id}', [EmployeeController::class, 'delete_foto'])->name('delete_foto');
+    Route::get('resign_employee/{id}', [EmployeeController::class, 'employee_resign_layout'])->name('resign_employee');
+    Route::put('resign_approval/{id}', [EmployeeController::class, 'resign_approval'])->name('resign_approval');
 
 
     // ROUTE FOR API employee
