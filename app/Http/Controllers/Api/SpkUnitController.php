@@ -204,7 +204,7 @@ class SpkUnitController extends Controller
             } elseif ($checking_data_confirmed->approval_by_sales_manager == 'N' && $checking_data_confirmed->approval_by_head_branch == 'Y') {
                 session()->flash('message_success', 'Data Berhasil disimpan!');
                 return redirect()->route('transaksi_spk_unit.index');
-            } elseif ($checking_data_confirmed->approval_by_head_branch == 'Y' && $checking_data_confirmed->approval_by_head_branch == 'Y') {
+            } elseif ($checking_data_confirmed->approval_by_head_branch == 'Y' && $checking_data_confirmed->approval_by_sales_manager == 'Y') {
                 VehicleModel::where('id', $request->vehicle_id)->update([
                     'status_vehicle_id' => 2,
                     'updated_at' => now(),

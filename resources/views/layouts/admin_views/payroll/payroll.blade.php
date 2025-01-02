@@ -80,7 +80,6 @@
                                             <th>Detail Presensi</th>
                                             <th>Approve Head of Finance</th>
                                             <th>Approve Head of Human Resource</th>
-                                            <th>Approve Head of Branch</th>
                                             <th>Created At</th>
                                             <th>Created By</th>                                   
                                         </tr>
@@ -91,10 +90,12 @@
                                         @foreach($payroll_data as $payroll)
                                         <tr style="width: 200px;">
                                             <td><?php echo $no++ ?></td>
-                                            <td><div style="display:flex; justify-content:center;gap:8px; " class="action">
+                                            <td>
+                                                @if($payroll->status == 'Sudah Konfirmasi')
+                                                <a class="btn btn-secondary" style="size: 12px;" href="{{route('get_payroll_detail', $payroll->id)}}">Approved</a>
+                                                @else
                                                 <a class="btn btn-primary" style="size: 12px;" href="{{route('get_payroll_detail', $payroll->id)}}">Approve</a>
-                                            
-                                                
+                                                @endif
                                             </td>
                                             <td>{{$payroll->nik}}</td>
                                             <td>{{$payroll->name}}</td>
@@ -128,9 +129,19 @@
                                                 </table>
                                           
                                               </td>
-                                            <td>{{$payroll->approval_by_head_of_finance}}</td>
-                                            <td>{{$payroll->approval_by_head_of_human_resource}}</td>
-                                            <td>{{$payroll->approval_by_head_branch}}</td>
+                                            <td>
+                                                @if($payroll->approval_by_head_of_finance == 'confirmed')
+                                                <p class="text-success">Confirmed</p>
+                                                @else 
+                                                <p class="text-danger">Pending</p>
+                                                @endif
+                                            <td>
+                                                @if($payroll->approval_by_head_of_human_resource == 'confirmed')
+                                                <p class="text-success">Confirmed</p>
+                                                @else 
+                                                <p class="text-danger">Pending</p>
+                                                @endif
+                                            </td>
                                             <td>{{$payroll->created_at}}</td>
                                             <td>{{$payroll->created_by}}</td>
                                         </tr>

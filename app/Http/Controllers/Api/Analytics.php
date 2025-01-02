@@ -116,7 +116,7 @@ class Analytics extends Controller
         $revenue_by_month = DB::table('v_spk')
             ->select(DB::raw('MONTH(created_at) as month'), DB::raw('SUM(price) as total_revenue'))
             ->groupBy(DB::raw('MONTH(created_at)'))
-            ->orderBy('month') // Menambahkan urutan berdasarkan bulan
+            ->orderBy('month')
             ->get();
 
         // Mengambil daftar bulan

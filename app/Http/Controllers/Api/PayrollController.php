@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\PayrollApproval;
+use App\Models\PayrollModel;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
@@ -60,7 +62,34 @@ class PayrollController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'payroll_file' => 'required|image|mimes:jpeg,png,jpg,gif|max:10048'
+        ]);
+
+
+        if ($request->hasFile('payroll_file')) {
+            $picture = $request->file('payroll_file');
+            $picturePath = $picture->storeAs('payroll_payment_file', uniqid() . '.' . $picture->getClientOriginalExtension(), 'public');
+            $sentPayroll = PayrollModel::create([
+                'employee_id' => $request->employee_id,
+                'status' => 'Menunggu Konfirmasi',
+                'payroll_file' => $picturePath,
+                'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+            ]);
+
+            if ($sentPayroll) {
+                PayrollApproval::create([
+                    'payroll_id' => $sentPayroll->id,
+                    'approval_by_head_of_finance' => 'pending',
+                    'approval_by_head_of_human_resource' => 'pending',
+                    'approval_by_head_of_finance' => 'pending'
+                ]);
+            }
+            $this->insertLogActivityUsers(__METHOD__);
+            session()->flash('message_success', 'Payroll Berhasil Disimpan!');
+            return redirect()->route('master_payroll.index');
+        }
     }
 
     /**
@@ -95,6 +124,44 @@ class PayrollController extends Controller
         //
     }
 
+    public function confirmed_payroll(Request $request, $payroll_id)
+    {
+
+        if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Finance Operation') {
+            DB::table('payroll_approval')->where('payroll_id', $request->payroll_id)->update([
+                'payroll_id' => $request->payroll_id,
+                'approval_by_head_of_finance' => $request->approval_by_head_of_finance
+            ]);
+        } elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource') {
+            DB::table('payroll_approval')->where('payroll_id', $request->payroll_id)->update([
+                'payroll_id' => $request->payroll_id,
+                'approval_by_head_of_human_resource' => $request->approval_by_head_of_human_resource
+            ]);
+        }
+
+        $checking_data_confirmed = DB::table('payroll_approval')->first();
+
+
+        if ($checking_data_confirmed->approval_by_head_of_finance == 'pending' && $checking_data_confirmed->approval_by_head_of_human_resource == 'pending') {
+            session()->flash('message_success', 'Data Berhasil disimpan!');
+            return redirect()->route('master_payroll.index');
+        } elseif ($checking_data_confirmed->approval_by_head_of_finance == 'pending' && $checking_data_confirmed->approval_by_head_of_human_resource == 'confirmed') {
+            session()->flash('message_success', 'Data Berhasil disimpan!');
+            return redirect()->route('master_payroll.index');
+        } elseif ($checking_data_confirmed->approval_by_head_of_human_resource == 'pending' && $checking_data_confirmed->approval_by_head_of_finance == 'confirmed') {
+            session()->flash('message_success', 'Data Berhasil disimpan!');
+            return redirect()->route('master_payroll.index');
+        } elseif ($checking_data_confirmed->approval_by_head_of_finance == 'confirmed' && $checking_data_confirmed->approval_by_head_of_human_resource == 'confirmed') {
+            PayrollModel::where('id', $request->payroll_id)->update([
+                'status' => 'Sudah Konfirmasi',
+                'updated_at' => now(),
+                'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+            ]);
+        }
+        $this->insertLogActivityUsers(__METHOD__);
+        session()->flash('message_success', 'Payroll berhasil dikonfirmasi!');
+        return redirect()->route('master_payroll.index');
+    }
 
 
     // <!-- bug fixing -->
@@ -103,21 +170,19 @@ class PayrollController extends Controller
     {
         // Fetching total revenue for each month
         $attendance = DB::table('v_payroll')
-            ->select('total_hadir', 'total_izin', 'total_sakit')
-            ->where('id', $id)
+            ->select('total_hadir', 'total_izin', 'total_sakit', 'total_alpha')
+            ->where('id', 1)
             ->get();
 
-        // Mengambil daftar bulan
 
-        $attendance_type = ['Hadir', 'Izin', 'Alpha']; // Menggunakan pluck untuk mendapatkan array
-
-        // Menyiapkan data untuk dikirim ke frontend
+        $attendance_type = ['Hadir', 'Izin', 'Sakit', 'Alpha']; // Menggunakan pluck untuk mendapatkan array
 
 
         return response()->json([
             'total_hadir' => $attendance->isNotEmpty() ? $attendance : [['total_hadir' => 0]], // Mengambil nilai total_hadir
             'total_izin' => $attendance->isNotEmpty() ? $attendance : [['total_izin' => 0]],   // Mengambil nilai total_izin
-            'total_sakit' => $attendance->isNotEmpty() ? $attendance : [['total_sakit' => 0]], // Mengambil nilai total_sakit
+            'total_sakit' => $attendance->isNotEmpty() ? $attendance : [['total_sakit' => 0]],
+            'total_alpha' => $attendance->isNotEmpty() ? $attendance : [['total_alpha' => 0]], // Mengambil nilai total_sakit
             'attendance_type' => $attendance_type
         ]);
     }
