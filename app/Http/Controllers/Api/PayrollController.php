@@ -82,8 +82,7 @@ class PayrollController extends Controller
                 PayrollApproval::create([
                     'payroll_id' => $sentPayroll->id,
                     'approval_by_head_of_finance' => 'pending',
-                    'approval_by_head_of_human_resource' => 'pending',
-                    'approval_by_head_of_finance' => 'pending'
+                    'approval_by_head_of_human_resource' => 'pending'
                 ]);
             }
             $this->insertLogActivityUsers(__METHOD__);
@@ -168,15 +167,12 @@ class PayrollController extends Controller
 
     public function get_attendance(Request $request, $id)
     {
-        // Fetching total revenue for each month
+
         $attendance = DB::table('v_payroll')
-            ->select('total_hadir', 'total_izin', 'total_sakit', 'total_alpha')
-            ->where('id', 1)
+            ->select('id', 'total_hadir', 'total_izin', 'total_sakit', 'total_alpha')
+            ->where('id', $request->id)
             ->get();
-
-
         $attendance_type = ['Hadir', 'Izin', 'Sakit', 'Alpha']; // Menggunakan pluck untuk mendapatkan array
-
 
         return response()->json([
             'total_hadir' => $attendance->isNotEmpty() ? $attendance : [['total_hadir' => 0]], // Mengambil nilai total_hadir
