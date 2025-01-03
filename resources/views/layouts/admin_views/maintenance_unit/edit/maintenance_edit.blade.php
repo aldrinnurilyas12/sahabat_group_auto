@@ -59,7 +59,7 @@
                                 <label >Unit Kendaraan</label>
                                 <select class="form-control" name="vehicle_id" id="">
                                     <option value="#">=== Pilih Unit ===</option>
-                                @foreach ($vehicle_data as $vehicle)
+                                @foreach ($maintenance_data as $vehicle)
                                     <option value="{{$vehicle->id}}" {{$vehicle->id == $mtc->vehicle_id ? 'selected' : '' }}>{{$vehicle->unit}}</option>     
                                 @endforeach
                                 </select>

@@ -78,7 +78,7 @@
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
                                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Presensi Rate</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Presensi Rate per Month</h6>
                                 
                                     <div class="dropdown no-arrow">
                                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
@@ -97,7 +97,9 @@
                                 </div>
                                 <!-- Card Body -->
                                 <div class="card-body">
-                                <div id=""></div>
+                                <div style="display: flex; justify-content:center;" id="">
+                                    <h1 style="font-size: 72px;" class="text-success">{{ sprintf("%.0f",$payroll_detail->first()->attendance_rate_permonth)}} %</h1>
+                                </div>
                                 </div>
                             </div>
                         </div>

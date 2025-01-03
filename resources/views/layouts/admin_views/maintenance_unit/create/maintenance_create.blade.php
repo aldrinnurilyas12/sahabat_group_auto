@@ -47,17 +47,20 @@
                     <h4 style="text-align:center;color:black;font-weight:bold;">Tambah Data Perbaikan Unit Kendaraan</h4>
                     
                     <div style="display: flex; gap:50px;flex-wrap:wrap;" class="form-group-content">
-                        <form class="form_input" method="POST" action="{{ route('master_maintenance_unit.store')}}">
+                        <form class="form_input" method="POST" action="{{ route('master_maintenance_unit.store')}}" enctype="multipart/form-data">
                             @csrf   
 
                             <div class="form-group">
                                 <label >Unit Kendaraan</label>
                                 <select class="form-control" name="vehicle_id" id="">
                                     <option value="#">=== Pilih Unit ===</option>
-                                @foreach ($vehicle_data as $vehicle)
+                                @foreach ($maintenance_data as $vehicle)
                                     <option value="{{$vehicle->id}}">{{$vehicle->unit}}</option>     
                                 @endforeach
                                 </select>
+                                @if ($errors->has('vehicle_id'))
+                                <span class="text-danger">{{ $errors->first('vehicle_id') }}</span>
+                                @endif
                             </div>
                             
                             <div class="form-group">
@@ -68,6 +71,9 @@
                                     <option value="{{$ctg->category_name}}">{{$ctg->category_name}}</option>
                                     @endforeach
                                 </select>
+                                @if ($errors->has('maintenance_type'))
+                                <span class="text-danger">{{ $errors->first('maintenance_type') }}</span>
+                                @endif
                             </div>
 
                             <div class="form-group">
@@ -78,11 +84,17 @@
                             <div class="form-group">
                                 <label >Biaya Perbaikan</label>
                                 <input type="text" class="form-control" name="cost" autocomplete="off" placeholder="Masukan biaya perbaikan">
+                                @if ($errors->has('cost'))
+                                <span class="text-danger">{{ $errors->first('cost') }}</span>
+                                @endif
                             </div>
 
                             <div class="form-group">
                                 <label >Tanggal Perbaikan Unit</label>
                                 <input type="date" class="form-control" name="maintenance_date" autocomplete="off">
+                                @if ($errors->has('maintenance_date'))
+                                <span class="text-danger">{{ $errors->first('maintenance_date') }}</span>
+                                @endif
                             </div>
 
                             <div class="form-group">
@@ -93,9 +105,19 @@
                                     <option value="{{$mekanik->name}}">{{$mekanik->nik . ' - ' . $mekanik->name}}</option>
                                     @endforeach
                                 </select>
+                                @if ($errors->has('mechanic_name'))
+                                <span class="text-danger">{{ $errors->first('mechanic_name') }}</span>
+                                @endif
                             </div>
 
-                           
+                           <div class="form-group">
+                            <label >Upload bukti pembayaran</label>
+                            <input type="file" class="form-control" name="foto" autocomplete="off">
+                            <p style="color: gray"> <small>*dokumen bisa berupa kwitansi/bon pembayaran</small></p>
+                            @if ($errors->has('foto'))
+                            <span class="text-danger">{{ $errors->first('foto') }}</span>
+                            @endif
+                           </div>
                             
                             <button type="submit" class="btn btn-primary">Simpan</button>
                         </form>  
