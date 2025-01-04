@@ -195,17 +195,27 @@
 
                         @if(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Finance Staff' || app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Human Resource Staff')
                         <hr>
-
-                            @if($payroll_detail->first()->payroll_file == null)
-                            <div style="padding: 40px;" class="attachment-file">
-                                <h5 style="color: black;"><strong> Upload bukti bayar </strong></h5>
-                                <input class="form-control" type="file" name="payroll_file" id="">
-                                <br>
-                                <button type="submit" class="btn btn-primary">Simpan Payroll</button>
-                            </div>
-                            @else
+                            <?php 
+                                $payroll_payment = date('d');
+                            ?>
+                            
+                            @if($payroll_payment == 25)
+                                @if($payroll_detail->first()->payroll_file == null)
+                                <div style="padding: 40px;" class="attachment-file">
+                                    <h5 style="color: black;"><strong> Upload bukti bayar </strong></h5>
+                                    <input class="form-control" type="file" name="payroll_file" id="">
+                                    <br>
+                                    <button type="submit" class="btn btn-primary">Simpan Payroll</button>
+                                </div>
+                                @else
+                            
                             <div style="padding: 40px;" class="attachment-file">
                                 <button type="button" class="btn btn-secondary">Sudah Bayar</button>
+                            </div>
+                                 @endif
+                            @else
+                            <div style="padding: 40px;" class="attachment-file">
+                                <h5 style="color: black;">Pembayaran Payroll Karyawan setiap tanggal 25.</h5>
                             </div>
                             @endif
 
@@ -228,9 +238,16 @@
 
                     @if(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Finance Operation' || app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Human Resource Staff' || app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource'|| app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations' ) 
                     <div style="padding: 0px 40px 40px 40px;" class="component-validate">
+                        @if($payroll_detail->first()->payroll_id == null)
+                        @else
                         <form action="{{route('confirmed_payroll', $payroll_detail->first()->payroll_id)}}" method="POST">
                             @csrf
                             @method('PUT')
+                            <?php 
+                            $payroll_payment = date('d');
+                            ?>
+                        
+                        @if($payroll_payment == 25)
                             @if($payroll_detail->first()->payroll_file == null)
                                 <button type="button" class="btn btn-secondary">Belum Bayar</button>
                                 @else
@@ -262,6 +279,8 @@
                                 @endif
                             @endif
                         </form>
+                        @endif
+                        @endif
                     </div>
                     @else
                     @endif

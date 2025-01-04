@@ -8,6 +8,8 @@ use App\Models\PayrollModel;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Helper\Downloader;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 use function Laravel\Prompts\select;
 
@@ -91,9 +93,49 @@ class PayrollController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
+    public function payroll_history(Request $request, $nik): View
+    {
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+
+        if (auth()->check() && auth()->user()->nik  !== $nik) {
+            abort(403, 'Ooops unauthorized nik');
+        }
+
+        $employee = DB::table('v_employee')->where('nik', $request->nik)->get();
+        if ($employee->isEmpty()) {
+            abort(403, 'Ooops unauthorized nik');
+        }
+
+        $payroll_data = DB::table('v_payroll')->where('nik', $request->nik)->get();
+        return view('layouts.admin_views.payroll.payroll_history', compact('employee', 'payroll_data', 'grouped_sub_menu', 'sidebar_menu'));
+    }
+
+    public function download_payroll(Request $request)
+    {
+        $payroll_data = DB::table('v_payroll')->where('id', $request->id)->get();
+
+        $head_of_finance_sign = DB::table('employee_signature as es')
+            ->select('es.signature', 'e.name')
+            ->join('employee as e', 'es.employee_id', '=', 'e.id')
+            ->where('employee_id', '9')->get();
+
+        $head_of_hr_sign = DB::table('employee_signature as es')
+            ->select('es.signature', 'e.name')
+            ->join('employee as e', 'es.employee_id', '=', 'e.id')
+            ->where('employee_id', '11')->get();
+
+        $pdf = Pdf::loadView('layouts.pdf.payroll', [
+            'payroll_data' => $payroll_data,
+            'head_of_hr_sign' => $head_of_hr_sign,
+            'head_of_finance_sign' => $head_of_finance_sign
+        ]);
+
+        return $pdf->download();
+    }
+
+
     public function show(string $id)
     {
         //

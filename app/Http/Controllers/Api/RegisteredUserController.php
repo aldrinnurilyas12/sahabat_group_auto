@@ -175,16 +175,18 @@ class RegisteredUserController extends Controller
         }
     }
 
-    public function getUSersActivity()
+    public function getUsersActivity()
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'] ?? [];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'] ?? [];
         $users_activity = DB::table('users as u')
-            ->select('u.id', 'u.nik', 'u.email', 'e.name', 'r.role_name', 'u.last_seen', 'b.location_name')
+            ->select('u.id', 'u.nik', 'u.email', 'e.name', 'r.role_name', 'u.last_seen', 'b.location_name', 'jp.position_name')
             ->leftJoin('employee as e', 'u.employee_id', '=', 'e.id')
             ->leftJoin('role as r', 'u.role', '=', 'r.id')
             ->leftJoin('branch as b', 'e.branch_id', '=', 'b.id')
+            ->leftJoin('job_position as jp', 'e.job_position', '=', 'jp.id')
+            ->orderBy('u.last_seen', 'DESC')
             ->get();
 
         return view('layouts.admin_views.users_activity', compact('users_activity', 'grouped_sub_menu', 'sidebar_menu',));

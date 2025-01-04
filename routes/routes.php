@@ -117,7 +117,7 @@ Route::middleware('auth')->group(function () {
 
     // USER ACCESS CONTROL ROUTES
     Route::apiResource('user_control', App\Http\Controllers\UserControl::class);
-    Route::get('users_activity', [RegisteredUserController::class, 'getUSersActivity'])->name('users_activity');
+    Route::get('users_activity', [RegisteredUserController::class, 'getUsersActivity'])->name('users_activity');
 
     // DEPARTMENT ROUTES
     Route::apiResource('master_department', App\Http\Controllers\Api\DepartmentController::class);
@@ -287,4 +287,6 @@ Route::middleware('auth')->group(function () {
     Route::get('get_payroll_detail/{id}', [PayrollController::class, 'payrol_detail_layout'])->name('get_payroll_detail');
     Route::get('get_attendance/{id}', [PayrollController::class, 'get_attendance'])->name('get_attendance');
     Route::put('confirmed_payroll/{payroll_id}', [PayrollController::class, 'confirmed_payroll'])->name('confirmed_payroll');
+    Route::get('show_payroll/{nik}', [PayrollController::class, 'payroll_history'])->name('show_payroll');
+    Route::get('get_payroll/{id}', [PayrollController::class, 'download_payroll'])->name('get_payroll');
 });

@@ -110,6 +110,14 @@
                                 </form>
                                 @endif
                             </div>
+                            <br>
+                            <hr>
+                            <br>
+
+                            <div class="signature-img">
+                              <a class="btn btn-primary" href="{{route('show_payroll', $employee->first()->nik)}}">Lihat Payroll Anda</a>
+                            </div>
+
                         </div>
                     </div>
                     <div style="width:70%; color:black;" class="container-content">

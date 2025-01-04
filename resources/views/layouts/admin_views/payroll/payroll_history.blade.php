@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Data Users Admin - SAHABAT GROUP AUTO ADMINISTRATOR</title>
+    <title>Riwayat Payroll - SAHABAT GROUP AUTO ADMINISTRATOR</title>
 
     <!-- Custom fonts for this template-->
     <link href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
@@ -46,8 +46,7 @@
                     <!-- DataTable -->
                     <div class="card shadow mb-4">
                         <div  class="card-header py-3">
-                            
-                            <h5 style="color:black;"><strong>Data Users Aktif (Online)</strong></h5>
+                            <h5 style="color: black;"><strong>Riwayat Payroll Anda</strong></h5>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -55,42 +54,30 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Nik</th>
-                                            <th>Nama</th>
-                                            <th>Last Seen</th>
-                                            <th>online</th>  
-                                            <th>Email</th>
-                                            <th>Kantor</th>
-                                            <th>Posisi</th>
-                                            <th>Role</th>                                         
+                                            <th>PDF</th>
+                                            <th>NIK</th>
+                                            <th>Nama Karyawan</th>
+                                            <th>Tanggal</th>
+                                                                              
                                         </tr>
                                     </thead>
                                    
                                     <tbody>
                                         <?php $no = 1;  ?>
-                                        @foreach($users_activity as $users)
+                                        @foreach($payroll_data as $payroll)
                                         <tr style="width: 200px;">
-                                            <td><?php echo $no++ ?></td>
-                                            <td>{{$users->nik}}</td>
-                                            <td>{{$users->name}}</td>
+                                            <td><?php echo $no++?></td>
                                             <td>
-                                                @if($users->last_seen)
-                                                {{ Carbon\Carbon::parse($users->last_seen)->diffForHumans() }}
+                                                @if($payroll->status == 'Sudah Konfirmasi')
+                                                <a class="btn btn-primary" href="{{route('get_payroll', $payroll->id)}}"><i class="fa fa-file"></i>&nbsp;<span>Unduh Payroll</span></a>
                                                 @else
-                                                belum aktif
+                                                <p class="text-danger">Belum Konfirmasi</p>
                                                 @endif
-                                            </td>
-                                            <td>
-                                                @if($users->last_seen)
-                                                <span class="text-success">Online</span>
-                                                @else
-                                                    <span class="text-secondary">Offline</span>
-                                                @endif
-                                            </td>
-                                            <td>{{$users->email}}</td>
-                                            <td>{{$users->location_name}}</td>
-                                            <td>{{$users->position_name}}</td>
-                                            <td>{{$users->role_name}}</td>
+                                               </td>
+                                            <td>{{$payroll->nik}}</td>
+                                            <td>{{$payroll->name}}</td>
+                                            <td>{{ \Carbon\Carbon::parse($payroll->created_at)->format('d F Y')}}</td>
+                                         
                                         </tr>
 
                                         @endforeach
@@ -100,13 +87,7 @@
                             </div>
                         </div>
                     </div>
-
-              
-
-                {{-- end content --}}
-
-                
-
+                    {{-- end content --}}
             </div>
            
             @include('layouts.admin_views.footer')
@@ -118,6 +99,40 @@
 
     </div>
 
+     {{-- modal change status --}}
+
+     {{-- @foreach($branch as $cab) 
+     <div class="modal fade" id="deleteUnit{{$cab->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{$cab->id}}" aria-hidden="true">
+         <div class="modal-dialog" role="document">
+             <div class="modal-content">
+                 <div class="modal-header">
+                     <h5 class="modal-title" id="exampleModalLabel{{$cab->id}}">Hapus data cabang: {{$cab->location_code . ' - ' . $cab->location_name}}</h5>
+                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                         <span aria-hidden="true">×</span>
+                     </button>
+                 </div>
+     
+                 <form method="POST" action="{{ route('master_branch.destroy', $cab->id) }}">
+                     @csrf
+                     @method('DELETE')
+                     <div style="color: black;" class="modal-body">
+                         Apakah Anda ingin menghapus data cabang:
+                         {{$cab->location_code . ' - ' . $cab->location_name}} ?
+                         <br>
+                         <span style="font-style: italic;color:gray;font-size:12px;">*Data akan terhapus permanen.</span>    
+                     </div>
+                     <div class="modal-footer">
+                         <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                         <button class="btn btn-danger" type="submit">Hapus</button>
+                     </div>
+                 </form>
+             </div>
+         </div>
+     </div>
+     
+     @endforeach --}}
+
+     {{-- end modal --}}
     <!-- End of Page Wrapper -->
 
     <!-- Scroll to Top Button-->
@@ -257,7 +272,7 @@
            console.log("Elemen spinner tidak ditemukan!");
        }
    });
-   </script>
+</script>
 
 
 </html>
