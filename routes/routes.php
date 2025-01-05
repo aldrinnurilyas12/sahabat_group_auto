@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\Api\LoginAdminController;
 use App\Http\Controllers\Api\AuthenticatedSessionController;
+use App\Http\Controllers\Api\Blog;
 use App\Http\Controllers\Api\BranchController;
 use App\Http\Controllers\Api\ConfirmablePasswordController;
 use App\Http\Controllers\Api\CustomerRequestVehicleSale;
@@ -36,6 +37,7 @@ use App\Http\Controllers\UserControl;
 use App\Mail\SendEmailAppointment;
 use App\Models\CreditSimulation;
 use App\Models\MasterVehicleAdvertisementModel;
+use FontLib\Table\Type\name;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Row;
 
@@ -67,6 +69,7 @@ Route::middleware('guest')->group(function () {
     Route::put('ads_clicked/{slug}', [LandingPageController::class, 'clicked_ads'])->name('ads_clicked');
 
 
+    Route::get('show_blog/{id}', [LandingPageController::class, 'showBlog'])->name('show_blog');
     // route vehicle sale request
     Route::post('vehicle_request_save', [VehicleSalesRequest::class, 'store'])->name('vehicle_request_save');
     Route::get('vehicle_sale_request', [VehicleSalesRequest::class, 'index'])->name('vehicle_sale_request');
@@ -289,4 +292,10 @@ Route::middleware('auth')->group(function () {
     Route::put('confirmed_payroll/{payroll_id}', [PayrollController::class, 'confirmed_payroll'])->name('confirmed_payroll');
     Route::get('show_payroll/{nik}', [PayrollController::class, 'payroll_history'])->name('show_payroll');
     Route::get('get_payroll/{id}', [PayrollController::class, 'download_payroll'])->name('get_payroll');
+
+    // ROUTES BLOG
+    Route::apiResource('master_blog', App\Http\Controllers\Api\Blog::class);
+    Route::get('blog_create', [Blog::class, 'blog_create_layouts'])->name('blog_create');
+    Route::get('edit_blog/{id}', [Blog::class, 'edit_blog_layouts'])->name('edit_blog');
+    Route::put('blog_edit/{id}', [Blog::class, 'update'])->name('blog_edit');
 });

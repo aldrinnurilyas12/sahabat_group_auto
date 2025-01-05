@@ -24,13 +24,14 @@ class LandingPageController extends Controller
     public function index(Request $request): View
     {
         $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->limit(10)->get();
+        $blog_data = DB::table('blog')->get();
         $brand      = DB::table('vehicle_brand')->get();
         $branch = DB::table('v_branch')->get();
         $token  = $request->unique_tokens;
         $vehicle_request = DB::table('customer_vehicle_request')
             ->select('vehicle_type', 'brand_name', 'year', 'vehicle_color', 'name', 'description', 'updated_at')
             ->leftJoin('vehicle_brand as vb', 'customer_vehicle_request.brand', '=', 'vb.id')->where('unique_tokens', $token)->get();
-        return view('layouts.landing_page.main_page.home_page', compact('vehicle_ads', 'brand', 'branch', 'vehicle_request'));
+        return view('layouts.landing_page.main_page.home_page', compact('vehicle_ads', 'blog_data', 'brand', 'branch', 'vehicle_request'));
     }
 
 
@@ -324,9 +325,11 @@ class LandingPageController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function showBlog(Request $request, string $id): View
     {
-        //
+        $blog_data = DB::table('blog')->where('id', $request->id)->get();
+
+        return view('layouts.landing_page.main_page.show_blog', compact('blog_data'));
     }
 
 

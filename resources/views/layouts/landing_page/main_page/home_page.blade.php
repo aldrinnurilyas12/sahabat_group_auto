@@ -314,15 +314,35 @@
     </section>
     
      {{-- section gallery--}}
-    <section id="gallery" class="bg-white dark:bg-gray-900">
-        <div class="max-w-screen-xl px-4 py-8 mx-auto lg:py-24 lg:px-6">
-            <div class="max-w-screen-md mx-auto mb-8 text-center lg:mb-12">
-                <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Gallery Kami</h2>
-                <p class="mb-5 font-light text-gray-500 sm:text-xl dark:text-gray-400">Tidak ada unit kendaraan yang dicari? silahkan masukan email dan nomor telepon anda.</p>
+     <section id="gallery" style="padding:20px;">
+        <div class="max-w-screen-xl px-4 pt-20 pb-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 ">
+        <h2 style="text-align: center;margin" class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Pilihan Unit Kami</h2>
+        <br>
+        <br> 
+            <div style="display: flex; gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:5rem;" class="form-group-content">
+        
+                @foreach($blog_data as $blog)
+                   
+                    <div class="card">
+                        <h5 style="margin-bottom: 0;font-size:15px; margin-bottom:10px;padding:10px;color:black;" class="card-title">
+                          <a style="color:black;font-weight:bold;" href="{{route('show_blog', $blog->id)}}">{{$blog->title}}</a></h5>
+                        <img style="width: 100%;height:150px;border-radius:0;"  src="{{ asset('storage/' . $blog->blog_foto) }}" class="card-img-top" alt="...">
+                        <div class="card-body">
+                        <div style="color:rgb(0, 0, 0);margin-bottom:10px;" class="small-text">
+                            <small>{{date('d F Y'), strtotime($blog->updated_at)}}</small>
+                        </div>
+                        </div>
+                    </div>   
+                @endforeach
+               
             </div>
-           
+
+
+        <div style="text-align: center" class="button-more-vehicle">
+            <a style="background-color:#212529;" class="btn btn-dark" href="{{route('all_vehicle')}}">Lihat semua <i class="fas fa-arrow-right"></i></a>
         </div>
-      </section>
+        </div>
+    </section>
 
       <section id="contactus" style="background-image: linear-gradient(to right, #fffff7 10%, #e8e8e828 80%);">
         <div class="max-w-screen-xl px-4 py-8 mx-auto space-y-12 lg:space-y-20 lg:py-24 lg:px-6">
