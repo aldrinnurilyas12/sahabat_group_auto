@@ -166,7 +166,7 @@
                                                     @if($customer_request->sending_email)
                                                     <a href="#" class="btn btn-dark">Sudah</a>
                                                     @else
-                                                    <a href="{{route('customer_vehicle_mail', $customer_request->id)}}" class="btn btn-primary">Email</a>
+                                                    <a href="{{route('customer_vehicle_sale_mail', $customer_request->id)}}" class="btn btn-primary">Email</a>
                                                     @endif
                                                    
                                                 </div>

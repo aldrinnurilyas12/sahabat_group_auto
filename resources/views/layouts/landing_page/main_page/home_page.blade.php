@@ -316,7 +316,7 @@
      {{-- section gallery--}}
      <section id="gallery" style="padding:20px;">
         <div class="max-w-screen-xl px-4 pt-20 pb-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 ">
-        <h2 style="text-align: center;margin" class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Pilihan Unit Kami</h2>
+        <h2 style="text-align: center;margin" class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Blog/Gallery Kami</h2>
         <br>
         <br> 
             <div style="display: flex; gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:5rem;" class="form-group-content">

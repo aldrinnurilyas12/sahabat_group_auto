@@ -77,7 +77,21 @@ class LoginAdminController extends Controller
 
         $user = Auth::user();
         $users = DB::table('users')
-            ->select('users.id', 'users.employee_id as user_emp_id', 'users.role', 'employee.nik', 'employee.name as name', 'employee.branch_id', 'employee.id as employee_id', 'branch.location_name', 'employee.job_position', 'employee.email', 'up.users_foto', 'jp.position_name', 'd.department_name')
+            ->select(
+                'users.id',
+                'users.employee_id as user_emp_id',
+                'users.role',
+                'employee.nik',
+                'employee.name as name',
+                'employee.branch_id',
+                'employee.id as employee_id',
+                'branch.location_name',
+                'employee.job_position',
+                'employee.email',
+                'up.users_foto',
+                'jp.position_name',
+                'd.department_name'
+            )
             ->leftJoin('employee', 'users.employee_id', '=', 'employee.id')
             ->leftJoin('branch', 'employee.branch_id', '=', 'branch.id')
             ->leftJoin('users_picture as up', 'employee.id', '=', 'up.user_id')
