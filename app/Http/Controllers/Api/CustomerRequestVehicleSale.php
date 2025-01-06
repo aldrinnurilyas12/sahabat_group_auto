@@ -85,7 +85,7 @@ class CustomerRequestVehicleSale extends Controller
         return view('layouts.admin_views.customer_vehicle_sale.send_mail_customer_request_sale', compact('customer_request_sale_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
-    public function response_customers_request(Request $request_data)
+    public function response_customers_request_sale(Request $request_data)
     {
         DB::table('vehicle_sale_request')->where('id', $request_data->id)->update([
             'id' => $request_data->id,

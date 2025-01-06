@@ -93,7 +93,9 @@ class LandingPageController extends Controller
             ->whereRaw(
                 "LOWER(CONCAT(REPLACE(vb.brand_name, ' ', '-'), '-', v.vehicle_type, '-', v.manufacture_year)) = ?",
                 [$request->slug]  // Menggunakan nilai slug yang diterima dari request
-            )->get();
+            )
+            ->whereIn('e.job_position', ['6', '9'])
+            ->get();
 
         return view('layouts.landing_page.main_page.vehicle_detail', compact('vehicle_data', 'vehicle_fotos', 'credit_simulation', 'contact', 'media_video', 'engine_sound'));
     }

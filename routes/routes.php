@@ -249,8 +249,8 @@ Route::middleware('auth')->group(function () {
 
     // customer sale request
     Route::apiResource('master_vehicle_sale', App\Http\Controllers\Api\CustomerRequestVehicleSale::class);
-    Route::get('customer_vehicle_sale_mail/{id}', [CustomerRequestVehicleSale::class, 'sendMailVehicleSaleRequest'])->name('customer_vehicle_mail');
-    Route::put('response_customers_request_sale/{id}', [CustomerRequestVehicleSale::class, 'response_customers_request'])->name('response_customers_request_sale');
+    Route::get('customer_vehicle_sale_mail/{id}', [CustomerRequestVehicleSale::class, 'sendMailVehicleSaleRequest'])->name('customer_vehicle_sale_mail');
+    Route::put('response_customers_request_sale/{id}', [CustomerRequestVehicleSale::class, 'response_customers_request_sale'])->name('response_customers_request_sale');
 
     // settings routes:
     Route::post('time_settings', [UserControl::class, 'time__settings'])->name('time_settings');
