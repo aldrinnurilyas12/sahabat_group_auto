@@ -117,6 +117,7 @@ Route::middleware('auth')->group(function () {
     Route::post('users_picture', [EmployeeController::class, 'upload_users_picture'])->name('users_picture');
     Route::put('update_picture/{id}', [EmployeeController::class, 'update_user_picture'])->name('update_picture');
     Route::get('users_export', [EmployeeController::class, 'users_export'])->name('users_export');
+    Route::get('master_it_users_activity', [EmployeeController::class, 'users_log_activity'])->name('master_it_users_activity');
 
     // USER ACCESS CONTROL ROUTES
     Route::apiResource('user_control', App\Http\Controllers\UserControl::class);
@@ -131,7 +132,7 @@ Route::middleware('auth')->group(function () {
     // MENU ROUTES
     Route::apiResource('master_main_menus', App\Http\Controllers\Api\MasterMainMenuController::class);
     Route::get('menu_create', [MasterMainMenuController::class, 'menus_create_layout'])->name('menu_create');
-    Route::get('submenu_create/', [MasterMainMenuController::class, 'submenu_create_layout'])->name('submenu_create');
+    Route::get('submenu_create/{id}', [MasterMainMenuController::class, 'submenu_create_layout'])->name('submenu_create');
     Route::get('submenu_detail/{id}', [MasterMainMenuController::class, 'submenu_detail_data'])->name('submenu_detail');
     Route::delete('submenu_delete/', [MasterMainMenuController::class, 'submenu_delete'])->name('submenu_delete');
     Route::post('submenu_save', [MasterMainMenuController::class, 'submenu_save'])->name('submenu_save');
@@ -205,6 +206,8 @@ Route::middleware('auth')->group(function () {
 
     // VEHICLE MEDIA PLAYER ROUTES:
     Route::post('vehicle_media_upload', [MasterVehicleData::class, 'vehicle_media_upload'])->name('vehicle_media_upload');
+    Route::delete('delete_onlychoose_sound/', [MasterVehicleData::class, 'delete_onlychoose_sound'])->name('delete_onlychoose_sound');
+    Route::delete('delete_onlychoose_video/', [MasterVehicleData::class, 'delete_onlychoose_video'])->name('delete_onlychoose_video');
 
     // Credit Simulation Routes
     Route::apiResource('master_credit_simulation', App\Http\Controllers\Api\MasterCreditSimulation::class);

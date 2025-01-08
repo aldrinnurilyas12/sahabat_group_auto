@@ -393,7 +393,7 @@
                                     <h5 style="color: black;">Dokumen Kendaraan : {{$vehicle->first()->brand . " " . $vehicle->first()->vehicle_type . " " . $vehicle->first()->manufacture_year}}</h5>
                                     <br>
 
-                                    <div style="display: flex; gap:15px; justify-content:space-between;flex-wrap:wrap;" class="btn-content">
+                                    <div class="btn-content">
                                         <div style="display: flex;gap:10px;" class="btn-container-doc">
                                             <form action="{{route('download.document', $vehicle->first()->id)}}"  method="GET">
                                                 <button style="margin-bottom: 20px;" class="btn btn-primary" type="submit"><i class="fas fa-download"></i> &nbsp; Download Dokumen</button>
@@ -409,8 +409,9 @@
                                             </div> --}}
                                         </div>
 
-                                        <div style="display: flex;" class="form-doc-upload">
-                                            <form style="display: flex;" action="{{route('document_upload')}}"  method="POST" enctype="multipart/form-data">
+                                        <div style="border: 1px solid rgb(194, 194, 194);padding:10px; border-radius:5px;" class="form-doc-upload">
+                                            <label style="color:black;" for=""><strong>Attachment Files</strong></label>
+                                            <form  action="{{route('document_upload')}}"  method="POST" enctype="multipart/form-data">
                                             @csrf
                                                 <div class="form-group">
                                                     <input type="text" name="vehicle_id" value="{{$vehicle->first()->id}}" hidden>
@@ -420,7 +421,7 @@
                                             </form>
                                         </div>
                                     </div>
-
+                                    <br>
                                     <div style="display: flex; flex-wrap:wrap;gap:5px;" class="container-image">
                                     @foreach ($documents as $item)
                                     <div class="doc-display">
@@ -448,10 +449,10 @@
                                     <h5 style="color: black;">Foto Unit : {{$vehicle->first()->brand . " " . $vehicle->first()->vehicle_type . " " . $vehicle->first()->manufacture_year}}</h5>
                                     <br>
                                     
-                                    <div style="display: flex; gap:15px; justify-content:space-between;flex-wrap:wrap;" class="btn-content">
+                                    <div class="btn-content">
                                     @if ($vehicle->isNotEmpty())
                                         @foreach ($vehicle as $item)
-                                        <div style="display: flex;gap:10px;" class="btn-container-img">
+                                        <div class="btn-container-img">
                                             <div class="form-download">
                                                 <form action="{{route('download.images', $item->id)}}"  method="GET">
                                                     <button style="margin-bottom: 20px;" class="btn btn-primary" type="submit"><i class="fas fa-download"></i> &nbsp; Download Foto Unit</button>
@@ -469,8 +470,9 @@
                                         </div>
                                         
                                         @endforeach
-                                        <div style="display: flex;" class="form-doc-upload">
-                                            <form style="display: flex;" action="{{route('image_upload')}}"  method="POST" enctype="multipart/form-data">
+                                        <div style="border: 1px solid rgb(194, 194, 194);padding:10px; border-radius:5px;" class="form-fotos-upload">
+                                            <label style="color:black;" for=""><strong>Attachment Files</strong></label>
+                                            <form action="{{route('image_upload')}}"  method="POST" enctype="multipart/form-data">
                                             @csrf
                                                 <div class="form-group">
                                                     <input type="text" name="vehicle_id" value="{{$vehicle->first()->id}}" hidden>
@@ -482,7 +484,7 @@
                                     @else           
                                     @endif
                                     </div>
-
+                                    <br>
                                     <div style="display: flex; flex-wrap:wrap;gap:5px;" class="container-image">
                                     @foreach ($images as $galery)
                                         <div class="img-display">
@@ -535,49 +537,69 @@
                                        
                                     {{-- </div> --}} 
 
-                                    <div style="display: flex;" class="form-video-upload">
+                                    <div  style="border: 1px solid rgb(194, 194, 194);padding:10px; border-radius:5px;" class="form-video-upload">
                                         <form action="{{route('vehicle_media_upload')}}"  method="POST" enctype="multipart/form-data">
                                         @csrf
                                             <div class="form-group">
                                                 <input type="text" name="vehicle_id" value="{{$vehicle->first()->id}}" hidden>
+                                                <label style="color:black;" for=""><strong> Tipe Media</strong></label>
                                                 <select class="form-control" name="media_type" id="">
                                                     <option value="">=== Pilih Tipe Media ===</option>
                                                     <option value="video">Video</option>
                                                     <option value="engine sound">Suara Mesin</option>
                                                 </select>
+                                                @if ($errors->has('media_type'))
+                                                <span class="text-danger">{{ $errors->first('media_type') }}</span>
+                                                @endif
+                                                <br>
+                                                <label style="color:black;" for=""><strong>Attachment Files</strong></label>
                                                 <br>
                                                 <input type="file" name="media_files">
                                             </div>
-                                            <br>
                                             <button style="margin-bottom: 20px;" class="btn btn-info" type="submit"><i class="fas fa-upload"></i> &nbsp; Upload Media</button>
                                         </form>
                                     </div>
+                                    <br>
 
+                                    <label style="color: black;" for=""><strong>Video Unitt</strong></label>
                                     <div style="display: flex; flex-wrap:wrap;gap:15px;" class="container-image">
-                                    @foreach ($media_video as $video)
-                                        <div style="border:1.5px solid gray;" class="img-display">
-                                            <video width="200" height="200" controls>
-                                            <source src="{{ asset('storage/' . $video->media_files) }}" type="video/mp4">
-                                            </video>
-                                            {{-- <div class="form-delete-img">
-                                                <form action="{{route('delete_onlychoose_images',['id' =>  $galery->id])}}"  method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button style="margin-top:5px;" type="submit"  style="margin-bottom: 20px;" class="btn btn-danger"><i class="fas fa-trash"></i></button>
-                                                </form>
-                                            </div> --}}
-                                        </div>
+                                        @foreach ($media_video as $video)
+                                            <div class="img-display">
+                                                <video width="200" height="200" controls>
+                                                <source src="{{ asset('storage/' . $video->media_files) }}" type="video/mp4">
+                                                </video>
+                                                <div class="form-delete-doc">
+                                                    <form action="{{route('delete_onlychoose_video',['id' =>  $video->id])}}"  method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button style="margin-top:5px;" type="submit"  style="margin-bottom: 20px;" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                                    </form>
+                                                </div>
+                                            </div>
 
-                                    @endforeach
-
-                                    @foreach($media_sound as $sound)
-                                        <div style="align-content: end; border:1.5px solid gray;" class="sound-display">
-                                            <audio controls>
-                                                <source src="{{ asset('storage/' . $sound->media_files) }}" type="audio/mpeg" >
-                                            </audio>
-                                        </div>
-                                    @endforeach
+                                        @endforeach
                                     </div>
+
+                                    <br>
+                                    <label style="color: black;" for=""><strong>Suara Mesin Unit</strong></label>
+                                    <div style="display:flex;" class="sound-display">
+                                        @foreach($media_sound as $sound)
+                                            <div style="display:block;" class="sound-display">
+                                                <audio controls>
+                                                    <source src="{{ asset('storage/' . $sound->media_files) }}" type="audio/mpeg" >
+                                                </audio>
+                                                <br>
+                                                <div class="form-delete-doc">
+                                                    <form action="{{route('delete_onlychoose_sound',['id' => $sound->id])}}"  method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button style="margin-top:5px;" type="submit"  style="margin-bottom: 20px;" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>

@@ -583,4 +583,19 @@ class EmployeeController extends Controller
             return redirect()->route('master_employee.index');
         }
     }
+
+    public function users_log_activity(Request $request): View
+    {
+
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+
+        $users_activity = DB::table('log_activity_users as la')
+            ->select('la.id', 'la.user_id', 'la.ip_address', 'la.log_activity', 'e.nik', 'e.name', 'la.created_at', 'la.created_by')
+            ->leftJoin('users as us', 'us.id', '=', 'la.user_id')
+            ->leftJoin('employee as e', 'us.employee_id', '=', 'e.id')
+            ->orderBy('created_at', 'DESC')->get();
+        return view('layouts.admin_views.users_admin.users_activity', compact('users_activity', 'grouped_sub_menu', 'sidebar_menu'));
+    }
 }

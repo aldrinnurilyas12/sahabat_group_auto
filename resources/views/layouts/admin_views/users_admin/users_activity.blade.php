@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Data Users Admin - SAHABAT GROUP AUTO ADMINISTRATOR</title>
+    <title>Data Users Log</title>
 
     <!-- Custom fonts for this template-->
     <link href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
@@ -46,8 +46,10 @@
                     <!-- DataTable -->
                     <div class="card shadow mb-4">
                         <div  class="card-header py-3">
-                            
-                            <h5 style="color:black;"><strong>Data Users Aktif (Online)</strong></h5>
+                            <h5 style="color: black;"><strong>Data Aktivitas Pengguna Admin PT Sahabat Group Auto</strong></h5>
+                            <br>
+
+                           
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -55,40 +57,26 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>Nik</th>
+                                            <th>NIK</th>
                                             <th>Nama</th>
-                                            <th>Last Seen</th>
-                                            <th>online</th>  
-                                            <th>Kantor</th>
-                                            <th>Posisi</th>
-                                            <th>Role</th>                                         
+                                            <th>Alamat IP</th>
+                                            <th>Aktivitas</th>
+                                            <th>Created At</th>
+                                            <th>Created By</th>
                                         </tr>
                                     </thead>
                                    
                                     <tbody>
                                         <?php $no = 1;  ?>
-                                        @foreach($users_activity as $users)
+                                        @foreach($users_activity as $user)
                                         <tr style="width: 200px;">
                                             <td><?php echo $no++ ?></td>
-                                            <td>{{$users->nik}}</td>
-                                            <td>{{$users->name}}</td>
-                                            <td>
-                                                @if($users->last_seen)
-                                                {{ Carbon\Carbon::parse($users->last_seen)->diffForHumans() }}
-                                                @else
-                                                belum aktif
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($users->last_seen)
-                                                <span class="text-success">Online</span>
-                                                @else
-                                                    <span class="text-secondary">Offline</span>
-                                                @endif
-                                            </td>
-                                            <td>{{$users->location_name}}</td>
-                                            <td>{{$users->position_name}}</td>
-                                            <td>{{$users->role_name}}</td>
+                                            <td>{{$user->nik}}</td>
+                                            <td>{{$user->name}}</td>
+                                            <td>{{$user->ip_address}}</td>
+                                            <td>{{$user->log_activity}}</td>
+                                            <td>{{$user->created_at}}</td>    
+                                            <td>{{$user->created_by}}</td>                                       
                                         </tr>
 
                                         @endforeach
@@ -98,13 +86,6 @@
                             </div>
                         </div>
                     </div>
-
-              
-
-                {{-- end content --}}
-
-                
-
             </div>
            
             @include('layouts.admin_views.footer')
@@ -115,7 +96,6 @@
         @yield('content')
 
     </div>
-
     <!-- End of Page Wrapper -->
 
     <!-- Scroll to Top Button-->
@@ -123,40 +103,7 @@
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <style>
-        .col-sm-12{
-            overflow-x: scroll;
-        }
-
-    </style>
-    {{-- spinner --}}
-    <div id="loadingSpinnerWrapper">
-      <div class="spinner-border" role="status">
-      </div>
-    </div>
     
-    <style>
-      #loadingSpinnerWrapper {
-      position: fixed; /* Fix posisi spinner */
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: none; /* Spinner disembunyikan saat halaman dimuat */
-      justify-content: center; /* Horizontal center */
-      align-items: center; /* Vertical center */
-      background-color: rgba(0, 0, 0, 0.517); /* Background semi-transparan */
-      z-index: 9999; /* Pastikan spinner berada di atas konten lainnya */
-    }
-    
-    .spinner-border {
-      color: yellow;
-      width: 3rem;
-      height: 3rem; /* Pastikan tinggi spinner diatur */
-    }
-    
-    </style>
-</body>
     
     <!-- Page level plugins -->
     <script src="{{ asset('assets/vendor/datatables/jquery.dataTables.min.js')}}"></script>
@@ -205,57 +152,8 @@
     @endif
 
 
+</body>
 
-
-
-@if (Session::has('message_success'))
-<script>
-    Swal.fire({
-        title: 'Berhasil',
-        text: "{{ Session::get('message_success') }}",
-        icon: 'success',
-        timer:2000,
-        confirmButtonText: 'OK'
-    });
-</script>
-    
-@endif
-
-@if (Session::has('failed_insert'))
-<script>
-    Swal.fire({
-        title: 'Gagal',
-        text: "{{ Session::get('failed_insert') }}",
-        icon: "error",
-        timer:6000,
-        confirmButtonText: 'OK'
-    });
-</script>
-    
-@endif
-
-<script>
-    window.addEventListener('load', function() {
-       var loadingSpinnerWrapper = document.getElementById('loadingSpinnerWrapper');
-   
-       // Log elemen untuk memastikan spinner ditemukan
-         // Cek apakah elemen ditemukan
-   
-       if (loadingSpinnerWrapper) {
-           // Menampilkan spinner saat halaman dimuat
-           loadingSpinnerWrapper.style.display = 'flex';
-          
-   
-           // Menyembunyikan spinner setelah 2 detik (2000ms)
-           setTimeout(function() {
-               
-               loadingSpinnerWrapper.style.display = 'none';  // Sembunyikan spinner setelah 2 detik
-           }, 1000);  // 2000ms = 2 detik
-       } else {
-           console.log("Elemen spinner tidak ditemukan!");
-       }
-   });
-   </script>
 
 
 </html>

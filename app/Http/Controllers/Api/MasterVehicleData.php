@@ -577,7 +577,8 @@ class MasterVehicleData extends Controller
     {
         $request->validate([
             'vehicle_id' => 'required',
-            'media_files' => 'required|file|mimetypes:video/mp4,audio/mpeg|max:10240000'
+            'media_files' => 'required|file|mimetypes:video/mp4,audio/mpeg|max:10240000',
+            'media_type' => 'required'
         ]);
 
 
@@ -595,6 +596,9 @@ class MasterVehicleData extends Controller
             ]);
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('success_document', 'Media Berhasil disimpan!');
+            return redirect()->back();
+        } else {
+            session()->flash('failed_insert', 'Pilih dahulu Tipe Media');
             return redirect()->back();
         }
     }
@@ -674,5 +678,71 @@ class MasterVehicleData extends Controller
 
         $zip->close();
         return response()->download($zipFilePath)->deleteFileAfterSend(true);
+    }
+
+    public function delete_onlychoose_sound(Request $request)
+    {
+
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+        $request->validate([
+            'id' => 'required|integer|exists:vehicle_media_player,id'
+        ]);
+
+        $sound_id = MediaUploadModel::find($request->id);
+
+        if ($insertTime >= 7 && $insertTime <= 18) {
+            if ($sound_id->media_files) {
+                $oldSoundEngine = public_path('storage/' . $sound_id->media_files);
+                if (file_exists($oldSoundEngine)) {
+                    unlink($oldSoundEngine);
+                }
+            }
+        }
+
+        if ($insertTime >= 7 && $insertTime <= 18) {
+            DB::table('vehicle_media_player')
+                ->where('id', $request->id)
+                ->delete();
+            $this->insertLogActivityUsers(__METHOD__);
+            session()->flash('delete_images', 'Sound Engine Berhasil dihapus!');
+            return redirect()->back();
+        } else {
+            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+            return redirect()->back();
+        }
+    }
+
+    public function delete_onlychoose_video(Request $request)
+    {
+
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+        $request->validate([
+            'id' => 'required|integer|exists:vehicle_media_player,id'
+        ]);
+
+        $sound_id = MediaUploadModel::find($request->id);
+
+        if ($insertTime >= 7 && $insertTime <= 18) {
+            if ($sound_id->media_files) {
+                $oldSoundEngine = public_path('storage/' . $sound_id->media_files);
+                if (file_exists($oldSoundEngine)) {
+                    unlink($oldSoundEngine);
+                }
+            }
+        }
+
+        if ($insertTime >= 7 && $insertTime <= 18) {
+            DB::table('vehicle_media_player')
+                ->where('id', $request->id)
+                ->delete();
+            $this->insertLogActivityUsers(__METHOD__);
+            session()->flash('delete_images', 'Video Unit Berhasil dihapus!');
+            return redirect()->back();
+        } else {
+            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+            return redirect()->back();
+        }
     }
 }

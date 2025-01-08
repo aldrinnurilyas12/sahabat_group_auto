@@ -31,16 +31,23 @@
                     <a href="{{ route('submenu_create', ['id' => $submenu->first()->parent_id]) }}" class="btn btn-primary">
                         <i class="fas fa-plus-circle"></i>&nbsp;Tambah Submenu
                     </a>
-                    @else
-                    <a href="{{ route('submenu_create', ['id' => $sub_menus->first()->id]) }}" class="btn btn-primary">
-                        <i class="fas fa-plus-circle"></i>&nbsp;Tambah Submenu
-                    </a>
-                    @endif
 
                     <a href="{{route('submenu_export', $submenu->first()->parent_id)}}" class="btn btn-success">
                         <i class="fas fa-file-excel"></i>
                         &nbsp; Download
                     </a>
+                    @else
+                    <a href="{{ route('submenu_create', $submenu_parent->first()->id) }}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i>&nbsp;Tambah Submenu
+                    </a>
+
+                    <a href="{{route('submenu_export', $submenu_parent->first()->id)}}" class="btn btn-success">
+                        <i class="fas fa-file-excel"></i>
+                        &nbsp; Download
+                    </a>
+                    @endif
+
+                    
                 </div>
                 
             </div>
