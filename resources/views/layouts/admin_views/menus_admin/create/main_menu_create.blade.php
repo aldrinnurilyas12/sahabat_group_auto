@@ -26,10 +26,16 @@
                     <div class="form-group">
                     <label >Nama Menu</label>
                     <input type="text" class="form-control" name="menu_name" placeholder="Masukan nama menu">
+                        @if ($errors->has('menu_name'))
+                        <span class="text-danger">{{ $errors->first('menu_name') }}</span>
+                        @endif
                     </div>
                     <div class="form-group">
                     <label >Icon Menu</label>
                     <input type="text" class="form-control" name="menu_icon" placeholder="Masukan Icon menu, cth: fas fa-users">
+                        @if ($errors->has('menu_icon'))
+                        <span class="text-danger">{{ $errors->first('menu_icon') }}</span>
+                        @endif
                     </div>
                     <div class="form-group">
                     <label >Lokasi Menu</label>
@@ -38,6 +44,9 @@
                         <option value="admin">Admin</option>
                         <option value="main_web">Website Utama</option>
                     </select>
+                        @if ($errors->has('location'))
+                        <span class="text-danger">{{ $errors->first('location') }}</span>
+                        @endif
                     </div>
                     <div class="form-group">
                     <label>Aktif?</label>

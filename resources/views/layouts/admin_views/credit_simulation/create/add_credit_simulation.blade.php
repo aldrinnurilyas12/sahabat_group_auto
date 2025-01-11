@@ -29,18 +29,17 @@
                         @foreach($vehicle as $car)
                         <div class="form-group">
                             <label>Unit</label>
-                        
                                 <input type="text" class="form-control" name="vehicle_id" value="{{$car->id}}" hidden autocomplete="off">
                                 <input type="text" class="form-control"  value="{{$car->brand .' '. $car->vehicle_type .' '. $car->manufacture_year}}" readonly autocomplete="off">
-                        
                         </div>
                         <div class="form-group">
-                            <label>Harga Unit</label>
+                            <label>Harga Kredit Unit</label>
                             @if($vehicle->first()->credit_price)
                             <input type="text" class="form-control"  value="{{"Rp " . number_format($car->credit_price)}}" autocomplete="off" readonly>
                             @else
                             <input type="text" class="form-control" placeholder="TIDAK ADA HARGA KREDIT, MASUKAN HARGA KREDIT DAHULU..." readonly>
                             @endif
+                            <small>*Harga yang digunakan dalam perhitungan simulasi kredit</small>
                         </div>
                         @endforeach
                     </div>

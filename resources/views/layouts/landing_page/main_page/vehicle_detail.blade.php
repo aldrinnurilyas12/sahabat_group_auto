@@ -274,7 +274,7 @@
                       <tr>
                           <th>No</th>
                           <th>Unit</th>
-                          <th>Harga Unit</th>
+                          <th>Harga Kredit Unit</th>
                           <th>Biaya DP Unit</th>
                           <th>Asuransi</th>
                           <th>Tenor 12 Bulan</th>
@@ -292,15 +292,51 @@
                       <tr>
                           <td><?php echo $no++ ?></td>
                           <td>{{$credit->unit}}</td>
-                          <td>{{"IDR " . number_format($credit->price)}}</td>
-                          <td>{{"IDR " . number_format($credit->down_payment)}}</td>
+                          <td>{{"Rp " . number_format($credit->credit_price)}}</td>
+                          <td>{{"Rp " . number_format($credit->down_payment)}}</td>
                           <td>{{$credit->insurance_name}}</td>
-                          <td>{{"IDR " . number_format($credit->tenor_12_month)}}</td>
-                          <td>{{"IDR " . number_format($credit->tenor_24_month)}}</td>
-                          <td>{{"IDR " . number_format($credit->tenor_36_month)}}</td>
-                          <td>{{"IDR " . number_format($credit->tenor_48_month)}}</td>
-                          <td>{{"IDR " . number_format($credit->tenor_60_month)}}</td>
-                          <td>{{"IDR " . number_format($credit->tenor_72_month)}}</td>
+                          <td>
+                            @if($credit->tenor_12_month)
+                            {{"Rp " . number_format($credit->tenor_12_month)}}
+                            @else
+                            <p>Tidak ada tenor</p>
+                            @endif
+                          </td>
+                          <td>
+                            @if($credit->tenor_24_month)
+                            {{"Rp " . number_format($credit->tenor_24_month)}}
+                            @else
+                            <p>Tidak ada tenor</p>
+                            @endif
+                          </td>
+                          <td>
+                            @if($credit->tenor_36_month)
+                            {{"Rp " . number_format($credit->tenor_36_month)}}
+                            @else
+                           <p>Tidak ada tenor</p>
+                            @endif
+                          </td>
+                          <td>
+                            @if($credit->tenor_48_month)
+                            {{"Rp " . number_format($credit->tenor_48_month)}}
+                            @else
+                            <p>Tidak ada tenor</p>
+                            @endif
+                          </td>
+                          <td>
+                            @if($credit->tenor_60_month)
+                            {{"Rp " . number_format($credit->tenor_60_month)}}
+                            @else
+                            <p>Tidak ada tenor</p>
+                            @endif
+                          </td>
+                          <td>
+                            @if($credit->tenor_72_month)
+                            {{"Rp " . number_format($credit->tenor_72_month)}}
+                            @else
+                            <p>Tidak ada tenor</p>
+                            @endif
+                          </td>
 
                       </tr>
 

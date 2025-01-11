@@ -178,7 +178,7 @@
                                                <span class="text-secondary">Belum datang</span>
                                                 @endif
                                                </td>
-                                            <td>{{date('d-m-Y', strtotime($appointment->date))}}</td>
+                                            <td>{{date('d F Y', strtotime($appointment->date))}}</td>
                                             <td>{{$appointment->schedule_time}}</td>
                                             <td>{{$appointment->created_at}}</td>
                                         </tr>

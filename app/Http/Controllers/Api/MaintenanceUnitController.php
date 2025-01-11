@@ -105,8 +105,7 @@ class MaintenanceUnitController extends Controller
             'vehicle_id' => 'required',
             'maintenance_type' => 'required',
             'maintenance_date'  => 'required',
-            'cost' => 'required',
-            'mechanic_name' => 'required'
+            'cost' => 'required'
 
         ]);
 

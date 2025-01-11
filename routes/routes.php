@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\MasterVehicleData;
 use App\Http\Controllers\Api\VerifyEmailController;
 use App\Http\Controllers\Api\MasterAppointment;
 use App\Http\Controllers\Api\DepartmentController;
+use App\Http\Controllers\Api\EticketingController;
 use App\Http\Controllers\Api\MaintenanceUnitController;
 use App\Http\Controllers\Api\PayrollController;
 use App\Http\Controllers\Api\SpkUnitController;
@@ -301,4 +302,15 @@ Route::middleware('auth')->group(function () {
     Route::get('blog_create', [Blog::class, 'blog_create_layouts'])->name('blog_create');
     Route::get('edit_blog/{id}', [Blog::class, 'edit_blog_layouts'])->name('edit_blog');
     Route::put('blog_edit/{id}', [Blog::class, 'update'])->name('blog_edit');
+
+    // ROUTES E-TICKETING
+    Route::apiResource('master_eticket', App\Http\Controllers\Api\EticketingController::class);
+    Route::get('eticket_create', [EticketingController::class, 'create_eticket_layout'])->name('eticket_create');
+    Route::get('edit_eticket/{id}', [EticketingController::class, 'edit_eticket_layouts'])->name('edit_eticket');
+    Route::put('update_eticket/{id}', [EticketingController::class, 'update'])->name('update_eticket');
+    Route::get('eticket_detail/{id}', [EticketingController::class, 'eticket_detail_layouts'])->name('eticket_detail');
+    // Routes IT-Monitoring
+    Route::get('master_it_eticketing', [EticketingController::class, 'it_eticketing_layouts'])->name('master_it_eticketing');
+    Route::put('confirmed_eticket/{id}', [EticketingController::class, 'confirmed_eticket_it'])->name('confirmed_eticket');
+    Route::put('confirmed_eticket_done/{id}', [EticketingController::class, 'confirmed_eticket_it_done'])->name('confirmed_eticket_done');
 });

@@ -323,14 +323,14 @@
         
                 @foreach($blog_data as $blog)
                    
-                    <div class="card">
-                        <h5 style="margin-bottom: 0;font-size:15px; margin-bottom:10px;padding:10px;color:black;" class="card-title">
-                          <a style="color:black;font-weight:bold;" href="{{route('show_blog', $blog->id)}}">{{$blog->title}}</a></h5>
+                    <div style="width: 300px;" class="card">
                         <img style="width: 100%;height:150px;border-radius:0;"  src="{{ asset('storage/' . $blog->blog_foto) }}" class="card-img-top" alt="...">
                         <div class="card-body">
                         <div style="color:rgb(0, 0, 0);margin-bottom:10px;" class="small-text">
                             <small>{{date('d F Y'), strtotime($blog->updated_at)}}</small>
                         </div>
+                        <h5 style="margin-bottom: 0;font-size:15px; margin-bottom:10px;color:black;" class="card-title">
+                            <a style="color:black;font-weight:bold;" href="{{route('show_blog', $blog->id)}}">{{$blog->title}}</a></h5>
                         </div>
                     </div>   
                 @endforeach

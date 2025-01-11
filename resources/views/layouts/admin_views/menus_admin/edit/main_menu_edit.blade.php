@@ -28,11 +28,19 @@
                     <div class="form-group">
                     <label >Nama Menu</label>
                     <input type="text" class="form-control" name="menu_name" value="{{$menu->menu_name}}" autocomplete="off">
+                        @if ($errors->has('menu_name'))
+                        <span class="text-danger">{{ $errors->first('menu_name') }}</span>
+                        @endif
                     </div>
+
                     <div class="form-group">
                     <label >Icon Menu</label>
                     <input type="text" class="form-control" name="menu_icon"  value="{{$menu->menu_icon}}" autocomplete="off">
+                        @if ($errors->has('menu_icon'))
+                        <span class="text-danger">{{ $errors->first('menu_icon') }}</span>
+                        @endif
                     </div>
+
                     <div class="form-group">
                     <label >Lokasi Menu</label>
                     <select class="form-control" name="location" id="">
@@ -40,7 +48,9 @@
                         <option value="admin">Admin</option>
                         <option value="landing page">Landing Page</option>
                     </select>
-                    
+                    @if ($errors->has('location'))
+                    <span class="text-danger">{{ $errors->first('location') }}</span>
+                    @endif
                     </div>
                     <div class="form-group">
                     <label>Aktif?</label>

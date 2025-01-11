@@ -63,16 +63,12 @@ class MasterMainMenuController extends Controller
     {
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
-        $validator =  Validator::make($request->all(), [
+        $request->validate([
             'menu_name' => 'required|unique:main_menu',
+            'menu_icon' => 'required',
+            'location'  => 'required'
 
         ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-
         if ($insertTime >= 7 && $insertTime <= 18) {
             $data = MainMenuModel::create([
                 'menu_name' => $request->menu_name,
@@ -224,9 +220,10 @@ class MasterMainMenuController extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
 
-        Validator::make($request->all(), [
-            'location' => 'required'
-
+        $request->validate([
+            'manu_name' => 'required',
+            'menu_icon' => 'required',
+            'location'  => 'required'
         ]);
 
         if ($insertTime >= 7 && $insertTime <= 18) {
