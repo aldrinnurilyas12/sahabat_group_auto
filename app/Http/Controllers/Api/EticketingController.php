@@ -50,7 +50,7 @@ class EticketingController extends Controller
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
-        $eticket_category = DB::table('eticket_category')->get();
+        $eticket_category = DB::table('v_eticket_category')->where('menu_name', '<>', 'IT Monitoring')->get();
         return view('layouts.admin_views.eticketing.create.eticket_create', compact('eticket_category', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -83,7 +83,7 @@ class EticketingController extends Controller
         $insertTime = (int) date('H');
 
 
-        if ($insertTime >= 7 && $insertTime <= 20) {
+        if ($insertTime >= 6 && $insertTime <= 20) {
 
             if ($request->hasFile('attachment_files')) {
                 $attachment_files = $request->file('attachment_files');

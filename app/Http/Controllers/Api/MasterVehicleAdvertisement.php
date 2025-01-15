@@ -100,7 +100,7 @@ class MasterVehicleAdvertisement extends Controller
             }
         } else {
             session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->back();
+            return redirect()->route('master_vehicle_advertisement.index');
         }
     }
 

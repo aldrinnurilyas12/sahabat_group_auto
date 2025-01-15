@@ -67,6 +67,7 @@ class MasterVehicleData extends Controller
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+
         $vehicle = DB::table('v_vehicle')->where('id', $request->id)->get();
         $status_category = DB::table('status_category')->get();
         $images = DB::table('vehicle_fotos')->where('vehicle_id', $request->id)->get();
@@ -388,7 +389,18 @@ class MasterVehicleData extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        // if ($open == true) {
+        //     if ($vehicleModel) {
+        //         $vehicleModel->delete();
+        //         $this->insertLogActivityUsers(__METHOD__);
+        //         session()->flash('message_success', 'Data Berhasil dihapus!');
+        //         return redirect()->route('master_vehicle_data.index');
+        //     }
+        // } else {
+        // }
+
+        if ($insertTime >= 7 && $insertTime <= 24) {
+
             if ($vehicleModel) {
                 $vehicleModel->delete();
                 $this->insertLogActivityUsers(__METHOD__);

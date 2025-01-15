@@ -86,7 +86,7 @@
                                 <select class="form-control" name="eticket_category" id="">
                                     <option value="#">=== Pilih Kategori Tiket ===</option>
                                 @foreach ($eticket_category as $category)
-                                    <option value="{{$category->id}}">{{$category->category_type . ' - ' . $category->category_name}}</option>     
+                                    <option value="{{$category->menu_name . ' - ' . $category->submenu_name}}">{{$category->menu_name . ' - ' . $category->submenu_name}}</option>     
                                 @endforeach
                                 </select>
                                 @if ($errors->has('eticket_category'))

@@ -113,7 +113,7 @@ Route::middleware('auth')->group(function () {
     Route::apiResource('master_users', App\Http\Controllers\Api\RegisteredUserController::class);
     Route::get('users_create', [RegisteredUserController::class, 'users_create_layout'])->name('users_create');
     Route::get('/get_email_nik/{employeeId}', [RegisteredUserController::class, 'getEmailNik']);
-    Route::get('profile/{nik}', [EmployeeController::class, 'profile'])->name('profile');
+    Route::get('profile', [EmployeeController::class, 'profile'])->name('profile');
     Route::put('user_update/', [EmployeeController::class, 'user_update'])->name('user_update');
     Route::post('users_picture', [EmployeeController::class, 'upload_users_picture'])->name('users_picture');
     Route::put('update_picture/{id}', [EmployeeController::class, 'update_user_picture'])->name('update_picture');
@@ -294,7 +294,7 @@ Route::middleware('auth')->group(function () {
     Route::get('get_payroll_detail/{id}', [PayrollController::class, 'payrol_detail_layout'])->name('get_payroll_detail');
     Route::get('get_attendance/{id}', [PayrollController::class, 'get_attendance'])->name('get_attendance');
     Route::put('confirmed_payroll/{payroll_id}', [PayrollController::class, 'confirmed_payroll'])->name('confirmed_payroll');
-    Route::get('show_payroll/{nik}', [PayrollController::class, 'payroll_history'])->name('show_payroll');
+    Route::get('show_payroll', [PayrollController::class, 'payroll_history'])->name('show_payroll');
     Route::get('get_payroll/{id}', [PayrollController::class, 'download_payroll'])->name('get_payroll');
 
     // ROUTES BLOG

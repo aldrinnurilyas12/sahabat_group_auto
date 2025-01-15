@@ -505,15 +505,15 @@ class EmployeeController extends Controller
 
 
     // BUG FIX
-    public function profile(Request $request, $nik): View
+    public function profile(Request $request): View
     {
 
 
-        if (auth()->check() && auth()->user()->nik  !== $nik) {
+        if (auth()->user()->nik  !== auth()->user()->nik) {
             abort(403, 'Ooops unauthorized nik');
         }
 
-        $employee = DB::table('v_employee')->where('nik', $request->nik)->get();
+        $employee = DB::table('v_employee')->where('nik', auth()->user()->nik)->get();
         if ($employee->isEmpty()) {
             abort(403, 'Ooops unauthorized nik');
         }
@@ -532,11 +532,11 @@ class EmployeeController extends Controller
         $user_picture = DB::table('users_picture as up')
             ->select('up.id', 'up.user_id', 'up.users_foto', 'u.nik')
             ->leftJoin('users as u', 'up.user_id', '=', 'u.employee_id')
-            ->where('u.nik', $nik)->get();
+            ->where('u.nik', auth()->user()->nik)->get();
 
         $signature_employee = DB::table('employee_signature as se')
             ->select('nik', 'name', 'signature')
-            ->leftJoin('employee as e', 'se.employee_id', '=', 'e.id')->where('nik', $nik)->get();
+            ->leftJoin('employee as e', 'se.employee_id', '=', 'e.id')->where('nik', auth()->user()->nik)->get();
         $user = app('App\Http\Controllers\Api\LoginAdminController')->getUsers();
         return view('layouts.admin_views.employee_profile.edit.edit_profile', compact('employee', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu', 'user', 'start_date', 'birth_date', 'user_picture', 'signature_employee'));
     }

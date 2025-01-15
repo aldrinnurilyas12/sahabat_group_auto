@@ -69,7 +69,6 @@
                                             <th>Nama</th>
                                             <th>Judul</th>
                                             <th>Tipe Tiket</th>
-                                            <th>Nama Tiket</th>
                                             <th>Permasalahan</th>
                                             <th>Tanggal E-Tiket</th>
                                             <th>Dijadwalkan</th>
@@ -97,8 +96,7 @@
                                             </td>
                                             <td>{{$ticket->name}}</td>
                                             <td>{{$ticket->title}}</td>
-                                            <td>{{$ticket->category_type}}</td>
-                                            <td>{{$ticket->category_name}}</td>
+                                            <td>{{$ticket->eticket_category}}</td>
                                             <td>{{$ticket->main_issue}}</td>
                                             <td>{{date('d F Y', strtotime($ticket->created_at))}}</td>
                                             <td>

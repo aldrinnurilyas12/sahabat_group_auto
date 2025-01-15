@@ -73,7 +73,7 @@
 
                             <div class="form-group">
                                 <label >Kategori Tiket</label>
-                                <input type="text" class="form-control" value="{{$ticket->category_type .' - ' . $ticket->category_name}}" autocomplete="off" readonly>
+                                <input type="text" class="form-control" value="{{$ticket->eticket_category}}" autocomplete="off" readonly>
                             </div>
 
                             <div class="form-group">
@@ -154,7 +154,7 @@
             <div class="modal-dialog" role="document">
                 <div style="padding:10px;color:black;" class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel{{$ticket->id}}">E-Ticket: {{$ticket->category_type . ' - ' . $ticket->category_name}}</h5>
+                        <h5 class="modal-title" id="exampleModalLabel{{$ticket->id}}">E-Ticket: {{$ticket->eticket_category}}</h5>
                         <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>

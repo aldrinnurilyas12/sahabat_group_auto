@@ -99,12 +99,17 @@
                                             </td>
                                             <td>{{$ticket->name}}</td>
                                             <td>{{$ticket->title}}</td>
-                                            <td>{{$ticket->category_type . ' - ' . $ticket->category_name }}</td>
+                                            <td>{{$ticket->eticket_category}}</td>
                                             <td>{{$ticket->main_issue}}</td>
                                             <td>{{$ticket->status}}</td>
                                             <td>{{$ticket->approval_by_it}}</td>
                                             <td>{{date('d F Y', strtotime($ticket->scheduled))}}</td>
-                                            <td>{{date('d F Y', strtotime($ticket->task_complete_date))}}</td>
+                                            <td>
+                                                @if($ticket->task_complete_date)
+                                                {{date('d F Y', strtotime($ticket->task_complete_date))}}
+                                                @else
+                                                <p>-</p>
+                                                @endif</td>
                                             <td>
                                                 @if($ticket->attachment_files)
                                                <a href="#" data-toggle="modal" data-target="#showFile{{$ticket->id}}">Lihat</a>
@@ -145,7 +150,7 @@
          <div class="modal-dialog" role="document">
              <div class="modal-content">
                  <div class="modal-header">
-                     <h5 class="modal-title" id="exampleModalLabel{{$ticket->id}}">Konfirmasi E-Ticket: {{$ticket->category_type . ' - ' . $ticket->category_name}}</h5>
+                     <h5 class="modal-title" id="exampleModalLabel{{$ticket->id}}">Konfirmasi E-Ticket: {{$ticket->eticket_category}}</h5>
                      <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                          <span aria-hidden="true">×</span>
                      </button>
@@ -192,7 +197,7 @@
          <div class="modal-dialog" role="document">
              <div class="modal-content">
                  <div class="modal-header">
-                     <h5 class="modal-title" id="exampleModalLabel{{$ticket->id}}">Konfirmasi E-Ticket: {{$ticket->category_type . ' - ' . $ticket->category_name}}</h5>
+                     <h5 class="modal-title" id="exampleModalLabel{{$ticket->id}}">Konfirmasi E-Ticket: {{$ticket->eticket_category}}</h5>
                      <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                          <span aria-hidden="true">×</span>
                      </button>
@@ -232,7 +237,7 @@
          <div class="modal-dialog" role="document">
              <div style="padding:10px;color:black;" class="modal-content">
                  <div class="modal-header">
-                     <h5 class="modal-title" id="exampleModalLabel{{$ticket->id}}">E-Ticket: {{$ticket->category_type . ' - ' . $ticket->category_name}}</h5>
+                     <h5 class="modal-title" id="exampleModalLabel{{$ticket->id}}">E-Ticket: {{$ticket->eticket_category}}</h5>
                      <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                          <span aria-hidden="true">×</span>
                      </button>

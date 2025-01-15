@@ -93,22 +93,22 @@ class PayrollController extends Controller
         }
     }
 
-    public function payroll_history(Request $request, $nik): View
+    public function payroll_history(Request $request): View
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        if (auth()->check() && auth()->user()->nik  !== $nik) {
+        if (auth()->check() && auth()->user()->nik  !== auth()->user()->nik) {
             abort(403, 'Ooops unauthorized nik');
         }
 
-        $employee = DB::table('v_employee')->where('nik', $request->nik)->get();
+        $employee = DB::table('v_employee')->where('nik', auth()->user()->nik)->get();
         if ($employee->isEmpty()) {
             abort(403, 'Ooops unauthorized nik');
         }
 
-        $payroll_data = DB::table('v_payroll')->where('nik', $request->nik)->get();
+        $payroll_data = DB::table('v_payroll')->where('nik', auth()->user()->nik)->get();
         return view('layouts.admin_views.payroll.payroll_history', compact('employee', 'payroll_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
