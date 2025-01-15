@@ -124,8 +124,34 @@ class SpkUnitController extends Controller
         $request->validate([
             'vehicle_id' => 'required'
         ]);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                SpkUnitModel::create([
+                    'vehicle_id' => $request->vehicle_id,
+                    'location_unit' => $request->location_unit,
+                    'payment_method' => $request->payment_method,
+                    'price' => $request->price,
+                    'price_nominal' => $request->price_nominal,
+                    'down_payment' => $request->down_payment,
+                    'customer' => $request->customer,
+                    'address' => $request->address,
+                    'phone_number' => $request->phone_number,
+                    'email' => $request->email,
+                    'approval_by_head_branch' => "N",
+                    'approval_by_sales_manager' => "N",
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('transaksi_spk_unit.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('transaksi_spk_unit.index');
+            }
+        } else {
             SpkUnitModel::create([
                 'vehicle_id' => $request->vehicle_id,
                 'location_unit' => $request->location_unit,
@@ -144,9 +170,6 @@ class SpkUnitController extends Controller
             ]);
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('transaksi_spk_unit.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->route('transaksi_spk_unit.index');
         }
     }
@@ -174,9 +197,55 @@ class SpkUnitController extends Controller
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 22) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 22) {
 
+                if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations') {
+                    $updateDataHeadBranch = DB::table('spk_unit')->where('id', $request->id)->update([
+                        'approval_by_head_branch' => $request->approval_by_head_branch,
+                        'updated_at' => now(),
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                    ]);
+                } elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Sales Manager') {
+                    $updateDataSalesManager =  DB::table('spk_unit')->where('id', $request->id)->update([
+                        'approval_by_sales_manager' => $request->approval_by_sales_manager,
+                        'updated_at' => now(),
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                    ]);
+                }
+
+
+                $checking_data_confirmed = DB::table('spk_unit')->first();
+
+
+                if ($checking_data_confirmed->approval_by_head_branch == 'N' && $checking_data_confirmed->approval_by_sales_manager == 'N') {
+                    session()->flash('message_success', 'Data Berhasil disimpan!');
+                    return redirect()->route('transaksi_spk_unit.index');
+                } elseif ($checking_data_confirmed->approval_by_head_branch == 'N' && $checking_data_confirmed->approval_by_sales_manager == 'Y') {
+                    session()->flash('message_success', 'Data Berhasil disimpan!');
+                    return redirect()->route('transaksi_spk_unit.index');
+                } elseif ($checking_data_confirmed->approval_by_sales_manager == 'N' && $checking_data_confirmed->approval_by_head_branch == 'Y') {
+                    session()->flash('message_success', 'Data Berhasil disimpan!');
+                    return redirect()->route('transaksi_spk_unit.index');
+                } elseif ($checking_data_confirmed->approval_by_head_branch == 'Y' && $checking_data_confirmed->approval_by_sales_manager == 'Y') {
+                    VehicleModel::where('id', $request->vehicle_id)->update([
+                        'status_vehicle_id' => 2,
+                        'updated_at' => now(),
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                    ]);
+                }
+
+
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('transaksi_spk_unit.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('transaksi_spk_unit.index');
+            }
+        } else {
             if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations') {
                 $updateDataHeadBranch = DB::table('spk_unit')->where('id', $request->id)->update([
                     'approval_by_head_branch' => $request->approval_by_head_branch,
@@ -211,13 +280,8 @@ class SpkUnitController extends Controller
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
             }
-
-
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('transaksi_spk_unit.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->route('transaksi_spk_unit.index');
         }
     }

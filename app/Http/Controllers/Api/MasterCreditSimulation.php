@@ -82,8 +82,33 @@ class MasterCreditSimulation extends Controller
             'vehicle_id' => 'required'
         ]);
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                CreditSimulation::create([
+                    'vehicle_id' => $request->vehicle_id,
+                    'normal_price' => $request->normal_price,
+                    'down_payment' => $request->down_payment,
+                    'insurance_id' => $request->insurance_id,
+                    'tenor_12_month' => $request->tenor_12_month,
+                    'tenor_24_month' => $request->tenor_24_month,
+                    'tenor_36_month' => $request->tenor_36_month,
+                    'tenor_48_month' => $request->tenor_48_month,
+                    'tenor_60_month' => $request->tenor_60_month,
+                    'tenor_72_month' => $request->tenor_72_month,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('detail_vehicle', $request->vehicle_id);
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->back();
+            }
+        } else {
             CreditSimulation::create([
                 'vehicle_id' => $request->vehicle_id,
                 'normal_price' => $request->normal_price,
@@ -102,9 +127,6 @@ class MasterCreditSimulation extends Controller
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
             return redirect()->route('detail_vehicle', $request->vehicle_id);
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->back();
         }
     }
 
@@ -131,8 +153,31 @@ class MasterCreditSimulation extends Controller
     {
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('credit_simulation')->where('id', $request->id)->update([
+                    'vehicle_id' => $request->vehicle_id,
+                    'down_payment' => $request->down_payment,
+                    'insurance_id' => $request->insurance_id,
+                    'tenor_12_month' => $request->tenor_12_month,
+                    'tenor_24_month' => $request->tenor_24_month,
+                    'tenor_36_month' => $request->tenor_36_month,
+                    'tenor_48_month' => $request->tenor_48_month,
+                    'tenor_60_month' => $request->tenor_60_month,
+                    'tenor_72_month' => $request->tenor_72_month,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_at' => now()
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('detail_vehicle',  $request->vehicle_id);
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->back();
+            }
+        } else {
             DB::table('credit_simulation')->where('id', $request->id)->update([
                 'vehicle_id' => $request->vehicle_id,
                 'down_payment' => $request->down_payment,
@@ -149,12 +194,7 @@ class MasterCreditSimulation extends Controller
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
             return redirect()->route('detail_vehicle',  $request->vehicle_id);
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->back();
         }
-
-        return redirect()->route('master_credit_simulation.index')->with('success', 'Data berhasil disimpan.');
     }
 
     /**
@@ -163,12 +203,29 @@ class MasterCreditSimulation extends Controller
     public function destroy(CreditSimulation $CreditSimulation, $id)
     {
         $CreditSimulation = CreditSimulation::find($id);
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($CreditSimulation) {
-            $CreditSimulation->delete();
-            $this->insertLogActivityUsers(__METHOD__);
-            session()->flash('delete_success', 'Data Berhasil dihapus!');
-            return redirect()->route('master_credit_simulation.index');
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($CreditSimulation) {
+                    $CreditSimulation->delete();
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('delete_success', 'Data Berhasil dihapus!');
+                    return redirect()->route('master_credit_simulation.index');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->back();
+            }
+        } else {
+            if ($CreditSimulation) {
+                $CreditSimulation->delete();
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('delete_success', 'Data Berhasil dihapus!');
+                return redirect()->route('master_credit_simulation.index');
+            }
         }
     }
 }

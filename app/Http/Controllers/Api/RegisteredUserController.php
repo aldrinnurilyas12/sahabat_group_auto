@@ -85,9 +85,30 @@ class RegisteredUserController extends Controller
             'nik' => 'required|max:6|unique:users',
             'employee_id' => 'unique:users'
         ]);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 22) {
-            $user = User::create([
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 22) {
+                User::create([
+                    'employee_id' => $request->employee_id,
+                    'nik' => $validate['nik'],
+                    'email' => $request->email,
+                    'email_verified_at' => now(),
+                    'is_active' => $request->is_active,
+                    'password' => Hash::make($request->password),
+                    'role' => $request->role,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_users.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 - 12.00.');
+                return redirect()->route('master_users.index');
+            }
+        } else {
+            User::create([
                 'employee_id' => $request->employee_id,
                 'nik' => $validate['nik'],
                 'email' => $request->email,
@@ -100,9 +121,6 @@ class RegisteredUserController extends Controller
             ]);
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_users.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 - 12.00.');
             return redirect()->route('master_users.index');
         }
     }
@@ -127,8 +145,27 @@ class RegisteredUserController extends Controller
     {
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
-        if ($insertTime >= 7 && $insertTime <= 18) {
-            $update = DB::table('users')->where('id', $request->id)->update([
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
+
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('users')->where('id', $request->id)->update([
+                    'nik' => $request->nik,
+                    'email' => $request->email,
+                    'is_active' => $request->is_active,
+                    'role' => $request->role,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_at' => now()
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_users.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 - 18.00.');
+                return redirect()->route('master_users.index');
+            }
+        } else {
+            DB::table('users')->where('id', $request->id)->update([
                 'nik' => $request->nik,
                 'email' => $request->email,
                 'is_active' => $request->is_active,
@@ -138,9 +175,6 @@ class RegisteredUserController extends Controller
             ]);
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_users.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 - 18.00.');
             return redirect()->route('master_users.index');
         }
     }
@@ -159,19 +193,27 @@ class RegisteredUserController extends Controller
         $user = User::find($id);
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-
-        // Check if the user exists
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($user) {
+                    $user->delete();
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('delete_success', 'Data Berhasil dihapus!');
+                    return redirect()->back()->with('success', 'User deleted successfully!');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional : 08.00 - 18.00.');
+                return redirect()->route('master_users.index');
+            }
+        } else {
             if ($user) {
                 $user->delete();
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('delete_success', 'Data Berhasil dihapus!');
                 return redirect()->back()->with('success', 'User deleted successfully!');
             }
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional : 08.00 - 18.00.');
-            return redirect()->route('master_users.index');
         }
     }
 

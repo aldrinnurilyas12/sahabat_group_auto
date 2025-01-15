@@ -73,9 +73,28 @@ class EmployeeSalary extends Controller
             'position_name' => 'required',
             'department_id' => 'required'
         ]);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
-
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                EmployeeSalaryModel::create([
+                    'department_id' => $request->department_id,
+                    'position_name' => $request->position_name,
+                    'salary'    => $request->salary,
+                    'tunjangan_transport' => $request->tunjangan_transport,
+                    'tunjangan_kesehatan' => $request->tunjangan_kesehatan,
+                    'tunjangan_lainnya'  => $request->tunjangan_lainnya,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_employee_salary.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_employee_salary.index');
+            }
+        } else {
             EmployeeSalaryModel::create([
                 'department_id' => $request->department_id,
                 'position_name' => $request->position_name,
@@ -88,9 +107,6 @@ class EmployeeSalary extends Controller
             ]);
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_employee_salary.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->route('master_employee_salary.index');
         }
     }
@@ -154,9 +170,28 @@ class EmployeeSalary extends Controller
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
-
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('job_position')->where('id', $request->id)->update([
+                    'department_id' => $request->department_id,
+                    'position_name' => $request->position_name,
+                    'salary'    => $request->salary,
+                    'tunjangan_transport' => $request->tunjangan_transport,
+                    'tunjangan_kesehatan' => $request->tunjangan_kesehatan,
+                    'tunjangan_lainnya'  => $request->tunjangan_lainnya,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_at' => now()
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_employee_salary.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_employee_salary.index');
+            }
+        } else {
             DB::table('job_position')->where('id', $request->id)->update([
                 'department_id' => $request->department_id,
                 'position_name' => $request->position_name,
@@ -170,9 +205,6 @@ class EmployeeSalary extends Controller
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
             return redirect()->route('master_employee_salary.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->route('master_employee_salary.index');
         }
     }
 
@@ -184,18 +216,27 @@ class EmployeeSalary extends Controller
         $emp_salary = EmployeeSalaryModel::find($id);
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
-
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($emp_salary) {
+                    $emp_salary->delete();
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil dihapus!');
+                    return redirect()->route('master_employee_salary.index');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_employee_salary.index');
+            }
+        } else {
             if ($emp_salary) {
                 $emp_salary->delete();
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Berhasil dihapus!');
                 return redirect()->route('master_employee_salary.index');
             }
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->route('master_employee_salary.index');
         }
     }
 }

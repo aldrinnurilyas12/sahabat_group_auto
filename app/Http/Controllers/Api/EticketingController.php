@@ -81,10 +81,46 @@ class EticketingController extends Controller
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime <= 15) {
+                if ($request->hasFile('attachment_files')) {
+                    $attachment_files = $request->file('attachment_files');
+                    $attachmentPath = $attachment_files->storeAs('eticket_attachment', uniqid() . '.' . $attachment_files->getClientOriginalExtension(), 'public');
+                    EticketModel::create([
+                        'employee_id' => app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id,
+                        'eticket_category' => $request->eticket_category,
+                        'title' => $request->title,
+                        'status' => 'menunggu konfirmasi',
+                        'main_issue' => $request->main_issue,
+                        'attachment_files' => $attachmentPath,
+                        'approval_by_it' => 'menunggu konfirmasi',
+                        'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
 
-        if ($insertTime >= 6 && $insertTime <= 20) {
+                    ]);
+                } else {
+                    EticketModel::create([
+                        'employee_id' => app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id,
+                        'eticket_category' => $request->eticket_category,
+                        'title' => $request->title,
+                        'status' => 'menunggu konfirmasi',
+                        'main_issue' => $request->main_issue,
+                        'approval_by_it' => 'menunggu konfirmasi',
+                        'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
 
+                    ]);
+                }
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_eticket.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_eticket.index');
+            }
+        } else {
             if ($request->hasFile('attachment_files')) {
                 $attachment_files = $request->file('attachment_files');
                 $attachmentPath = $attachment_files->storeAs('eticket_attachment', uniqid() . '.' . $attachment_files->getClientOriginalExtension(), 'public');
@@ -115,9 +151,6 @@ class EticketingController extends Controller
             }
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_eticket.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->route('master_eticket.index');
         }
     }
@@ -194,35 +227,86 @@ class EticketingController extends Controller
     public function confirmed_eticket_it(Request $request)
     {
         $IT_ROLE = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Information Technology';
-        if ($IT_ROLE) {
-            DB::table('eticket')->where('id', $request->id)->update([
-                'scheduled' => $request->scheduled,
-                'approval_by_it' => $request->approval_by_it,
-                'status' => $request->status
-            ]);
-            $this->insertLogActivityUsers(__METHOD__);
-            session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_it_eticketing');
+
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
+
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime <= 8 && $insertTime >= 18) {
+                if ($IT_ROLE) {
+                    DB::table('eticket')->where('id', $request->id)->update([
+                        'scheduled' => $request->scheduled,
+                        'approval_by_it' => $request->approval_by_it,
+                        'status' => $request->status
+                    ]);
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil disimpan!');
+                    return redirect()->route('master_it_eticketing');
+                } else {
+                    session()->flash('failed_insert', 'Anda tidak bisa konfirmasi layanan ini.');
+                    return redirect()->route('master_it_eticketing');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_eticket.index');
+            }
         } else {
-            session()->flash('failed_insert', 'Anda tidak bisa konfirmasi layanan ini.');
-            return redirect()->route('master_it_eticketing');
+            if ($IT_ROLE) {
+                DB::table('eticket')->where('id', $request->id)->update([
+                    'scheduled' => $request->scheduled,
+                    'approval_by_it' => $request->approval_by_it,
+                    'status' => $request->status
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_it_eticketing');
+            } else {
+                session()->flash('failed_insert', 'Anda tidak bisa konfirmasi layanan ini.');
+                return redirect()->route('master_it_eticketing');
+            }
         }
     }
 
     public function confirmed_eticket_it_done(Request $request)
     {
         $IT_ROLE = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Information Technology';
-        if ($IT_ROLE) {
-            DB::table('eticket')->where('id', $request->id)->update([
-                'status' => $request->status,
-                'task_complete_date' => $request->task_complete_date
-            ]);
-            $this->insertLogActivityUsers(__METHOD__);
-            session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_it_eticketing');
+        date_default_timezone_set('Asia/Jakarta');
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
+
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime <= 8 && $insertTime >= 18) {
+                if ($IT_ROLE) {
+                    DB::table('eticket')->where('id', $request->id)->update([
+                        'status' => $request->status,
+                        'task_complete_date' => $request->task_complete_date
+                    ]);
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil disimpan!');
+                    return redirect()->route('master_it_eticketing');
+                } else {
+                    session()->flash('failed_insert', 'Anda tidak bisa konfirmasi layanan ini.');
+                    return redirect()->route('master_it_eticketing');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_eticket.index');
+            }
         } else {
-            session()->flash('failed_insert', 'Anda tidak bisa konfirmasi layanan ini.');
-            return redirect()->route('master_it_eticketing');
+            if ($IT_ROLE) {
+                DB::table('eticket')->where('id', $request->id)->update([
+                    'status' => $request->status,
+                    'task_complete_date' => $request->task_complete_date
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_it_eticketing');
+            } else {
+                session()->flash('failed_insert', 'Anda tidak bisa konfirmasi layanan ini.');
+                return redirect()->route('master_it_eticketing');
+            }
         }
     }
 

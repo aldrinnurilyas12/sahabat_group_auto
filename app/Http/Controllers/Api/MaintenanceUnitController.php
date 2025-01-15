@@ -111,8 +111,37 @@ class MaintenanceUnitController extends Controller
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 21) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 21) {
+                if ($request->hasFile('foto')) {
+                    $images = $request->file('foto');
+                    $folderPath = 'repair_cashbon/' . $request->vehicle_id;
+                    $path = $images->storeAs($folderPath, uniqid() . '-' . $images->getClientOriginalExtension(), 'public');
+                    MaintenanceUnit::create([
+                        'vehicle_id' => $request->vehicle_id,
+                        'maintenance_type' => $request->maintenance_type,
+                        'maintenance_detail' => $request->maintenance_detail,
+                        'cost' => $request->cost,
+                        'maintenance_date' => $request->maintenance_date,
+                        'mechanic_name' => $request->mechanic_name,
+                        'foto' => $path,
+                        'created_by' =>  auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_by' =>  auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                    ]);
+                    DB::table('vehicle')->where('id', $request->vehicle_id)->update([
+                        'status_vehicle_id' => 4
+                    ]);
+                }
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_maintenance_unit.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_maintenance_unit.index');
+            }
+        } else {
             if ($request->hasFile('foto')) {
                 $images = $request->file('foto');
                 $folderPath = 'repair_cashbon/' . $request->vehicle_id;
@@ -134,9 +163,6 @@ class MaintenanceUnitController extends Controller
             }
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_maintenance_unit.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->route('master_maintenance_unit.index');
         }
     }
@@ -185,8 +211,29 @@ class MaintenanceUnitController extends Controller
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 21) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('maintenance_unit')->where('id', $request->id)->update([
+                    'maintenance_type' => $request->maintenance_type,
+                    'maintenance_detail' => $request->maintenance_detail,
+                    'cost' => $request->cost,
+                    'maintenance_date' => $request->maintenance_date,
+                    'mechanic_name' => $request->mechanic_name,
+                    'foto' => $request->foto,
+                    'updated_at' => now(),
+                    'updated_by' =>  auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]);
+
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_maintenance_unit.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_maintenance_unit.index');
+            }
+        } else {
             DB::table('maintenance_unit')->where('id', $request->id)->update([
                 'maintenance_type' => $request->maintenance_type,
                 'maintenance_detail' => $request->maintenance_detail,
@@ -200,9 +247,6 @@ class MaintenanceUnitController extends Controller
 
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_maintenance_unit.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->route('master_maintenance_unit.index');
         }
     }

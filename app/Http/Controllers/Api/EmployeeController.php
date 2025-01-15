@@ -133,8 +133,42 @@ class EmployeeController extends Controller
             'job_position' => 'required',
             'branch_id' => 'required'
         ]);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                EmployeeModel::create([
+                    'nik' => $request->nik,
+                    'name' => $request->name,
+                    'address' => $request->address,
+                    'phone_number' => "+62 " . $request->phone_number,
+                    'email' => $request->email,
+                    'job_position' => $request->job_position,
+                    'branch_id' => $request->branch_id,
+                    'is_active' => $request->is_active,
+                    'birth_date' => $request->birth_date,
+                    'start_date' => $request->start_date,
+                    'resign_date' => $request->resign_date,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]);
+
+                EmployeeBankAccount::create([
+                    'nik' => $request->nik,
+                    'bank_id' => $request->bank_id,
+                    'bank_account' => $request->bank_account,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_employee.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 wib - 18.00 wib');
+                return redirect()->route('master_employee.index');
+            }
+        } else {
             EmployeeModel::create([
                 'nik' => $request->nik,
                 'name' => $request->name,
@@ -161,9 +195,6 @@ class EmployeeController extends Controller
             ]);
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_employee.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 wib - 18.00 wib');
             return redirect()->route('master_employee.index');
         }
     }
@@ -257,9 +288,52 @@ class EmployeeController extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
         $checkingBankAccount = DB::table('employee_bank_account')->where('nik', $request->nik)->first();
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('employee')->where('id', $request->id)->update([
+                    'nik' => $request->nik,
+                    'name' => $request->name,
+                    'address' => $request->address,
+                    'phone_number' => "+62 " . $request->phone_number,
+                    'email' => $request->email,
+                    'job_position' => $request->job_position,
+                    'branch_id' => $request->branch_id,
+                    'is_active' => $request->is_active,
+                    'birth_date' => $request->birth_date,
+                    'start_date' => $request->start_date,
+                    'resign_date' => $request->resign_date,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_at' => now()
+                ]);
 
+                if ($checkingBankAccount === null) {
+                    EmployeeBankAccount::create([
+                        'nik' => $request->nik,
+                        'bank_id' => $request->bank_id,
+                        'bank_account' => $request->bank_account,
+                        'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                    ]);
+                } else {
+                    DB::table('employee_bank_account')->where('nik', $request->nik)->update([
+                        'bank_id' => $request->bank_id,
+                        'bank_account' => $request->bank_account,
+                        'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+
+                    ]);
+                }
+
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_employee.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 wib - 18.00 wib');
+                return redirect()->route('master_employee.index');
+            }
+        } else {
             DB::table('employee')->where('id', $request->id)->update([
                 'nik' => $request->nik,
                 'name' => $request->name,
@@ -297,9 +371,6 @@ class EmployeeController extends Controller
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
             return redirect()->route('master_employee.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 wib - 18.00 wib');
-            return redirect()->route('master_employee.index');
         }
     }
 
@@ -307,9 +378,28 @@ class EmployeeController extends Controller
     {
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 5 && $insertTime <= 18) {
-
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 5 && $insertTime <= 18) {
+                DB::table('employee')->where('nik', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->nik)->update([
+                    'nik' => $request->nik,
+                    'name' => $request->name,
+                    'address' => $request->address,
+                    'phone_number' => "+62 " . $request->phone_number,
+                    'email' => $request->email,
+                    'birth_date' => $request->birth_date,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_at' => now()
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil diperbarui!');
+                return redirect()->route('profile', ['nik' => auth()->user()->nik]);
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 wib - 18.00 wib');
+                return redirect()->route('profile', ['nik' => auth()->user()->nik]);
+            }
+        } else {
             DB::table('employee')->where('nik', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->nik)->update([
                 'nik' => $request->nik,
                 'name' => $request->name,
@@ -322,9 +412,6 @@ class EmployeeController extends Controller
             ]);
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil diperbarui!');
-            return redirect()->route('profile', ['nik' => auth()->user()->nik]);
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 wib - 18.00 wib');
             return redirect()->route('profile', ['nik' => auth()->user()->nik]);
         }
     }
@@ -488,17 +575,27 @@ class EmployeeController extends Controller
         $employee_model = EmployeeModel::find($id);
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($employee_model) {
+                    $employee_model->delete();
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('delete_success', 'Berhasil hapus data!');
+                    return redirect()->back();
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional  : 08.00 wib - 18.00 wib');
+                return redirect()->route('master_employee.index');
+            }
+        } else {
             if ($employee_model) {
                 $employee_model->delete();
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('delete_success', 'Berhasil hapus data!');
                 return redirect()->back();
             }
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional  : 08.00 wib - 18.00 wib');
-            return redirect()->route('master_employee.index');
         }
     }
 
@@ -566,8 +663,25 @@ class EmployeeController extends Controller
             'resign_reasons' => 'required',
             'resign_date'   => 'required'
         ]);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('employee')->where('id', $request->id)->update([
+                    'resign_reasons' => $request->resign_reasons,
+                    'is_active' => $request->is_active,
+                    'resign_date' => $request->resign_date,
+                    'updated_at' => now(),
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_employee.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 wib - 18.00 wib');
+                return redirect()->route('master_employee.index');
+            }
+        } else {
             DB::table('employee')->where('id', $request->id)->update([
                 'resign_reasons' => $request->resign_reasons,
                 'is_active' => $request->is_active,
@@ -577,9 +691,6 @@ class EmployeeController extends Controller
             ]);
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_employee.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 wib - 18.00 wib');
             return redirect()->route('master_employee.index');
         }
     }

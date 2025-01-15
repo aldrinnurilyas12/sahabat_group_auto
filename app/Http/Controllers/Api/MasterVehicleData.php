@@ -389,27 +389,27 @@ class MasterVehicleData extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
 
-        // if ($open == true) {
-        //     if ($vehicleModel) {
-        //         $vehicleModel->delete();
-        //         $this->insertLogActivityUsers(__METHOD__);
-        //         session()->flash('message_success', 'Data Berhasil dihapus!');
-        //         return redirect()->route('master_vehicle_data.index');
-        //     }
-        // } else {
-        // }
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 24) {
-
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 24) {
+                if ($vehicleModel) {
+                    $vehicleModel->delete();
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil dihapus!');
+                    return redirect()->route('master_vehicle_data.index');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_vehicle_data.index');
+            }
+        } else {
             if ($vehicleModel) {
                 $vehicleModel->delete();
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Berhasil dihapus!');
                 return redirect()->route('master_vehicle_data.index');
             }
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->route('master_vehicle_data.index');
         }
     }
 
@@ -474,26 +474,42 @@ class MasterVehicleData extends Controller
         ]);
 
         $document_id = DocumentModel::find($request->id);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($document_id->document_files) {
+                    $olddocument = public_path('storage/' . $document_id->document_files);
+                    if (file_exists($olddocument)) {
+                        unlink($olddocument);
+                    }
+                }
+            }
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('vehicle_document')
+                    ->where('id', $request->id)
+                    ->delete();
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('delete_document', 'Dokumen Berhasil dihapus!');
+                return redirect()->back();
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->back();
+            }
+        } else {
             if ($document_id->document_files) {
                 $olddocument = public_path('storage/' . $document_id->document_files);
                 if (file_exists($olddocument)) {
                     unlink($olddocument);
                 }
             }
-        }
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
             DB::table('vehicle_document')
                 ->where('id', $request->id)
                 ->delete();
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('delete_document', 'Dokumen Berhasil dihapus!');
-            return redirect()->back();
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->back();
         }
     }
@@ -508,25 +524,42 @@ class MasterVehicleData extends Controller
         ]);
 
         $picture_id = VehicleFotos::find($request->id);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($picture_id->images) {
+                    $oldPicture = public_path('storage/' . $picture_id->images);
+                    if (file_exists($oldPicture)) {
+                        unlink($oldPicture);
+                    }
+                }
+            }
+
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('vehicle_fotos')
+                    ->where('id', $request->id)
+                    ->delete();
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('delete_images', 'Foto Berhasil dihapus!');
+                return redirect()->back();
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->back();
+            }
+        } else {
             if ($picture_id->images) {
                 $oldPicture = public_path('storage/' . $picture_id->images);
                 if (file_exists($oldPicture)) {
                     unlink($oldPicture);
                 }
             }
-        }
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
             DB::table('vehicle_fotos')
                 ->where('id', $request->id)
                 ->delete();
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('delete_images', 'Foto Berhasil dihapus!');
-            return redirect()->back();
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->back();
         }
     }
@@ -540,23 +573,48 @@ class MasterVehicleData extends Controller
         $request->validate([
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:4048',
         ]);
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-
-                $folderPath = 'vehicle_images/' . $request->vehicle_id;
-                $imagePath = $image->storeAs($folderPath, uniqid() . '.' . $image->getClientOriginalExtension(), 'public');
-                VehicleFotos::create([
-                    'vehicle_id' => $request->vehicle_id,
-                    'images' => $imagePath,
-                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-                ]);
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($request->hasFile('images')) {
+                    foreach ($request->file('images') as $image) {
+                        $folderPath = 'vehicle_images/' . $request->vehicle_id;
+                        $imagePath = $image->storeAs($folderPath, uniqid() . '.' . $image->getClientOriginalExtension(), 'public');
+                        VehicleFotos::create([
+                            'vehicle_id' => $request->vehicle_id,
+                            'images' => $imagePath,
+                            'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                            'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                        ]);
+                    }
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('success_images', 'Foto Berhasil disimpan!');
+                    return redirect()->back()->with('message', 'Images deleted successfully.');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->back();
+            }
+        } else {
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $folderPath = 'vehicle_images/' . $request->vehicle_id;
+                    $imagePath = $image->storeAs($folderPath, uniqid() . '.' . $image->getClientOriginalExtension(), 'public');
+                    VehicleFotos::create([
+                        'vehicle_id' => $request->vehicle_id,
+                        'images' => $imagePath,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                    ]);
+                }
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('success_images', 'Foto Berhasil disimpan!');
+                return redirect()->back()->with('message', 'Images deleted successfully.');
             }
         }
-        $this->insertLogActivityUsers(__METHOD__);
-        session()->flash('success_images', 'Foto Berhasil disimpan!');
-        return redirect()->back()->with('message', 'Images deleted successfully.');
     }
 
     public function document_upload(Request $request)
@@ -568,21 +626,48 @@ class MasterVehicleData extends Controller
             'document_files.*' => 'required|image|mimes:jpeg,png,jpg,gif,pdf,excel|max:4048'
         ]);
 
-        if ($request->hasFile('document_files')) {
-            foreach ($request->file('document_files') as $document) {
-                $folderPath = 'document/' . $request->vehicle_id;
-                $documentPath = $document->storeAs($folderPath, uniqid() . '.' . $document->getClientOriginalExtension(), 'public');
-                DocumentModel::create([
-                    'vehicle_id' => $request->vehicle_id,
-                    'document_files' => $documentPath,
-                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-                ]);
-                $this->insertLogActivityUsers(__METHOD__);
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
+
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($request->hasFile('document_files')) {
+                    foreach ($request->file('document_files') as $document) {
+                        $folderPath = 'document/' . $request->vehicle_id;
+                        $documentPath = $document->storeAs($folderPath, uniqid() . '.' . $document->getClientOriginalExtension(), 'public');
+                        DocumentModel::create([
+                            'vehicle_id' => $request->vehicle_id,
+                            'document_files' => $documentPath,
+                            'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                            'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                        ]);
+                        $this->insertLogActivityUsers(__METHOD__);
+                    }
+                    session()->flash('success_document', 'Dokumen Berhasil disimpan!');
+                    return redirect()->back();
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->back();
+            }
+        } else {
+            if ($request->hasFile('document_files')) {
+                foreach ($request->file('document_files') as $document) {
+                    $folderPath = 'document/' . $request->vehicle_id;
+                    $documentPath = $document->storeAs($folderPath, uniqid() . '.' . $document->getClientOriginalExtension(), 'public');
+                    DocumentModel::create([
+                        'vehicle_id' => $request->vehicle_id,
+                        'document_files' => $documentPath,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                    ]);
+                    $this->insertLogActivityUsers(__METHOD__);
+                }
+                session()->flash('success_document', 'Dokumen Berhasil disimpan!');
+                return redirect()->back();
             }
         }
-        session()->flash('success_document', 'Dokumen Berhasil disimpan!');
-        return redirect()->back();
     }
 
     public function vehicle_media_upload(Request $request)
@@ -593,25 +678,55 @@ class MasterVehicleData extends Controller
             'media_type' => 'required'
         ]);
 
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($request->hasFile('media_files')) {
-            $folderPath = 'media_file/' . $request->vehicle_id;
-            $picture = $request->file('media_files');
-            $mediaFiles = $picture->storeAs($folderPath, uniqid() . '.' . $picture->getClientOriginalExtension(), 'public');
-            MediaUploadModel::create([
-                'vehicle_id' => $request->vehicle_id,
-                'media_type' => $request->media_type,
-                'media_files' => $mediaFiles,
-                'media_size' => $request->media_size,
-                'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-            ]);
-            $this->insertLogActivityUsers(__METHOD__);
-            session()->flash('success_document', 'Media Berhasil disimpan!');
-            return redirect()->back();
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($request->hasFile('media_files')) {
+                    $folderPath = 'media_file/' . $request->vehicle_id;
+                    $picture = $request->file('media_files');
+                    $mediaFiles = $picture->storeAs($folderPath, uniqid() . '.' . $picture->getClientOriginalExtension(), 'public');
+                    MediaUploadModel::create([
+                        'vehicle_id' => $request->vehicle_id,
+                        'media_type' => $request->media_type,
+                        'media_files' => $mediaFiles,
+                        'media_size' => $request->media_size,
+                        'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    ]);
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('success_document', 'Media Berhasil disimpan!');
+                    return redirect()->back();
+                } else {
+                    session()->flash('failed_insert', 'Pilih dahulu Tipe Media');
+                    return redirect()->back();
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->back();
+            }
         } else {
-            session()->flash('failed_insert', 'Pilih dahulu Tipe Media');
-            return redirect()->back();
+            if ($request->hasFile('media_files')) {
+                $folderPath = 'media_file/' . $request->vehicle_id;
+                $picture = $request->file('media_files');
+                $mediaFiles = $picture->storeAs($folderPath, uniqid() . '.' . $picture->getClientOriginalExtension(), 'public');
+                MediaUploadModel::create([
+                    'vehicle_id' => $request->vehicle_id,
+                    'media_type' => $request->media_type,
+                    'media_files' => $mediaFiles,
+                    'media_size' => $request->media_size,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('success_document', 'Media Berhasil disimpan!');
+                return redirect()->back();
+            } else {
+                session()->flash('failed_insert', 'Pilih dahulu Tipe Media');
+                return redirect()->back();
+            }
         }
     }
 
@@ -702,25 +817,42 @@ class MasterVehicleData extends Controller
         ]);
 
         $sound_id = MediaUploadModel::find($request->id);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($sound_id->media_files) {
+                    $oldSoundEngine = public_path('storage/' . $sound_id->media_files);
+                    if (file_exists($oldSoundEngine)) {
+                        unlink($oldSoundEngine);
+                    }
+                }
+            }
+
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('vehicle_media_player')
+                    ->where('id', $request->id)
+                    ->delete();
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('delete_images', 'Sound Engine Berhasil dihapus!');
+                return redirect()->back();
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->back();
+            }
+        } else {
             if ($sound_id->media_files) {
                 $oldSoundEngine = public_path('storage/' . $sound_id->media_files);
                 if (file_exists($oldSoundEngine)) {
                     unlink($oldSoundEngine);
                 }
             }
-        }
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
             DB::table('vehicle_media_player')
                 ->where('id', $request->id)
                 ->delete();
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('delete_images', 'Sound Engine Berhasil dihapus!');
-            return redirect()->back();
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->back();
         }
     }
@@ -735,25 +867,42 @@ class MasterVehicleData extends Controller
         ]);
 
         $sound_id = MediaUploadModel::find($request->id);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($sound_id->media_files) {
+                    $oldSoundEngine = public_path('storage/' . $sound_id->media_files);
+                    if (file_exists($oldSoundEngine)) {
+                        unlink($oldSoundEngine);
+                    }
+                }
+            }
+
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('vehicle_media_player')
+                    ->where('id', $request->id)
+                    ->delete();
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('delete_images', 'Video Unit Berhasil dihapus!');
+                return redirect()->back();
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->back();
+            }
+        } else {
             if ($sound_id->media_files) {
                 $oldSoundEngine = public_path('storage/' . $sound_id->media_files);
                 if (file_exists($oldSoundEngine)) {
                     unlink($oldSoundEngine);
                 }
             }
-        }
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
             DB::table('vehicle_media_player')
                 ->where('id', $request->id)
                 ->delete();
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('delete_images', 'Video Unit Berhasil dihapus!');
-            return redirect()->back();
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->back();
         }
     }

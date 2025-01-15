@@ -41,13 +41,14 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-
-                          <form action="{{route('time_settings')}}" method="POST">
+                          <form action="{{route('setting_time')}}" method="POST">
+                            @method('PUT')
+                            @csrf
                             <h5>Nonaktifkan Jam Web</h5>
-                            <label class="switch">
-                                <input name="time_settings" value="off" type="checkbox">
-                                <span class="slider round"></span>
-                              </label>
+                            <select class="form-control" name="open_schedule_time" id="">
+                              <option value="on">ON</option>
+                              <option value="off">OFF</option>
+                            </select>
                               <br>
                               <button type="submit" class="btn btn-dark">Simpan Pengaturan</button>
                           </form>

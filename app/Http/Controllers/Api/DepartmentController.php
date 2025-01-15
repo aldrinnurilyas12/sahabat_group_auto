@@ -68,8 +68,25 @@ class DepartmentController extends Controller
             'department_name' => 'required'
         ]);
 
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7  && $insertTime <= 20) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7  && $insertTime <= 18) {
+                DepartmentModel::create([
+                    'department_code' => $request->department_code,
+                    'department_name' => $request->department_name,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]);
+
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_department.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_department.index');
+            }
+        } else {
             DepartmentModel::create([
                 'department_code' => $request->department_code,
                 'department_name' => $request->department_name,
@@ -79,9 +96,6 @@ class DepartmentController extends Controller
 
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_department.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->route('master_department.index');
         }
     }
@@ -114,25 +128,32 @@ class DepartmentController extends Controller
     {
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
-
-            $update_department = DB::table('department')->where('id', $request->id)->update([
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('department')->where('id', $request->id)->update([
+                    'department_code' => $request->department_code,
+                    'department_name' => $request->department_name,
+                    'updated_by'    => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_at'    => now()
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil diperbarui!');
+                return redirect()->route('master_department.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_department.index');
+            }
+        } else {
+            DB::table('department')->where('id', $request->id)->update([
                 'department_code' => $request->department_code,
                 'department_name' => $request->department_name,
                 'updated_by'    => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                 'updated_at'    => now()
             ]);
-
-            if ($update_department) {
-                $this->insertLogActivityUsers(__METHOD__);
-                session()->flash('message_success', 'Data Berhasil diperbarui!');
-                return redirect()->route('master_department.index');
-            } else {
-                abort(403, 'Gagal updated data');
-            }
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+            $this->insertLogActivityUsers(__METHOD__);
+            session()->flash('message_success', 'Data Berhasil diperbarui!');
             return redirect()->route('master_department.index');
         }
     }
@@ -145,17 +166,27 @@ class DepartmentController extends Controller
         $department = DepartmentModel::find($id);
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($department) {
+                    $department->delete();
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil dihapus!');
+                    return redirect()->route('master_department.index');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_department.index');
+            }
+        } else {
             if ($department) {
                 $department->delete();
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Berhasil dihapus!');
                 return redirect()->route('master_department.index');
             }
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->route('master_department.index');
         }
     }
 

@@ -69,8 +69,27 @@ class MasterMainMenuController extends Controller
             'location'  => 'required'
 
         ]);
-        if ($insertTime >= 7 && $insertTime <= 18) {
-            $data = MainMenuModel::create([
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
+
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                MainMenuModel::create([
+                    'menu_name' => $request->menu_name,
+                    'menu_icon' => $request->menu_icon,
+                    'location'  => $request->location,
+                    'is_active' => $request->is_active,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_main_menus.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_main_menus.index');
+            }
+        } else {
+            MainMenuModel::create([
                 'menu_name' => $request->menu_name,
                 'menu_icon' => $request->menu_icon,
                 'location'  => $request->location,
@@ -80,9 +99,6 @@ class MasterMainMenuController extends Controller
             ]);
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_main_menus.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->route('master_main_menus.index');
         }
     }
@@ -123,7 +139,7 @@ class MasterMainMenuController extends Controller
             } else {
                 if ($admin_role) {
                     $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->where('id', '<>', '4')->get();
-                    $sub_menu = DB::table('submenu')->where('id', '<>', '18')->where('admin_role', '<>', 'N')->orderBy('submenu_name', 'asc')->get();
+                    $sub_menu = DB::table('submenu')->whereNotIn('id', ['18', '15'])->where('admin_role', '<>', 'N')->orderBy('submenu_name', 'asc')->get();
                     $grouped_sub_menu = $sub_menu->groupBy('parent_id');
                     return compact('grouped_sub_menu', 'sidebar_menu');
                 } elseif ($head_branch) {
@@ -141,7 +157,7 @@ class MasterMainMenuController extends Controller
         } elseif (!$IT_DEV) {
             if ($admin_role) {
                 $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->where('id', '<>', '4')->get();
-                $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->where('id', '<>', '17')->orderBy('submenu_name', 'asc')->get();
+                $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->whereNotIn('id', ['17', '15'])->orderBy('submenu_name', 'asc')->get();
                 $grouped_sub_menu = $sub_menu->groupBy('parent_id');
                 return compact('grouped_sub_menu', 'sidebar_menu');
             } elseif ($head_branch) {
@@ -158,7 +174,7 @@ class MasterMainMenuController extends Controller
         } else {
             if ($admin_role) {
                 $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
-                $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->whereNotIn('id', ['17', '18'])->orderBy('submenu_name', 'asc')->get();
+                $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->whereNotIn('id', ['17', '18', '15'])->orderBy('submenu_name', 'asc')->get();
                 $grouped_sub_menu = $sub_menu->groupBy('parent_id');
                 return compact('grouped_sub_menu', 'sidebar_menu');
             } elseif ($head_branch) {
@@ -225,10 +241,27 @@ class MasterMainMenuController extends Controller
             'menu_icon' => 'required',
             'location'  => 'required'
         ]);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
-
-            $update = DB::table('main_menu')->where('id', $request->id)->update([
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('main_menu')->where('id', $request->id)->update([
+                    'menu_name' => $request->menu_name,
+                    'menu_icon' => $request->menu_icon,
+                    'location' => $request->location,
+                    'is_active' => $request->is_active,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_at' => now()
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_main_menus.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_main_menus.index');
+            }
+        } else {
+            DB::table('main_menu')->where('id', $request->id)->update([
                 'menu_name' => $request->menu_name,
                 'menu_icon' => $request->menu_icon,
                 'location' => $request->location,
@@ -238,9 +271,6 @@ class MasterMainMenuController extends Controller
             ]);
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_main_menus.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->route('master_main_menus.index');
         }
     }
@@ -253,7 +283,28 @@ class MasterMainMenuController extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
         $main_menu = MainMenuModel::find($id);
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
+
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($main_menu) {
+                    $main_menu->delete();
+                    DB::table('log_activity_users')->insert([
+                        'user_id' => app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->id,
+                        'ip_address' => \Request::ip(),
+                        'log_activity' => __METHOD__,
+                        'created_at'  => now(),
+                        'created_by'   => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                    ]);
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('delete_success', 'Data Berhasil dihapus!');
+                    return redirect()->route('master_main_menus.index');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_main_menus.index');
+            }
+        } else {
             if ($main_menu) {
                 $main_menu->delete();
                 DB::table('log_activity_users')->insert([
@@ -267,9 +318,6 @@ class MasterMainMenuController extends Controller
                 session()->flash('delete_success', 'Data Berhasil dihapus!');
                 return redirect()->route('master_main_menus.index');
             }
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->route('master_main_menus.index');
         }
     }
 
@@ -283,17 +331,35 @@ class MasterMainMenuController extends Controller
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
-        $validator =  Validator::make($request->all(), [
+        $validator =  $request->validate([
             'submenu_name' => 'required|unique:submenu',
             'parent_id' => 'required'
 
         ]);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                SubmenuModel::create([
+                    'submenu_name' => $request->submenu_name,
+                    'submenu_icons' => $request->submenu_icons,
+                    'submenu_link'  => $request->submenu_link,
+                    'parent_id' => $request->parent_id,
+                    'admin_role' => $request->admin_role,
+                    'superadmin_role' => $request->superadmin_role,
+                    'branch_head_role' => $request->branch_head_role,
+                    'is_active' => $request->is_active,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data submenu berhasil disimpan!');
+                return redirect()->route('submenu_detail', ['id' => $request->parent_id]);
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 17.00 wib');
+                return redirect()->route('submenu_detail', ['id' => $request->parent_id]);
+            }
+        } else {
             SubmenuModel::create([
                 'submenu_name' => $request->submenu_name,
                 'submenu_icons' => $request->submenu_icons,
@@ -308,9 +374,6 @@ class MasterMainMenuController extends Controller
             ]);
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data submenu berhasil disimpan!');
-            return redirect()->route('submenu_detail', ['id' => $request->parent_id]);
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 17.00 wib');
             return redirect()->route('submenu_detail', ['id' => $request->parent_id]);
         }
     }
@@ -394,8 +457,30 @@ class MasterMainMenuController extends Controller
             'parent_id' => 'required'
 
         ]);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('submenu')->where('id', $request->id)->update([
+                    'submenu_name' => $request->submenu_name,
+                    'submenu_icons' => $request->submenu_icons,
+                    'submenu_link' => $request->submenu_link,
+                    'parent_id' => $request->parent_id,
+                    'superadmin_role' => $request->superadmin_role,
+                    'admin_role' => $request->admin_role,
+                    'branch_head_role' => $request->branch_head_role,
+                    'is_active' => $request->is_active,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_at' => now()
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data submenu berhasil disimpan!');
+                return redirect()->route('submenu_detail', ['id' => $request->parent_id]);
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 17.00 wib');
+                return redirect()->back();
+            }
+        } else {
             DB::table('submenu')->where('id', $request->id)->update([
                 'submenu_name' => $request->submenu_name,
                 'submenu_icons' => $request->submenu_icons,
@@ -411,9 +496,6 @@ class MasterMainMenuController extends Controller
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data submenu berhasil disimpan!');
             return redirect()->route('submenu_detail', ['id' => $request->parent_id]);
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 17.00 wib');
-            return redirect()->back();
         }
     }
 
@@ -422,8 +504,28 @@ class MasterMainMenuController extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
         $SubMenuModel = SubmenuModel::where('id', [$request->id])->first();
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($SubMenuModel) {
+                    $SubMenuModel->delete();
+                    DB::table('log_activity_users')->insert([
+                        'user_id' => app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->id,
+                        'ip_address' => \Request::ip(),
+                        'log_activity' => __METHOD__,
+                        'created_at'  => now(),
+                        'created_by'   => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                    ]);
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data submenu berhasil dihapus!');
+                    return redirect()->back()->with('message', 'data successfully.');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 17.00 wib');
+                return redirect()->back();
+            }
+        } else {
             if ($SubMenuModel) {
                 $SubMenuModel->delete();
                 DB::table('log_activity_users')->insert([
@@ -437,9 +539,6 @@ class MasterMainMenuController extends Controller
                 session()->flash('message_success', 'Data submenu berhasil dihapus!');
                 return redirect()->back()->with('message', 'data successfully.');
             }
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 17.00 wib');
-            return redirect()->back();
         }
     }
 

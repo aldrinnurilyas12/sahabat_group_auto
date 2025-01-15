@@ -69,8 +69,31 @@ class Blog extends Controller
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($request->hasFile('blog_foto')) {
+                    foreach ($request->file('blog_foto') as $foto) {
+                        $folderPath = $foto->storeAs('blog_foto', uniqid() . '.' . $foto->getClientOriginalExtension(), 'public');
+                        BlogModel::create([
+                            'title' => $request->title,
+                            'subtitle' => $request->subtitle,
+                            'blog_foto' => $folderPath,
+                            'post_date' => now(),
+                            'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                            'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                        ]);
+                        $this->insertLogActivityUsers(__METHOD__);
+                        session()->flash('message_succes', 'Data Berhasil Disimpan!');
+                        return redirect()->route('master_blog.index');
+                    }
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_blog.index');
+            }
+        } else {
             if ($request->hasFile('blog_foto')) {
                 foreach ($request->file('blog_foto') as $foto) {
                     $folderPath = $foto->storeAs('blog_foto', uniqid() . '.' . $foto->getClientOriginalExtension(), 'public');
@@ -87,9 +110,6 @@ class Blog extends Controller
                     return redirect()->route('master_blog.index');
                 }
             }
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->route('master_blog.index');
         }
     }
 
@@ -127,37 +147,79 @@ class Blog extends Controller
         ]);
 
         $blogfoto = BlogModel::find($id);
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($request->hasFile('blog_foto')) {
-            foreach ($request->file('blog_foto') as $foto) {
-                $folderPath = $foto->storeAs('blog_foto', uniqid() . '.' . $foto->getClientOriginalExtension(), 'public');
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($request->hasFile('blog_foto')) {
+                    foreach ($request->file('blog_foto') as $foto) {
+                        $folderPath = $foto->storeAs('blog_foto', uniqid() . '.' . $foto->getClientOriginalExtension(), 'public');
+                        DB::table('blog')->where('id', $request->id)->update([
+                            'title' => $request->title,
+                            'subtitle' => $request->subtitle,
+                            'blog_foto' => $folderPath,
+                            'updated_at'  => now(),
+                            'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                        ]);
+                    }
+
+                    if ($blogfoto->blog_foto) {
+                        $oldPicture = public_path('storage/' . $blogfoto->blog_foto);
+                        if (file_exists($oldPicture)) {
+                            unlink($oldPicture);
+                        }
+                    }
+                } elseif (!$request->hasFile('blog_foto')) {
+                    $blogfotoOld = DB::table('blog')
+                        ->where('id', $id)
+                        ->value('blog_foto');
+
+                    DB::table('blog')->where('id', $request->id)->update([
+                        'title' => $request->title,
+                        'subtitle' => $request->subtitle,
+                        'blog_foto' => $blogfotoOld,
+                        'updated_at'  => now(),
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                    ]);
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_blog.index');
+            }
+        } else {
+            if ($request->hasFile('blog_foto')) {
+                foreach ($request->file('blog_foto') as $foto) {
+                    $folderPath = $foto->storeAs('blog_foto', uniqid() . '.' . $foto->getClientOriginalExtension(), 'public');
+                    DB::table('blog')->where('id', $request->id)->update([
+                        'title' => $request->title,
+                        'subtitle' => $request->subtitle,
+                        'blog_foto' => $folderPath,
+                        'updated_at'  => now(),
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                    ]);
+                }
+
+                if ($blogfoto->blog_foto) {
+                    $oldPicture = public_path('storage/' . $blogfoto->blog_foto);
+                    if (file_exists($oldPicture)) {
+                        unlink($oldPicture);
+                    }
+                }
+            } elseif (!$request->hasFile('blog_foto')) {
+                $blogfotoOld = DB::table('blog')
+                    ->where('id', $id)
+                    ->value('blog_foto');
+
                 DB::table('blog')->where('id', $request->id)->update([
                     'title' => $request->title,
                     'subtitle' => $request->subtitle,
-                    'blog_foto' => $folderPath,
+                    'blog_foto' => $blogfotoOld,
                     'updated_at'  => now(),
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
             }
-
-            if ($blogfoto->blog_foto) {
-                $oldPicture = public_path('storage/' . $blogfoto->blog_foto);
-                if (file_exists($oldPicture)) {
-                    unlink($oldPicture);
-                }
-            }
-        } elseif (!$request->hasFile('blog_foto')) {
-            $blogfotoOld = DB::table('blog')
-                ->where('id', $id)
-                ->value('blog_foto');
-
-            DB::table('blog')->where('id', $request->id)->update([
-                'title' => $request->title,
-                'subtitle' => $request->subtitle,
-                'blog_foto' => $blogfotoOld,
-                'updated_at'  => now(),
-                'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-            ]);
         }
 
 
@@ -173,17 +235,27 @@ class Blog extends Controller
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($blog) {
+                    $blog->delete();
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil dihapus!');
+                    return redirect()->route('master_blog.index');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_blog.index');
+            }
+        } else {
             if ($blog) {
                 $blog->delete();
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Berhasil dihapus!');
                 return redirect()->route('master_blog.index');
             }
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->route('master_blog.index');
         }
     }
 }

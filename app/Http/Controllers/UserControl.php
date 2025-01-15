@@ -55,20 +55,7 @@ class UserControl extends Controller
         }
     }
 
-    public function time__settings(Request $request)
-    {
-        date_default_timezone_set('Asia/Jakarta');
-        $insertTime = (int) date('H');
 
-
-        $__settings_time = $request->time_settings;
-
-        if ($insertTime == 0 && $__settings_time == 'off') {
-        }
-
-
-        return redirect()->back();
-    }
     /**
      * Display the specified resource.
      */

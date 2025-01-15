@@ -80,8 +80,31 @@ class MasterVehicleAdvertisement extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
         $checking_data = DB::table('vehicle_advertisement')->where('vehicle_id', $request->vehicle_id)->exists();
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($checking_data) {
+                    session()->flash('failed_message', 'Data iklan ini sudah terpasang!');
+                    return redirect()->route('master_vehicle_advertisement.index');
+                } else {
+                    MasterVehicleAdvertisementModel::create([
+                        'vehicle_id' => $request->vehicle_id,
+                        'foto'      => $request->foto,
+                        'is_active' => $request->is_active,
+                        'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+
+                    ]);
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil disimpan!');
+                    return redirect()->route('master_vehicle_advertisement.index');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_vehicle_advertisement.index');
+            }
+        } else {
             if ($checking_data) {
                 session()->flash('failed_message', 'Data iklan ini sudah terpasang!');
                 return redirect()->route('master_vehicle_advertisement.index');
@@ -98,9 +121,6 @@ class MasterVehicleAdvertisement extends Controller
                 session()->flash('message_success', 'Data Berhasil disimpan!');
                 return redirect()->route('master_vehicle_advertisement.index');
             }
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->route('master_vehicle_advertisement.index');
         }
     }
 
@@ -206,16 +226,27 @@ class MasterVehicleAdvertisement extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
         $MasterVehicleAdvertisementModel = MasterVehicleAdvertisementModel::where('id', $request->id);
-        if ($insertTime >= 7 && $insertTime <= 24) {
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
+
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($MasterVehicleAdvertisementModel) {
+                    $MasterVehicleAdvertisementModel->delete();
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil dihapus!');
+                    return redirect()->route('master_vehicle_advertisement.index');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_vehicle_advertisement.index');
+            }
+        } else {
             if ($MasterVehicleAdvertisementModel) {
                 $MasterVehicleAdvertisementModel->delete();
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Berhasil dihapus!');
                 return redirect()->route('master_vehicle_advertisement.index');
             }
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->route('master_vehicle_advertisement.index');
         }
     }
 }

@@ -31,6 +31,7 @@ use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EticketingController;
 use App\Http\Controllers\Api\MaintenanceUnitController;
 use App\Http\Controllers\Api\PayrollController;
+use App\Http\Controllers\Api\SettingsApp;
 use App\Http\Controllers\Api\SpkUnitController;
 use App\Http\Controllers\Api\VehicleSalesRequest;
 use App\Http\Controllers\ProfileController;
@@ -236,7 +237,8 @@ Route::middleware('auth')->group(function () {
 
 
     // settings routes
-    Route::get('settings', [DashboardController::class, 'settings_layout'])->name('settings');
+    Route::get('settings', [SettingsApp::class, 'settings_layout'])->name('settings');
+    Route::put('setting_time', [SettingsApp::class, 'time__settings'])->name('setting_time');
 
     // Appointment Routes
     Route::apiResource('customers_appointment', App\Http\Controllers\Api\MasterAppointment::class);
@@ -255,9 +257,6 @@ Route::middleware('auth')->group(function () {
     Route::apiResource('master_vehicle_sale', App\Http\Controllers\Api\CustomerRequestVehicleSale::class);
     Route::get('customer_vehicle_sale_mail/{id}', [CustomerRequestVehicleSale::class, 'sendMailVehicleSaleRequest'])->name('customer_vehicle_sale_mail');
     Route::put('response_customers_request_sale/{id}', [CustomerRequestVehicleSale::class, 'response_customers_request_sale'])->name('response_customers_request_sale');
-
-    // settings routes:
-    Route::post('time_settings', [UserControl::class, 'time__settings'])->name('time_settings');
 
     // Analytics DashboardController
     Route::get('master_analytics', [Analytics::class, 'index'])->name('master_analytics');

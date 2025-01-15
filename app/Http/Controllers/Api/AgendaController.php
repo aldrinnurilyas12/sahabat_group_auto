@@ -69,21 +69,42 @@ class AgendaController extends Controller
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        AgendaModel::create([
-            'department' => $request->department,
-            'branch' => $request->branch,
-            'agenda_name' => $request->agenda_name,
-            'agenda_date' => $request->agenda_date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-            'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-        ]);
-
-        $this->insertLogActivityUsers(__METHOD__);
-        session()->flash('message_success', 'Data Agenda berhasil disimpan!');
-        return redirect()->route('master_agenda.index');
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                AgendaModel::create([
+                    'department' => $request->department,
+                    'branch' => $request->branch,
+                    'agenda_name' => $request->agenda_name,
+                    'agenda_date' => $request->agenda_date,
+                    'start_time' => $request->start_time,
+                    'end_time' => $request->end_time,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Agenda berhasil disimpan!');
+                return redirect()->route('master_agenda.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_blog.index');
+            }
+        } else {
+            AgendaModel::create([
+                'department' => $request->department,
+                'branch' => $request->branch,
+                'agenda_name' => $request->agenda_name,
+                'agenda_date' => $request->agenda_date,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+            ]);
+            $this->insertLogActivityUsers(__METHOD__);
+            session()->flash('message_success', 'Data Agenda berhasil disimpan!');
+            return redirect()->route('master_agenda.index');
+        }
     }
 
     /**
@@ -128,7 +149,28 @@ class AgendaController extends Controller
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
-        if ($insertTime >= 7 && $insertTime <= 22) {
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
+
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('agenda')->where('id', $request->id)->update([
+                    'department' => $request->department,
+                    'branch' => $request->branch,
+                    'agenda_name' => $request->agenda_name,
+                    'agenda_date' => $request->agenda_date,
+                    'start_time' => $request->start_time,
+                    'end_time' => $request->end_time,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Agenda berhasil disimpan!');
+                return redirect()->route('master_agenda.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 17.00 wib');
+                return redirect()->route('master_agenda.index');
+            }
+        } else {
             DB::table('agenda')->where('id', $request->id)->update([
                 'department' => $request->department,
                 'branch' => $request->branch,
@@ -142,9 +184,6 @@ class AgendaController extends Controller
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Agenda berhasil disimpan!');
             return redirect()->route('master_agenda.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 17.00 wib');
-            return redirect()->route('master_agenda.index');
         }
     }
 
@@ -157,18 +196,27 @@ class AgendaController extends Controller
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 22) {
-
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($agenda) {
+                    $agenda->delete();
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil dihapus!');
+                    return redirect()->route('master_agenda.index');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_agenda.index');
+            }
+        } else {
             if ($agenda) {
                 $agenda->delete();
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Berhasil dihapus!');
                 return redirect()->route('master_agenda.index');
             }
-        } else {
-            session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->route('master_agenda.index');
         }
     }
 }
