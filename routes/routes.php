@@ -69,6 +69,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/get_location/{vehicle_id}', [LandingPageController::class, 'get_location']);
     Route::get('filter_branch', [LandingPageController::class, 'filter_branch_vehicle'])->name('filter_branch');
     Route::put('ads_clicked/{slug}', [LandingPageController::class, 'clicked_ads'])->name('ads_clicked');
+    Route::get('search/', [LandingPageController::class, 'searchControll'])->name('search/');
 
 
     Route::get('show_blog/{id}', [LandingPageController::class, 'showBlog'])->name('show_blog');

@@ -47,7 +47,7 @@
                     <h4 style="text-align:center;color:black;font-weight:bold;">Tambah User Admin</h4>
                     
                     <div style="display: flex; gap:50px;flex-wrap:wrap;" class="form-group-content">
-                        <form style="width:60%;" class="form_input" method="POST" action="{{ route('save_users')}}">
+                        <form  class="form_input" method="POST" action="{{ route('save_users')}}">
                             @csrf   
                             <div class="form-group">
                                 <label>Pilih Karyawan</label>
@@ -152,6 +152,22 @@
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
+
+
+
+    <style>
+        .form_input {
+            width: 60%;
+        }
+
+
+    @media only screen and (max-width: 390px) {
+    .form_input{
+    width: 100%;
+    color: rgb(0, 0, 0);
+    }
+    }
+    </style>
 
     <script>
       document.getElementById('employeeId').addEventListener('change', function(){

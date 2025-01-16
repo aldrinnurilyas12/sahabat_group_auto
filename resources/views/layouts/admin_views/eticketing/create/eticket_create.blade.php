@@ -79,7 +79,7 @@
                             </div>
                         </div>
 
-                        <form style="width: 60%;" class="form_input" method="POST" action="{{ route('master_eticket.store')}}" enctype="multipart/form-data">
+                        <form class="form_input" method="POST" action="{{ route('master_eticket.store')}}" enctype="multipart/form-data">
                             @csrf   
                             <div class="form-group">
                                 <label>Kategory Tiket</label>
@@ -167,6 +167,17 @@
         height: 3rem; /* Pastikan tinggi spinner diatur */
       }
       
+        .form_input {
+            width: 60%;
+        }
+
+
+    @media only screen and (max-width: 390px) {
+    .form_input{
+    width: 100%;
+    color: rgb(0, 0, 0);
+    }
+    }
     </style>
   
 

@@ -35,10 +35,20 @@
           </li> --}}
           
         </ul>
-       <div style="display: block;" class="btn-appointment">
-        <p style="color:gray;margin-bottom:4px;font-size:13px;">Hubungi kami</p>
-        <p style="font-weight: bold;">021-4664355223</p>
-       </div>
+        <div style="display: flex;gap:20px;align-items:center;" class="search-bar">
+          <div class="form-search">
+            <form action="{{route('search/')}}" method="GET" class="form-inline my-2 my-lg-0">
+              <input class="form-control mr-sm-2" name="search" type="search" placeholder="Cari mobil disini...." value="{{ old('search') }}" aria-label="Search">
+              <button class="btn btn-primary" type="submit">Search</button>
+            </form>
+           </div>
+
+          {{-- <div style="display: block;" class="btn-appointment">
+            <p style="color:gray;margin-bottom:4px;font-size:13px;">Hubungi kami</p>
+            <p style="font-weight: bold;">021-4664355223</p>
+           </div> --}}
+        </div>
+       
       </div>
     </div>
   </nav>

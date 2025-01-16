@@ -290,15 +290,35 @@ class MasterAppointment extends Controller
 
     public function change_appointment(Request $request)
     {
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        $change_status = AppointmentModel::where('id', $request->id)->update([
-            'appointment_status' => $request->appointment_status
-        ]);
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                $change_status = AppointmentModel::where('id', $request->id)->update([
+                    'appointment_status' => $request->appointment_status
+                ]);
 
-        if ($change_status) {
-            $this->insertLogActivityUsers(__METHOD__);
-            session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('customers_appointment.index');
+                if ($change_status) {
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil disimpan!');
+                    return redirect()->route('customers_appointment.index');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('customers_appointment.index');
+            }
+        } else {
+            $change_status = AppointmentModel::where('id', $request->id)->update([
+                'appointment_status' => $request->appointment_status
+            ]);
+
+            if ($change_status) {
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('customers_appointment.index');
+            }
         }
     }
 
@@ -441,21 +461,50 @@ class MasterAppointment extends Controller
     // vehicle_request
     public function response_customers_request(Request $response_request)
     {
-        DB::table('customer_vehicle_request')->where('id', $response_request->id)->update([
-            'id' => $response_request->id,
-            'email' => $response_request->email,
-            'sending_mail' => $response_request->sending_mail,
-            'description' => $response_request->description,
-            'updated_at' => now()
-        ]);
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        $updated_request = VehicleCustomerRequest::find($response_request->id);
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
 
-        if ($updated_request) {
-            $this->sendResponseCustomersRequest($updated_request);
-            $this->insertLogActivityUsers(__METHOD__);
-            session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect('customer_vehicle_request');
+                DB::table('customer_vehicle_request')->where('id', $response_request->id)->update([
+                    'id' => $response_request->id,
+                    'email' => $response_request->email,
+                    'sending_mail' => $response_request->sending_mail,
+                    'description' => $response_request->description,
+                    'updated_at' => now()
+                ]);
+
+                $updated_request = VehicleCustomerRequest::find($response_request->id);
+
+                if ($updated_request) {
+                    $this->sendResponseCustomersRequest($updated_request);
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil disimpan!');
+                    return redirect('customer_vehicle_request');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect('customer_vehicle_request');
+            }
+        } else {
+            DB::table('customer_vehicle_request')->where('id', $response_request->id)->update([
+                'id' => $response_request->id,
+                'email' => $response_request->email,
+                'sending_mail' => $response_request->sending_mail,
+                'description' => $response_request->description,
+                'updated_at' => now()
+            ]);
+
+            $updated_request = VehicleCustomerRequest::find($response_request->id);
+
+            if ($updated_request) {
+                $this->sendResponseCustomersRequest($updated_request);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect('customer_vehicle_request');
+            }
         }
     }
 

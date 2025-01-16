@@ -29,7 +29,9 @@
                     <div class="form-group">
                     <label>NIK <span style="color: red">*</span></label>
                     <input type="text" class="form-control" name="nik" value="{{$emp->nik }}" readonly autocomplete="off">
-                
+                    @if ($errors->has('nik'))
+                    <span class="text-danger">{{ $errors->first('nik') }}</span>
+                    @endif
                     </div>
                     <div class="form-group">
                         <label>Nama Karyawan <span style="color: red">*</span> </label>
@@ -165,7 +167,7 @@
     </script>
 @endif
 
-
+<script src="assets/js/sb-admin-2.js"></script>
 <script>
     window.addEventListener('load', function() {
        var loadingSpinnerWrapper = document.getElementById('loadingSpinnerWrapper');

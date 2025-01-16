@@ -41,27 +41,45 @@ class LandingPageController extends Controller
         $lowerprice = $request->lower_price;
         $highprice = $request->high_price;
         $brand = DB::table('vehicle_brand')->where('brand_name', '<>', 'Maserati')->get();
-        $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->paginate(10);
-        return view('layouts.landing_page.main_page.all_vehicle', compact('vehicle_ads', 'brand', 'lowerprice', 'highprice'));
+        $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->paginate(12);
+        $search = $request->input('search');
+        return view('layouts.landing_page.main_page.all_vehicle', compact('vehicle_ads', 'brand', 'lowerprice', 'highprice', 'search'));
     }
 
-    public function filterbyvehiclebrand(Request $request): View
+    // public function filterbyvehiclebrand(Request $request): View
+    // {
+    //     // Ambil brand yang dipilih dari request
+    //     $brand = $request->input('brand_name');
+    //     $brands = DB::table('vehicle_brand')->get();
+    //     $lowerprice = $request->lower_price;
+    //     $highprice = $request->high_price;
+    //     $search = $request->input('search');
+    //     if (!empty($brand)) {
+    //         $vehicle_ads = DB::table('v_vehicle_advertisement')
+    //             ->where('brand_name', $request->brand_name)->where('is_active', 'Ya')
+    //             ->paginate(10);
+    //     } else {
+    //         // Jika tidak ada brand yang dipilih, tampilkan semua data
+    //         $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->get();
+    //     }
+
+    //     return view('layouts.landing_page.main_page.all_vehicle', compact('vehicle_ads', 'brand', 'brands', 'lowerprice', 'highprice', 'search'));
+    // }
+
+    public function searchControll(Request $request): View
     {
-        // Ambil brand yang dipilih dari request
+
         $brand = $request->input('brand_name');
         $brands = DB::table('vehicle_brand')->get();
         $lowerprice = $request->lower_price;
         $highprice = $request->high_price;
-        if (!empty($brand)) {
-            $vehicle_ads = DB::table('v_vehicle_advertisement')
-                ->where('brand_name', $request->brand_name)->where('is_active', 'Ya')
-                ->paginate(10);
-        } else {
-            // Jika tidak ada brand yang dipilih, tampilkan semua data
-            $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->get();
-        }
+        $search = $request->input('search');
 
-        return view('layouts.landing_page.main_page.all_vehicle', compact('vehicle_ads', 'brand', 'brands', 'lowerprice', 'highprice'));
+        if ($search) {
+            $result = DB::table('v_vehicle_advertisement')->where('unit', 'like', '%' . $search . '%')->paginate();
+        }
+        $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->get();
+        return view('layouts.landing_page.main_page.all_vehicle', compact('result', 'vehicle_ads', 'brand', 'brands', 'lowerprice', 'highprice', 'search'));
     }
 
 

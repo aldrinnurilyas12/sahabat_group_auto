@@ -120,7 +120,7 @@
 
                         </div>
                     </div>
-                    <div style="width:70%; color:black;" class="container-content">
+                    <div class="container-content">
                         <div style="padding:8px;width:100%;" class="card shadow mb-4">
                             <div class="card-header py-3">
                                 <h6 class="mb-2 font-weight-bold text-primary">Informasi Data Diri</h6>
@@ -203,7 +203,7 @@
                             </div>
                         </div>
 
-                        <div style="width:100%; color:black;" class="container-content">
+                        <div class="container-content">
                             <div style="padding:8px;width:100%;" class="card shadow mb-4">
                                 <div class="card-header py-3">
                                     <h6 class="mb-2 font-weight-bold text-primary">Ubah Password</h6>
@@ -356,7 +356,6 @@
         alert('{{ session('alert') }}');
     </script>
 @endif
-
 
 <script>
     window.addEventListener('load', function() {

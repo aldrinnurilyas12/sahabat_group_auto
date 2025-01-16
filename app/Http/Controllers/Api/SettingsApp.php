@@ -40,7 +40,8 @@ class SettingsApp extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'] ?? [];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'] ?? [];
 
-        return view('layouts.admin_views.settings', compact('grouped_sub_menu', 'sidebar_menu'));
+        $setting_time = DB::table('settings_schedule_time')->first();
+        return view('layouts.admin_views.settings', compact('grouped_sub_menu', 'sidebar_menu', 'setting_time'));
     }
 
     public function time__settings(Request $request)

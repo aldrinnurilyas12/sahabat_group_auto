@@ -91,7 +91,7 @@
     </section>
     
      {{-- section mobil bekas--}}
-    <section id="mobil-bekas" style="padding:20px;">
+    <section id="mobil-bekas" style="padding:10px;">
         <div class="max-w-screen-xl px-4 pt-20 pb-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 ">
         <h2 style="text-align: center;margin" class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Pilihan Unit Kami</h2>
         <br>
@@ -101,7 +101,6 @@
                 @foreach($vehicle_ads as $ads)
                     @if($ads->category_name == 'Unit Booked')
                         <div class="card">
-                           
                                 <div style="background-image:linear-gradient(to bottom, rgba(27, 64, 134, 0.316), rgba(15, 15, 15, 0.947));color:rgb(0, 0, 0);width:100%; height:100%;padding:5px;border-radius:5px;font-size:12px;position: absolute;" class="info-date">
                                     <p style="background-color: rgba(255, 255, 255, 0.596);color:rgb(0, 0, 0);width:max-content;padding:5px;border-radius:5px;font-size:12px;position: absolute;">
                                         {{\Carbon\Carbon::parse($ads->created_at)->diffForHumans()}}
@@ -122,7 +121,7 @@
                                     
                                     </div>
                                 </div>
-                            </div>
+                        </div>
                         
                     @else
 
@@ -173,12 +172,12 @@
                 <h2 class="mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Bantuan pencarian mobil</h2>
                 <p class="font-light text-gray-500 sm:text-xl dark:text-gray-400">Tidak ada unit kendaraan yang dicari? silahkan masukan email dan nomor telepon anda, Kami akan menghubungi anda.</p>
             </div>
-            <form action="{{route('request_vehicle')}}" method="POST">
+            <form class="form_input" action="{{route('request_vehicle')}}" method="POST">
                 @csrf
                 <div class="input-form">
                     <Label style="color: black; font-size:15px;font-weight:bold;">Merek Mobil</Label>
                     <br>
-                    <select style="width:60%;text-align:center;border-radius:6px;" name="brand" id="">
+                    <select class="form-control" name="brand" id="">
                         <option value="">=== Pilih Brand/Merek ===</option>
                         @foreach($brand as $merk)
                         <option  value="{{$merk->id}}">{{$merk->brand_name}}</option>
@@ -193,7 +192,7 @@
                 <div class="input-form">
                     <Label style="color: black; font-size:15px;font-weight:bold;" >Tipe Mobil</Label>
                     <br>
-                    <input class="input-form-submit" style="width:60%;" type="text" name="vehicle_type" autocomplete="off" placeholder="Masukan tipe mobil : avanza veloz sport">
+                    <input class="form-control" type="text" name="vehicle_type" autocomplete="off" placeholder="Masukan tipe mobil : avanza veloz sport">
                     @error('vehicle_type')
                     <div class="alert alert-danger">{{ $message }}</div>
                     @enderror
@@ -202,7 +201,7 @@
                 <div class="input-form">
                     <Label style="color: black; font-size:15px;font-weight:bold;">Tahun Kendaraan</Label>
                     <br>
-                    <input class="input-form-submit" style="width:60%;" name="year" type="number" autocomplete="off" placeholder="Masukan tahun kendaraan">
+                    <input class="form-control" name="year" type="number" autocomplete="off" placeholder="Masukan tahun kendaraan">
                     @error('year')
                     <div class="alert alert-danger">{{ $message }}</div>
                     @enderror
@@ -212,7 +211,7 @@
                 <div class="input-form">
                     <Label style="color: black; font-size:15px;font-weight:bold;">Warna Kendaraan</Label>
                     <br>
-                    <input class="input-form-submit" style="width:60%;" name="vehicle_color" type="text" autocomplete="off" placeholder="Masukan warna kendaraan">
+                    <input class="form-control" name="vehicle_color" type="text" autocomplete="off" placeholder="Masukan warna kendaraan">
                     @error('vehicle_color')
                     <div class="alert alert-danger">{{ $message }}</div>
                     @enderror
@@ -221,7 +220,7 @@
                 <div class="input-form">
                     <Label style="color: black; font-size:15px;font-weight:bold;">Nama Anda</Label>
                     <br>
-                    <input class="input-form-submit" style="width:60%;" name="name" type="text" autocomplete="off" placeholder="Masukan nama anda...">
+                    <input class="form-control" name="name" type="text" autocomplete="off" placeholder="Masukan nama anda...">
                     @error('name')
                     <div class="alert alert-danger">{{ $message }}</div>
                     @enderror
@@ -230,7 +229,7 @@
                 <div class="input-form">
                     <Label style="color: black; font-size:15px;font-weight:bold;">Email</Label>
                     <br>
-                    <input class="input-form-submit" style="width:60%;" name="email" type="text" autocomplete="off" placeholder="Masukan Email anda...">
+                    <input class="form-control" name="email" type="text" autocomplete="off" placeholder="Masukan Email anda...">
                     @error('email')
                     <div class="alert alert-danger">{{ $message }}</div>
                     @enderror
@@ -239,7 +238,7 @@
                 <div class="input-form">
                     <Label  style="color: black; font-size:15px;font-weight:bold;">No.Telp/WA</Label>
                     <br>
-                    <input class="input-form-submit" style="width:60%;" name="phone_number" type="text" autocomplete="off" placeholder="Masukan nomor telepon anda...">
+                    <input class="form-control" name="phone_number" type="text" autocomplete="off" placeholder="Masukan nomor telepon anda...">
                     @error('phone_number')
                     <div class="alert alert-danger">{{ $message }}</div>
                     @enderror
@@ -412,7 +411,21 @@
     </div>
   </div>
   
-  <style>
+<style>
+     @import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+
+
+body {
+    font-family: "Noto Serif", serif;
+}
+
+input.input-form-submit {
+    border-radius:6px;
+}
+
+
+    #map { height: 400px; }
     #loadingSpinnerWrapper {
     position: fixed; /* Fix posisi spinner */
     top: 0;
@@ -436,7 +449,23 @@
     display: none;
   }
   
-  </style>
+  .card {
+    width: 16rem;
+    height: max-content
+}
+   
+
+    @media only screen and (max-width: 390px) {
+    .card{
+    width: 100%;
+    color: rgb(0, 0, 0);
+    },
+    .form_input {
+        width:100%;
+        padding:50px;
+    }
+    }
+    </style>
     
 
 
@@ -453,34 +482,6 @@
 </script>
     
 @endif
-
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
-
-    .card {
-        width: 14rem;
-        height: max-content
-    }
-
-    body {
-        font-family: "Noto Serif", serif;
-    }
-
-    input.input-form-submit {
-        border-radius:6px;
-    }
-
-
-    #map { height: 400px; }
-    @media only screen and (max-width:360px){
-        .form-group-content{
-            width:100%;
-        },
-        .card {
-            width:100px;
-        }
-    }
-</style>
 
 <script>
 

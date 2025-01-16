@@ -17,7 +17,7 @@
 
 @include('layouts.landing_page.navbar.header_new')
 
-<section style="padding:0 30px 0 30px;"  class="bg-white dark:bg-gray-900">
+<section class="bg-white dark:bg-gray-900">
     <div class="container">
       <div class="card">
           <div class="container-fliud">
@@ -26,16 +26,36 @@
                   <div style="height: max-content;" class="preview col-md-6">
                       
                       <div class="preview-pic tab-content">
-                        
-                      <img style="height: 300px;"  src="{{ asset('storage/' . $vehicle_fotos->first()->images) }}" class="card-img-top" alt="...">
-                      
-                      @foreach($vehicle_fotos as $vehicles)
-                        <div class="tab-pane" id="pic">
-                        
-                          <img src="{{ asset('storage/' . $vehicles->images) }}" />
-                        
-                      </div>
-                      @endforeach
+
+                      {{-- slider images --}}
+                         
+                      <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                        <ol class="carousel-indicators">
+                            @foreach ($vehicle_fotos as $key => $img)
+                                <li data-target="#carouselExampleIndicators" data-slide-to="{{ $key }}" class="{{ $key === 0 ? 'active' : '' }}"></li>
+                            @endforeach
+                        </ol>
+                        <div style="margin-bottom: 20px;" class="carousel-inner">
+                            @foreach ($vehicle_fotos as $key => $img)
+                                <div class="carousel-item {{ $key === 0 ? 'active' : '' }}">
+                                    <img style="height:400px;" class="d-block w-100" src="{{ asset('storage/' . $img->images) }}" alt="Slide {{ $key + 1 }}">
+                                </div>
+                            @endforeach
+                        </div>
+                    
+                        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+
+                      {{-- end --}}
+
+
                       </div>    
                       <ul style="margin-bottom: 30px;" class="preview-thumbnail nav nav-tabs">
                           @foreach($vehicle_fotos as $vehicles)
@@ -514,8 +534,16 @@ img {
 .card {
   margin-top: 50px;
   background: #ffffff;
-  padding: 3em;
+  padding: 1em;
   line-height: 1.5em; }
+
+  @media only screen and (max-width: 390px) {
+    .card{
+   padding: 10px;
+    color: rgb(0, 0, 0);
+    }
+    }
+
 
 @media screen and (min-width: 997px) {
   .wrapper {

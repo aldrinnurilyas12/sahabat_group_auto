@@ -70,13 +70,21 @@
                                             <td>
                                                 @if($payroll->status == 'Sudah Konfirmasi')
                                                 <a class="btn btn-primary" href="{{route('get_payroll', $payroll->id)}}"><i class="fa fa-file"></i>&nbsp;<span>Unduh Payroll</span></a>
-                                                @else
+                                                @elseif($payroll->status == 'Menunggu Konfirmasi')
                                                 <p class="text-danger">Belum Konfirmasi</p>
+                                                @else
+                                                <p>-</p>
                                                 @endif
                                                </td>
                                             <td>{{$payroll->nik}}</td>
                                             <td>{{$payroll->name}}</td>
-                                            <td>{{ \Carbon\Carbon::parse($payroll->created_at)->format('d F Y')}}</td>
+                                            <td>
+                                            @if($payroll->created_at)
+                                                {{ \Carbon\Carbon::parse($payroll->created_at)->format('d F Y')}}
+                                            @else
+                                            <p>-</p>
+                                            @endif
+                                        </td>
                                          
                                         </tr>
 
@@ -140,12 +148,7 @@
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <style>
-        .col-sm-12{
-            overflow-x: scroll;
-        }
-
-    </style>
+   
     {{-- spinner --}}
     <div id="loadingSpinnerWrapper">
       <div class="spinner-border" role="status">

@@ -227,4 +227,4 @@
 
                 <!-- End of Topbar -->
 
-
+<script src="../assets/js/sb-admin-2.js"></script>

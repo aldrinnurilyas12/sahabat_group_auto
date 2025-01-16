@@ -187,7 +187,7 @@
             <div style="margin: 0; padding:0;" id="content">
                       
                 <div style="display: flex; gap:50px;flex-wrap:wrap;" class="form-group-content">
-                    <form style="width: 60%;" class="form_input" method="POST" action="{{ route('appointment_save')}}">
+                    <form class="form_input" method="POST" action="{{ route('appointment_save')}}">
                         @csrf 
                         
                         <div class="form-group">
@@ -340,8 +340,19 @@
         }
         
 
-  
-  </style>
+       
+        .form_input {
+            width: 60%;
+        }
+
+
+    @media only screen and (max-width: 390px) {
+    .form_input{
+    width: 100%;
+    color: rgb(0, 0, 0);
+    }
+    }
+    </style>
     
 </body>
 @if (Session::has('message_success'))

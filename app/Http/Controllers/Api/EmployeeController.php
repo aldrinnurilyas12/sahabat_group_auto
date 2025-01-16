@@ -125,7 +125,7 @@ class EmployeeController extends Controller
         $insertTime = (int) date('H');
 
         $request->validate([
-            'nik' => 'required|unique:employee',
+            'nik' => 'required|max:6|unique:employee',
             'name'  => 'required',
             'address' => 'required',
             'phone_number' => 'required|unique:employee',
@@ -269,6 +269,9 @@ class EmployeeController extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
         $emp = EmployeeModel::find($id);
+        if ($emp == null) {
+            abort(404, 'Data Not Found');
+        }
         $start_date = Carbon::parse($emp->start_date);
         $resign_date = Carbon::parse($emp->resign_date);
         $birth_date  = Carbon::parse($emp->birth_date);
@@ -278,6 +281,7 @@ class EmployeeController extends Controller
         $job_position = DB::table('job_position')->get();
         $branch = DB::table('branch')->get();
         $banks = DB::table('bank')->get();
+
         return view('layouts.admin_views.employee.edit.edit_employee', compact('employee', 'banks', 'start_date', 'birth_date', 'resign_date', 'branch', 'job_position', 'main_menu', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -285,6 +289,10 @@ class EmployeeController extends Controller
 
     public function update(Request $request)
     {
+        $request->validate([
+            'nik' => 'max:6'
+        ]);
+
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
         $checkingBankAccount = DB::table('employee_bank_account')->where('nik', $request->nik)->first();
@@ -435,7 +443,7 @@ class EmployeeController extends Controller
         }
         $this->insertLogActivityUsers(__METHOD__);
         session()->flash('message_success', 'Foto berhasil diupload!');
-        return redirect()->route('profile', ['nik' => auth()->user()->nik]);
+        return redirect()->route('profile');
     }
 
     public function update_user_picture(Request $request, $id)
@@ -444,7 +452,7 @@ class EmployeeController extends Controller
             'users_foto' => 'required|image|mimes:jpeg,png,jpg,gif|max:10048'
         ]);
 
-        $picture_id = UsersPicture::find($id);
+        $picture_id = DB::table('users_picture')->where('user_id', $request->id)->first();
 
         if ($request->hasFile('users_foto')) {
             $picture = $request->file('users_foto');
@@ -467,7 +475,7 @@ class EmployeeController extends Controller
         if ($update_picture) {
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Foto berhasil diperbarui!');
-            return redirect()->route('profile', ['nik' => auth()->user()->nik]);
+            return redirect()->route('profile');
         }
     }
 
@@ -500,14 +508,14 @@ class EmployeeController extends Controller
 
         $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
 
-        $signatureId = EmployeeSignature::find($employee_id);
+        $signatureId = DB::table('employee_signature')->where('employee_id', $employee_id)->firstOrFail();
 
         if ($request->hasFile('signature')) {
             $signature = $request->file('signature');
             $signaturePath = $signature->storeAs('employee_signature', uniqid() . '.' . $signature->getClientOriginalExtension(), 'public');
 
             DB::table('employee_signature')->where('employee_id', $request->employee_id)->update([
-                'employee_id' => app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id,
+                'employee_id' => $employee_id,
                 'signature' => $signaturePath,
                 'updated_at' => now(),
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
@@ -523,7 +531,7 @@ class EmployeeController extends Controller
 
         $this->insertLogActivityUsers(__METHOD__);
         session()->flash('message_success', 'Signature berhasil disimpan!');
-        return redirect()->route('profile', ['nik' => auth()->user()->nik]);
+        return redirect()->route('profile');
     }
 
     public function delete_signature($employee_id)

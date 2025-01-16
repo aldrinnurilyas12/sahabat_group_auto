@@ -87,22 +87,52 @@ class CustomerRequestVehicleSale extends Controller
 
     public function response_customers_request_sale(Request $request_data)
     {
-        DB::table('vehicle_sale_request')->where('id', $request_data->id)->update([
-            'id' => $request_data->id,
-            'email' => $request_data->email,
-            'sending_email' => $request_data->sending_email,
-            'status' => $request_data->status,
-            'description' => $request_data->description,
-            'updated_at' => now()
-        ]);
 
-        $updated_request = VehicleCarSaleRequest::find($request_data->id);
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($updated_request) {
-            $this->sendResponseCustomersSaleRequest($updated_request);
-            $this->insertLogActivityUsers(__METHOD__);
-            session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect('master_vehicle_sale');
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                DB::table('vehicle_sale_request')->where('id', $request_data->id)->update([
+                    'id' => $request_data->id,
+                    'email' => $request_data->email,
+                    'sending_email' => $request_data->sending_email,
+                    'status' => $request_data->status,
+                    'description' => $request_data->description,
+                    'updated_at' => now()
+                ]);
+
+                $updated_request = VehicleCarSaleRequest::find($request_data->id);
+
+                if ($updated_request) {
+                    $this->sendResponseCustomersSaleRequest($updated_request);
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil disimpan!');
+                    return redirect('master_vehicle_sale');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect('master_vehicle_sale');
+            }
+        } else {
+            DB::table('vehicle_sale_request')->where('id', $request_data->id)->update([
+                'id' => $request_data->id,
+                'email' => $request_data->email,
+                'sending_email' => $request_data->sending_email,
+                'status' => $request_data->status,
+                'description' => $request_data->description,
+                'updated_at' => now()
+            ]);
+
+            $updated_request = VehicleCarSaleRequest::find($request_data->id);
+
+            if ($updated_request) {
+                $this->sendResponseCustomersSaleRequest($updated_request);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect('master_vehicle_sale');
+            }
         }
     }
 

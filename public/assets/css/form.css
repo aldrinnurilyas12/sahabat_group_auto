@@ -24,7 +24,7 @@
 }
 
 .form_input {
-    width: 70%;
+    width: 100%;
 }
 
 /* Label styling */
@@ -110,6 +110,12 @@
     box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25);
 }
 
+@media only screen and (max-width: 380px) {
+    .container-content{
+    width: 100%;
+    color: rgb(0, 0, 0);
+}
+ }
 
 
 

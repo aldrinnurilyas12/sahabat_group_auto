@@ -46,12 +46,12 @@
                     <!-- DataTable -->
                     <div class="card shadow mb-4">
                         <div  class="card-header py-3">
-                            <h5 style="color: black;"><strong>Data Kantor Cabang PT Sahabat Group Auto</strong></h5>
+                            <h5 style="color: black;"><strong>Data Payroll PT Sahabat Group Auto</strong></h5>
                             <br>
                             <div style="display: flex; flex-wrap:wrap; gap:10px;" class="component">
-                            <a href="{{ route('branch_create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus-circle"></i>&nbsp;Tambah Cabang
-                             </a>
+                            {{-- <a href="{{ route('branch_create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus-circle"></i>&nbsp;Tambah Payroll
+                             </a> --}}
 
                              <a class="btn btn-success" href="{{route('branch_export')}}">
                                 <i class="fas fa-file-excel"></i>

@@ -44,11 +44,18 @@
                           <form action="{{route('setting_time')}}" method="POST">
                             @method('PUT')
                             @csrf
-                            <h5>Nonaktifkan Jam Web</h5>
+                            <h5> Jam Operasional Web Administrator</h5>
                             <select class="form-control" name="open_schedule_time" id="">
+                              <option value="#">==== Pilih ====</option>
                               <option value="on">ON</option>
                               <option value="off">OFF</option>
                             </select>
+                            <p>
+                              @if($setting_time->open_schedule_time == 'on')
+                             <p>Setting Time : <span class="text-success">Aktif</span></p> 
+                              @else
+                              <p>Setting Time : <span class="text-secondary">Tidak Aktif</span></p> 
+                              @endif
                               <br>
                               <button type="submit" class="btn btn-dark">Simpan Pengaturan</button>
                           </form>

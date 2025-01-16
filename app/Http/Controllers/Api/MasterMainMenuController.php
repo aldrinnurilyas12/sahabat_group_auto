@@ -172,21 +172,35 @@ class MasterMainMenuController extends Controller
                 return compact('grouped_sub_menu', 'sidebar_menu');
             }
         } else {
-            if ($admin_role) {
-                $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
-                $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->whereNotIn('id', ['17', '18', '15'])->orderBy('submenu_name', 'asc')->get();
-                $grouped_sub_menu = $sub_menu->groupBy('parent_id');
-                return compact('grouped_sub_menu', 'sidebar_menu');
-            } elseif ($head_branch) {
-                $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
-                $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->where('branch_head_role', '<>', 'N')->orderBy('submenu_name', 'asc')->get();
-                $grouped_sub_menu = $sub_menu->groupBy('parent_id');
-                return compact('grouped_sub_menu', 'sidebar_menu');
-            } elseif ($superadmin_role) {
-                $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
-                $sub_menu = DB::table('submenu')->whereNotIn('id', ['17', '18'])->orderBy('submenu_name', 'asc')->get();
-                $grouped_sub_menu = $sub_menu->groupBy('parent_id');
-                return compact('grouped_sub_menu', 'sidebar_menu');
+            if ($IT_DEV) {
+                if ($admin_role) {
+                    $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
+                    $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->whereNotIn('id', ['17', '18'])->orderBy('submenu_name', 'asc')->get();
+                    $grouped_sub_menu = $sub_menu->groupBy('parent_id');
+                    return compact('grouped_sub_menu', 'sidebar_menu');
+                } elseif ($superadmin_role) {
+                    $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
+                    $sub_menu = DB::table('submenu')->whereNotIn('id', ['17', '18'])->orderBy('submenu_name', 'asc')->get();
+                    $grouped_sub_menu = $sub_menu->groupBy('parent_id');
+                    return compact('grouped_sub_menu', 'sidebar_menu');
+                }
+            } else {
+                if ($admin_role) {
+                    $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
+                    $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->whereNotIn('id', ['17', '18', '15'])->orderBy('submenu_name', 'asc')->get();
+                    $grouped_sub_menu = $sub_menu->groupBy('parent_id');
+                    return compact('grouped_sub_menu', 'sidebar_menu');
+                } elseif ($head_branch) {
+                    $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
+                    $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->where('branch_head_role', '<>', 'N')->orderBy('submenu_name', 'asc')->get();
+                    $grouped_sub_menu = $sub_menu->groupBy('parent_id');
+                    return compact('grouped_sub_menu', 'sidebar_menu');
+                } elseif ($superadmin_role) {
+                    $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
+                    $sub_menu = DB::table('submenu')->whereNotIn('id', ['17', '18'])->orderBy('submenu_name', 'asc')->get();
+                    $grouped_sub_menu = $sub_menu->groupBy('parent_id');
+                    return compact('grouped_sub_menu', 'sidebar_menu');
+                }
             }
         }
 

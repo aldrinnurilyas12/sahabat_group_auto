@@ -26,8 +26,8 @@
 </head>
 <body>
     <div id="wrapper">
-
-        @include('layouts.landing_page.sidebar.sidebar_landingpage')
+{{-- 
+        @include('layouts.landing_page.sidebar.sidebar_landingpage') --}}
     
         <!-- Content Wrapper -->
         <div id="content-wrapper">
@@ -44,10 +44,11 @@
                         
                         <h3>Data tidak ditemukan</h3>
                         @else
-                        @foreach($vehicle_ads as $ads)
+                          @if($search)
+                          @foreach($result as $ads)
                         
                         @if($ads->category_name == 'Unit Booked')
-                        <div class="card" style="width: 14rem; height:max-content;">
+                        <div class="card">
                             <div style="background-image:linear-gradient(to bottom, rgba(27, 64, 134, 0.316), rgba(15, 15, 15, 0.947));color:rgb(0, 0, 0);width:100%; height:100%;padding:5px;border-radius:5px;font-size:12px;position: absolute;" class="info-date">
                                 <p style="background-color: rgba(255, 255, 255, 0.596);color:rgb(0, 0, 0);width:max-content;padding:5px;border-radius:5px;font-size:12px;position: absolute;">
                                     {{\Carbon\Carbon::parse($ads->created_at)->diffForHumans()}}
@@ -71,7 +72,7 @@
                           </div> 
                         
                         @else
-                        <div class="card" style="width: 14rem; height:max-content;">
+                        <div class="card">
                             <div class="info-date">
                                 <p style="background-color: rgba(255, 255, 255, 0.596);color:rgb(0, 0, 0);width:max-content;padding:5px;border-radius:5px;font-size:12px;position: absolute;">
                                     {{\Carbon\Carbon::parse($ads->created_at)->diffForHumans()}}
@@ -99,7 +100,66 @@
                             </div>
                           </div> 
                           @endif  
-                          @endforeach
+                        @endforeach
+                          @else
+
+                        @foreach($vehicle_ads as $ads)
+                        
+                        @if($ads->category_name == 'Unit Booked')
+                        <div class="card">
+                            <div style="background-image:linear-gradient(to bottom, rgba(27, 64, 134, 0.316), rgba(15, 15, 15, 0.947));color:rgb(0, 0, 0);width:100%; height:100%;padding:5px;border-radius:5px;font-size:12px;position: absolute;" class="info-date">
+                                <p style="background-color: rgba(255, 255, 255, 0.596);color:rgb(0, 0, 0);width:max-content;padding:5px;border-radius:5px;font-size:12px;position: absolute;">
+                                    {{\Carbon\Carbon::parse($ads->created_at)->diffForHumans()}}
+                                </p>
+                                
+                            </div>
+                            <img style="width: 100%;height:150px;"  src="{{ asset('storage/' . $ads->foto) }}" class="card-img-top" alt="...">
+                            <div class="card-body">
+                              <h5 style="margin-bottom: 0;font-size:16px;" class="card-title">{{$ads->unit . ' ' . $ads->manufacture_year}}</h5>
+                              <div style="color:gray;margin-bottom:10px;" class="small-text">
+                                <small>{{$ads->color}}</small> &bullet; <small>{{$ads->manufacture_year}}</small>
+                              </div>
+                             
+                              <p style="font-weight: bold;" class="card-text">{{"Rp." . number_format($ads->price)}}</p>
+                              
+                              <div style="font-size: 14px;display:flex;padding:0;align-items:center;gap:10px;justify-content:center;" class="btn">
+                                <a href="{{route('vehicle_detail', $ads->ads_id)}}" class="btn btn-danger">Sudah Booked</a>
+                                
+                              </div>
+                            </div>
+                          </div> 
+                        
+                        @else
+                        <div class="card">
+                            <div class="info-date">
+                                <p style="background-color: rgba(255, 255, 255, 0.596);color:rgb(0, 0, 0);width:max-content;padding:5px;border-radius:5px;font-size:12px;position: absolute;">
+                                    {{\Carbon\Carbon::parse($ads->created_at)->diffForHumans()}}
+                                </p>
+                            </div>
+                            <img style="width: 100%;height:150px;"  src="{{ asset('storage/' . $ads->foto) }}" class="card-img-top" alt="...">
+                            <div class="card-body">
+                              <h5 style="margin-bottom: 0;font-size:16px;" class="card-title">{{$ads->unit}}</h5>
+                              <div style="color:gray;margin-bottom:10px;" class="small-text">
+                                <small>{{$ads->color}}</small> &bullet; <small>{{$ads->manufacture_year}}</small>
+                              </div>
+                             
+                              <p style="font-weight: bold;" class="card-text">{{"Rp." . number_format($ads->price)}}</p>
+                              
+                              <div style="font-size: 14px;display:flex;padding:0;align-items:center;gap:10px;justify-content:space-between;border:none;" class="btn">
+                                <form action="{{route('ads_clicked', $ads->slug)}}" method="POST">
+                                  @method('PUT')
+                                  @csrf
+                                  <input type="text" name="id" value="{{$ads->ads_id}}" hidden>
+                                  <input type="text" value="{{$ads->clicked}}" name="clicked" hidden>
+                                   <button class="btn btn-dark" type="submit">Detail</button>
+                              </form>
+                                <a style="color: #212529;text-decoration:underline;" href="https://wa.me/+6289674050680">Hubungi Kami</a>
+                              </div>
+                            </div>
+                          </div> 
+                          @endif  
+                        @endforeach
+                        @endif
                           @endif
 
                      </div>    
@@ -118,7 +178,11 @@
                 </div> 
             </div>
             <div style="display: flex; justify-content:center;" class="pagination">
+              @if($search)
+              {{$result->links()}}
+              @else
               {{$vehicle_ads->links()}}
+              @endif
             </div>
            
             <br>
@@ -151,6 +215,18 @@
       color: yellow;
       width: 3rem;
       height: 3rem; /* Pastikan tinggi spinner diatur */
+    }
+
+    .card {
+    width: 16rem;
+    height: max-content
+}
+
+    @media only screen and (max-width: 390px) {
+    .card{
+    width: 85%;
+    color: rgb(0, 0, 0);
+    }
     }
     
     </style>
