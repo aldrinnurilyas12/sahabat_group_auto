@@ -97,7 +97,9 @@
         <br>
         <br> 
             <div style="display: flex; gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:5rem;" class="form-group-content">
-        
+                @if($vehicle_ads->isEmpty())
+                <h5 style="text-align: center;">Belum ada unit tersedia</h5>
+                @else
                 @foreach($vehicle_ads as $ads)
                     @if($ads->category_name == 'Unit Booked')
                         <div class="card">
@@ -154,7 +156,7 @@
                     </div>   
                     @endif
                 @endforeach
-               
+               @endif
             </div>
 
 
@@ -483,6 +485,7 @@ input.input-form-submit {
     
 @endif
 
+
 <script>
 
     var btnSubmit = document.getElementById('btn-submit-check');
@@ -548,8 +551,7 @@ input.input-form-submit {
                         );
                     });
                 } else {
-                   
-                  
+                       
                 }
             },
             error: function (xhr, status, error) {
@@ -575,9 +577,9 @@ input.input-form-submit {
 
     // Daftar koordinat (tiga titik)
     var coordinates = [
-        [51.505, -0.09],   // Titik 1
-        [51.515, -0.1],    // Titik 2
-        [51.525, -0.11]    // Titik 3
+        [-6.209602928047727, 106.68867164152863],   // Titik 1
+        [-6.212175153365249, 106.698178050714],    // Titik 2
+        [-6.235612379406214, 106.80735566195257]    // Titik 3
     ];
 
     // Menambahkan marker untuk setiap titik koordinat

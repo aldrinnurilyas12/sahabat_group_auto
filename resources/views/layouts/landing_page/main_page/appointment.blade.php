@@ -258,12 +258,12 @@
 
                     
 
-                    <div style="width: 400px; height:max-content; padding:8px;" class="card shadow mb-4">
+                    <div style="width: 400px; height:max-content;" class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">Informasi Appointment</h6>
                         </div>
                         <div class="card-body">
-                            <ul>
+                            <ul style="padding:0;">
                                 <li>Silahkan lihat dahulu jadwal kunjungan dan lokasi yang ingin dikunjungi</li>
                                 <br>
                                 <li>Pilih Unit Kendaraan yang ingin melakukan kunjungan/test drive</li>
@@ -308,7 +308,7 @@
     height: 3rem; /* Pastikan tinggi spinner diatur */
   }
 
-  .fixed-column {
+        .fixed-column {
             position: -webkit-sticky; /* Untuk kompatibilitas browser */
             position: sticky;
             left: 0;

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AgendaController;
 use App\Http\Controllers\Api\Analytics;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 use App\Http\Controllers\Api\LoginAdminController;
 use App\Http\Controllers\Api\AuthenticatedSessionController;
@@ -43,6 +44,11 @@ use FontLib\Table\Type\name;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Row;
 
+// $SETTING_CHECKING = DB::table('under_development_setting')->first();
+
+// if ($SETTING_CHECKING->landing_page_web === 'ya' &&  $SETTING_CHECKING->under_development === 'ya') {
+//     return view('layouts.admin_views.under_dev_page');
+// } else {
 Route::middleware('guest')->group(function () {
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
@@ -81,6 +87,7 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/get_status_request', [LandingPageController::class, 'check_status_request'])->name('get_status_request');
 });
+
 
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
@@ -235,11 +242,12 @@ Route::middleware('auth')->group(function () {
     Route::put('update_foto/{vehicle_id}', [MasterVehicleAdvertisement::class, 'update_advertisement_foto'])->name('update_foto');
     Route::get('filter_advertisement', [MasterVehicleAdvertisement::class, 'filter_advertisement'])->name('filter_advertisement');
     Route::post('/advertisement_export', [MasterVehicleAdvertisement::class, 'advertisement_export'])->name('advertisement_export');
-
+    Route::put('updated_ads_position', [MasterVehicleAdvertisement::class, 'updated_posted_date'])->name('updated_ads_position');
 
     // settings routes
     Route::get('settings', [SettingsApp::class, 'settings_layout'])->name('settings');
     Route::put('setting_time', [SettingsApp::class, 'time__settings'])->name('setting_time');
+    Route::put('setting_development', [SettingsApp::class, 'under_development_setting'])->name('setting_development');
 
     // Appointment Routes
     Route::apiResource('customers_appointment', App\Http\Controllers\Api\MasterAppointment::class);
@@ -264,6 +272,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/get_clicked_data', [Analytics::class, 'get_total_vehicle_ads']);
     Route::get('/get_brand_total', [Analytics::class, 'get_brand_total']);
     Route::get('/get_revenue', [Analytics::class, 'get_revenue']);
+    Route::get('/get_budget_maintenance', [Analytics::class, 'get_budget_maintenance']);
     Route::get('filter_analytics', [Analytics::class, 'filter_analytics'])->name('filter_analytics');
 
     // AGENDA controller

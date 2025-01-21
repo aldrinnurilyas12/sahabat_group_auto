@@ -47,22 +47,18 @@
 
                 <div id="content">
                     
-                    <h4 style="text-align:center;color:black;font-weight:bold;">Edit Cabang</h4>
+                    <h4 style="text-align:center;color:black;font-weight:bold;">Edit Data Perbaikan Unit Kendaraan</h4>
                     @foreach($maintenance_data as $mtc)
                     <div class="form-group-content">
                   
                         <form class="form_input" method="POST" action="{{ route('maintenance_update', $mtc->id)}}">
                             @csrf   
                             @method('PUT')
-
+                            <input hidden type="text" name="vehicle_id" value="{{$mtc->vehicle_id}}" class="form-control" readonly>
+                            
                             <div class="form-group">
                                 <label >Unit Kendaraan</label>
-                                <select class="form-control" name="vehicle_id" id="">
-                                    <option value="#">=== Pilih Unit ===</option>
-                                @foreach ($maintenance_data as $vehicle)
-                                    <option value="{{$vehicle->id}}" {{$vehicle->id == $mtc->vehicle_id ? 'selected' : '' }}>{{$vehicle->unit}}</option>     
-                                @endforeach
-                                </select>
+                               <input type="text" value="{{$mtc->unit}}" class="form-control" readonly>
                             </div>
                             
                             <div class="form-group">
@@ -87,7 +83,7 @@
 
                             <div class="form-group">
                                 <label >Tanggal Perbaikan Unit</label>
-                                <input type="date" class="form-control" name="maintenance_date" autocomplete="off">
+                                <input type="date" class="form-control" value="{{ old('maintenance_date',$mtc->maintenance_date ? $repair_date->format('Y-m-d'):null) }}" name="maintenance_date" autocomplete="off">
                             </div>
 
                             <div class="form-group">
@@ -100,8 +96,18 @@
                                 </select>
                             </div>
 
-                           
-                            
+                            <div class="form-group">
+                                <label >Nama Bengkel</label>
+                                <input type="text" class="form-control" name="car_repair_shop" value="{{$mtc->car_repair_shop}}" autocomplete="off" placeholder="Masukan nama bengkel">
+                            </div>
+                            <div class="form-group">
+                                <label >Apakah unit kendaraan sedang dalam perbaikan?</label>
+                               <select class="form-control" name="vehicle_repair" id="">
+                                <option value="">=== Pilih Status ===</option>
+                                <option value="Ya">Ya</option>
+                                <option value="Tidak">Tidak</option>
+                               </select>
+                            </div>
                             <button type="submit" class="btn btn-primary">Simpan</button>
                         </form>  
                         @endforeach

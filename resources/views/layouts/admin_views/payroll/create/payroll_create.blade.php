@@ -377,7 +377,7 @@ fetch('/get_attendance/'+ payrollId)
                     data.total_hadir[0] ?. total_hadir ||0,
                     data.total_izin[0] ?. total_izin ||0,
                     data.total_sakit[0] ?. total_sakit ||0,
-                    data.total_alpha[0] ?. total_alpha ||0,
+                    data.total_alpha_ongoing[0] ?. total_alpha_ongoing ||0,
                 ]
             }],
             chart: {

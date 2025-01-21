@@ -76,6 +76,7 @@ class BranchController extends Controller
                     'location_code' => $request->location_code,
                     'location_name' => $request->location_name,
                     'address'       => $request->address,
+                    'coordinate_location' => $request->coordinate_location,
                     'branch_head_name'   => $request->branch_head_name,
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
@@ -93,6 +94,7 @@ class BranchController extends Controller
                 'location_code' => $request->location_code,
                 'location_name' => $request->location_name,
                 'address'       => $request->address,
+                'coordinate_location' => $request->coordinate_location,
                 'branch_head_name'   => $request->branch_head_name,
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                 'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
@@ -139,6 +141,7 @@ class BranchController extends Controller
                     'location_code' => $request->location_code,
                     'location_name' => $request->location_name,
                     'address'       => $request->address,
+                    'coordinate_location' => $request->coordinate_location,
                     'branch_head_name'   => $request->branch_head_name,
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'updated_at' => now()
@@ -155,6 +158,7 @@ class BranchController extends Controller
                 'location_code' => $request->location_code,
                 'location_name' => $request->location_name,
                 'address'       => $request->address,
+                'coordinate_location' => $request->coordinate_location,
                 'branch_head_name'   => $request->branch_head_name,
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                 'updated_at' => now()

@@ -45,18 +45,39 @@
                 
                     <!-- DataTable -->
                     <div class="card shadow mb-4">
+                        
+                        <div  class="card-header py-3">
+                            <h5 style="color: black;"><strong>Data Maintenance Unit PT Sahabat Group Auto</strong></h5>
+                            <br>
+                            <div style="display: flex; flex-wrap:wrap; gap:10px;" class="component">
+                            <h5>Total Pengeluaran : {{"Rp".number_format($repair_cost)}}</h5>
+
+                            
+
+                            </div>
+                        </div>
+
+
                         <div class="card-body">
-                            <div style="display: flex; justify-content:center;gap:20px;" class="content-image">
+                            <div style="display: flex;flex-wrap:wrap; justify-content:center;gap:20px;" class="content-image">
                                 @foreach ($maintenance_data as $item)
                                
-                                <div style="display: block;color:black;width:220px;background:rgba(249, 249, 249, 0.988);padding:10px;" class="content">
-                                    <p>{{ \Carbon\Carbon::parse($item->maintenance_date)->format('d F Y')}}</p>
+                                <div style="display: block;color:black;width:220px;height:max-content;background:rgba(249, 249, 249, 0.988);padding:10px;" class="content">
+                                    <div style="display: flex; justify-content:space-between;" class="action">
+                                        <p style="font-size: 13px;">{{ \Carbon\Carbon::parse($item->maintenance_date)->format('d F Y')}}</p>
+                                        <div style="display:flex; gap:7px;" class="action-delete-update">
+                                            <a href="{{route('maintenance_unit_edit', $item->id)}}"><i class="fas fa-edit"></i></a>
+                                            <a style="size: 12px;" href="#" data-toggle="modal" data-target="#deleteCashbon{{$item->id}}"><i class="fas fa-trash"></i></a>
+                                         </div>
+                                       
+                                    </div>
                                     <img style="margin-bottom:10px;" width="200" height="180" src="{{asset('storage/'. $item->foto)}}" alt="">
                                     <h6 style="text-decoration: underline;"> <strong>{{$item->maintenance_type}} </strong> </h6>
                                     <p style="margin-bottom:10px;width:210px;">{{$item->maintenance_detail}}</p>
                                     <p style="margin-bottom:10px;"> <strong>{{"Rp".number_format($item->cost)}}</strong></p>
                                    <div class="dflex-component">
                                     <p>{{$item->mechanic_name}}</p>
+                                    <p>{{$item->car_repair_shop}}</p>
                                     </div> 
                                 </div>
                                 @endforeach
@@ -77,23 +98,23 @@
 
      {{-- modal change status --}}
 
-     {{-- @foreach($branch as $cab) 
-     <div class="modal fade" id="deleteUnit{{$cab->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{$cab->id}}" aria-hidden="true">
+     @foreach($maintenance_data as $mtc) 
+     <div class="modal fade" id="deleteCashbon{{$mtc->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{$mtc->id}}" aria-hidden="true">
          <div class="modal-dialog" role="document">
              <div class="modal-content">
                  <div class="modal-header">
-                     <h5 class="modal-title" id="exampleModalLabel{{$cab->id}}">Hapus data cabang: {{$cab->location_code . ' - ' . $cab->location_name}}</h5>
+                     <h5 class="modal-title" id="exampleModalLabel{{$mtc->id}}">Hapus data maintenance: {{$mtc->unit}}</h5>
                      <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                          <span aria-hidden="true">×</span>
                      </button>
                  </div>
      
-                 <form method="POST" action="{{ route('master_branch.destroy', $cab->id) }}">
+                 <form method="POST" action="{{ route('master_maintenance_unit.destroy', $mtc->id) }}">
                      @csrf
                      @method('DELETE')
                      <div style="color: black;" class="modal-body">
-                         Apakah Anda ingin menghapus data cabang:
-                         {{$cab->location_code . ' - ' . $cab->location_name}} ?
+                         Apakah Anda ingin menghapus data maintenance:
+                         {{$mtc->unit}} ?
                          <br>
                          <span style="font-style: italic;color:gray;font-size:12px;">*Data akan terhapus permanen.</span>    
                      </div>
@@ -106,7 +127,7 @@
          </div>
      </div>
      
-     @endforeach --}}
+     @endforeach
 
      {{-- end modal --}}
     <!-- End of Page Wrapper -->

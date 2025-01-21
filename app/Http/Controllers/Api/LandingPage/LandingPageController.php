@@ -23,7 +23,13 @@ class LandingPageController extends Controller
      */
     public function index(Request $request): View
     {
-        $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->limit(10)->get();
+        // $SETTING_CHECKING = DB::table('under_development_setting')->first();
+
+        // if ($SETTING_CHECKING->landing_page_web == 'ya' &&  $SETTING_CHECKING->under_development == 'ya') {
+        //     return view('layouts.admin_views.under_dev_page');
+        // }
+
+        $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->orderBy('updated_posted_date', 'DESC')->limit(10)->get();
         $blog_data = DB::table('blog')->get();
         $brand      = DB::table('vehicle_brand')->get();
         $branch = DB::table('v_branch')->get();
@@ -41,7 +47,7 @@ class LandingPageController extends Controller
         $lowerprice = $request->lower_price;
         $highprice = $request->high_price;
         $brand = DB::table('vehicle_brand')->where('brand_name', '<>', 'Maserati')->get();
-        $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->paginate(12);
+        $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->orderBy('updated_posted_date', 'DESC')->paginate(12);
         $search = $request->input('search');
         return view('layouts.landing_page.main_page.all_vehicle', compact('vehicle_ads', 'brand', 'lowerprice', 'highprice', 'search'));
     }
@@ -68,6 +74,9 @@ class LandingPageController extends Controller
 
     public function searchControll(Request $request): View
     {
+        $validate = $request->validate([
+            'search' => 'required'
+        ]);
 
         $brand = $request->input('brand_name');
         $brands = DB::table('vehicle_brand')->get();
@@ -319,7 +328,7 @@ class LandingPageController extends Controller
             'phone_number' =>  $request->phone_number,
             'unique_tokens' => $unique_tokens,
             'created_at' => now(),
-            'updated_at'  => now()
+            'updated_at'  => null
         ]);
 
         if ($customer_request) {

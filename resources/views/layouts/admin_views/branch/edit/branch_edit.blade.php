@@ -55,26 +55,31 @@
                             @csrf   
                             @method('PUT')
                             
-                            <input hidden type="text" class="form-control" value="{{$cab->id}}" name="id" autocomplete="off" placeholder="Masukan Kode Lokasi  , *Hanya 3 kata cth: PLZ">
+                            <input hidden type="text" class="form-control" value="{{$cab->id}}" name="id" autocomplete="off">
                     
                             <div class="form-group">
                                 <label >Kode Lokasi</label>
-                                <input type="text" class="form-control" value="{{$cab->location_code}}" name="location_code" autocomplete="off" placeholder="Masukan Kode Lokasi  , *Hanya 3 kata cth: PLZ">
+                                <input type="text" class="form-control" value="{{$cab->location_code}}" name="location_code" autocomplete="off">
                             </div>
 
                             <div class="form-group">
                                 <label >Nama Cabang</label>
-                                <input type="text" class="form-control" value="{{$cab->location_name}}" name="location_name" autocomplete="off" placeholder="Masukan Nama Cabang">
+                                <input type="text" class="form-control" value="{{$cab->location_name}}" name="location_name" autocomplete="off">
                             </div>
 
                             <div class="form-group">
                                 <label >Alamat Cabang</label>
-                                <input type="text" class="form-control" value="{{$cab->address}}" name="address" autocomplete="off" placeholder="Masukan Alamat Cabang">
+                                <input type="text" class="form-control" value="{{$cab->address}}" name="address" autocomplete="off">
+                            </div>
+
+                            <div class="form-group">
+                                <label >Lokasi Koordinat</label>
+                                <input type="text" class="form-control"  value="{{$cab->coordinate_location}}" name="coordinate_location" autocomplete="off">
                             </div>
 
                             <div class="form-group">
                                 <label >Nama Kepala Cabang</label>
-                                <input type="text" class="form-control" value="{{$cab->branch_head_name}}" name="branch_head_name" autocomplete="off" placeholder="Masukan Nama Kepala Cabang">
+                                <input type="text" class="form-control" value="{{$cab->branch_head_name}}" name="branch_head_name" autocomplete="off">
                             </div>
                             
                             <button type="submit" class="btn btn-primary">Simpan</button>

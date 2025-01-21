@@ -134,7 +134,7 @@
                             
                             <div style="display: block" class="select-group">
                             <label for="">Bulan</label>
-                            <select class="form-control" name="bulan" id="status">
+                            <select class="form-control" name="month" id="status">
                                 <option value="">--- Pilih Bulan ---</option>
                                 <option value="alldata">Semua Bulan</option>
                                 @foreach($months as $month)
@@ -149,7 +149,7 @@
                             
                             <div style="display: block" class="select-group">
                                 <label for="">Tahun</label>
-                                <select class="form-control" name="tahun" id="status">
+                                <select class="form-control" name="year" id="status">
                                     <option value="">--- Pilih Tahun ---</option>
                                     <option value="alldata">Semua Tahun</option>
                                     @foreach($years as $yrs)
@@ -160,7 +160,18 @@
                                 @if ($errors->has('year'))
                                 <span class="text-danger">{{ $errors->first('year') }}</span>
                                 @endif
-                                </div>
+                            </div>
+
+                            <div style="display: block" class="select-group">
+                                <label for="">Kantor</label>
+                                <select class="form-control" name="location" id="status">
+                                    <option value="">--- Pilih Lokasi Cabang ---</option>
+                                    <option value="alldata">Semua Lokasi</option>
+                                    @foreach($location_unit as $loc)
+                                        <option value="{{$loc->location_name}}">{{$loc->location_name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
                             <button style="height: 40px; align-self:end;" type="submit" class="btn btn-dark">Pilih</button>
                             <a href="{{route('master_vehicle_advertisement.index')}}" style="height: 40px; align-self:end;" class="btn btn-secondary">Reset</a>
@@ -195,7 +206,7 @@
                             <div class="card shadow mb-4">
                                 <!-- Card Header - Dropdown -->
                                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Revenue</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Total Pendapatan</h6>
                                   
                                     <div class="dropdown no-arrow">
                                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
@@ -217,7 +228,36 @@
                                   <div id="revenueChart"></div>
                                 </div>
                             </div>
-                          </div>
+                        </div>
+
+                        {{-- COST BUDGET CHART --}}
+                        <div class="col-xl-12 col-lg-7">
+                            <div class="card shadow mb-4">
+                                <!-- Card Header - Dropdown -->
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Total Pengeluaran Perbaikan Unit Kendaraan</h6>
+                                  
+                                    <div class="dropdown no-arrow">
+                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                                        </a>
+                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                                            aria-labelledby="dropdownMenuLink">
+                                            <div class="dropdown-header">Dropdown Header:</div>
+                                            <a class="dropdown-item" href="#">Action</a>
+                                            <a class="dropdown-item" href="#">Another action</a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="#">Something else here</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Card Body -->
+                                <div class="card-body">
+                                  <div id="maintenanceBudget"></div>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="col-xl-8 col-lg-7">
                           <div class="card shadow mb-4">
@@ -417,7 +457,6 @@
                 curve: 'straight' // Mengubah menjadi 'smooth' untuk tampilan yang lebih baik
             },
             title: {
-                text: 'Revenue',
                 align: 'left'
             },
             grid: {
@@ -436,7 +475,40 @@
     })
     .catch(error => console.error('Error fetching revenue data:', error)); // Menangani error
 
-    
+    // budgetMaintenance
+
+     fetch('/get_budget_maintenance')
+    .then(response => response.json())
+    .then(data => {
+        var options = {
+        chart : {
+          type: 'bar',
+          height : 300
+        },
+        plotOptions: {
+            bar: {
+            horizontal: true
+            }
+        },
+        series : [{
+          name : 'Total Maintenance Budget',
+          data : data.total_cost
+        }],
+        xaxis :{
+          categories: data.unit
+        },
+        theme : {
+          mode: 'light',
+          palette : 'palette4',
+          monochrome : {
+            enabled : false,
+          }
+        }
+      };
+        var chart = new ApexCharts(document.querySelector("#maintenanceBudget"), options);
+        chart.render();
+    })
+    .catch(error => console.error('Error fetching revenue data:', error));
 
 </script>
 

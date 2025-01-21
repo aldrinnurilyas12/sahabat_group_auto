@@ -17,6 +17,8 @@ class MaintenanceUnit extends Model
         'cost',
         'maintenance_date',
         'mechanic_name',
+        'car_repair_shop',
+        'vehicle_repair',
         'foto',
         'created_by',
         'updated_by'

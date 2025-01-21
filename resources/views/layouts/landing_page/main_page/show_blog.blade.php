@@ -17,7 +17,7 @@
 
 @include('layouts.landing_page.navbar.header_new')
 
-<section style="padding:0 30px 0 30px;"  class="bg-white dark:bg-gray-900">
+<section class="bg-white dark:bg-gray-900">
     <div class="container">
       <div class="card">
           <div class="container-fliud">
@@ -25,13 +25,8 @@
             @foreach($blog_data as $blog) 
             <div style="margin-bottom: 10px;text-align:center;" class="title">
                 <h2 style="font-weight: bold;">{{$blog->title}}</h2>
-                <br>
-                <div style="display: flex; justify-content:center;margin-bottom:0px;" class="flex-author">
-                    <p>{{$blog->created_by}}</p>
-                    &nbsp;
-                    &bullet;
-                    &nbsp;
-                    <p>{{$blog->created_at}}</p>
+                <div style="justify-content:center;margin-bottom:0px;" class="flex-author">
+                    <p>{{date('d F Y', strtotime($blog->created_at))}}</p>
                 </div>
                 
             </div>
@@ -40,7 +35,7 @@
             </div>
             <br>
             <div class="description">
-                <p>{{$blog->subtitle}}</p>
+                <p style="line-height: 1.5;text-align: justify;">{{$blog->subtitle}}</p>
             </div>
             @endforeach
           </div>
@@ -77,6 +72,14 @@
   width: 3rem;
   height: 3rem; /* Pastikan tinggi spinner diatur */
 }
+
+@media only screen and (max-width: 390px) {
+    .card{
+      padding: 10px;
+    width: 100%;
+    color: rgb(0, 0, 0);
+    }
+    }
 
 </style>
 
@@ -152,7 +155,7 @@ img {
 .card {
   margin-top: 50px;
   background: #ffffff;
-  padding: 3em;
+  padding: 1em;
   line-height: 1.5em; }
 
 @media screen and (min-width: 997px) {

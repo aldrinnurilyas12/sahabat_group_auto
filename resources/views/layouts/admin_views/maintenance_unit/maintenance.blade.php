@@ -140,6 +140,7 @@
                                             <th>No</th>
                                             {{-- <th>Aksi</th> --}}
                                             <th>Unit</th>
+                                            <th>Total Biaya</th>
                                             <TH>Detail</TH> 
                                         </tr>
                                     </thead>
@@ -154,6 +155,7 @@
                                                 {{-- <a style="size: 12px;" href="#" data-toggle="modal" data-target="#deleteUnit{{$maintenance->id}}"><i class="fas fa-trash"></i></a> --}}
                                             {{-- </td> --}}
                                             <td>{{$maintenance->unit}}</td>
+                                            <td>{{"Rp".number_format($maintenance->total_cost)}}</td>
                                             <td>
                                                 <a class="btn btn-success" href="{{route('cashbon_detail', $maintenance->vehicle_id)}}">lihat</a>
                                               </td>

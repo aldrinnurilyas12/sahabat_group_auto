@@ -66,6 +66,11 @@
                             </div>
 
                             <div class="form-group">
+                                <label >Lokasi Koordinat</label>
+                                <input type="text" class="form-control" name="coordinate_location" autocomplete="off" placeholder="Masukan Titik Lokasi Koordinat">
+                            </div>
+
+                            <div class="form-group">
                                 <label >Nama Kepala Cabang</label>
                                 <select class="form-control" name="branch_head_name" id="">
                                     <option value="#">=== Pilih Kepala Cabang ===</option>

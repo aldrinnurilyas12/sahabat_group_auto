@@ -18,6 +18,7 @@ class MasterVehicleAdvertisementModel extends Model
         'foto',
         'is_active',
         'clicked',
+        'updated_posted_date',
         'created_by',
         'updated_by'
     ];

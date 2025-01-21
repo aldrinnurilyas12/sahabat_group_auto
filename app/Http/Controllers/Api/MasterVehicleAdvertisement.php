@@ -10,6 +10,7 @@ use App\Models\MasterVehicleAdvertisementModel;
 use App\Http\Controllers\Api\MasterMainMenuController;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\RateLimiter\RequestRateLimiterInterface;
 
 class MasterVehicleAdvertisement extends Controller
 {
@@ -56,7 +57,8 @@ class MasterVehicleAdvertisement extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $vehicle_data = DB::table('v_vehicle_advertisement')->orderBy('created_at', 'desc')->get();
-        return view('layouts.admin_views.vehicle_advertisement.main_page', compact('vehicle_data', 'grouped_sub_menu', 'sidebar_menu', 'bulan', 'tahun', 'months', 'years'));
+        $availableAds = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->orderBy('updated_posted_date', 'desc')->get();
+        return view('layouts.admin_views.vehicle_advertisement.main_page', compact('vehicle_data', 'availableAds', 'grouped_sub_menu', 'sidebar_menu', 'bulan', 'tahun', 'months', 'years'));
     }
 
     /**
@@ -92,6 +94,7 @@ class MasterVehicleAdvertisement extends Controller
                         'vehicle_id' => $request->vehicle_id,
                         'foto'      => $request->foto,
                         'is_active' => $request->is_active,
+                        'updated_posted_date' => now(),
                         'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                         'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
 
@@ -113,6 +116,7 @@ class MasterVehicleAdvertisement extends Controller
                     'vehicle_id' => $request->vehicle_id,
                     'foto'      => $request->foto,
                     'is_active' => $request->is_active,
+                    'updated_posted_date' => now(),
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
 
@@ -193,9 +197,28 @@ class MasterVehicleAdvertisement extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function updated_posted_date(Request $request)
     {
-        //
+
+        $request->validate([
+            'id' => 'required|array',
+            'id*' => 'integer|exists:vehicle_advertisement,id'
+        ]);
+        $adsId = $request->input('id');
+
+
+        if (empty($adsId)) {
+            session()->flash('failed_message', 'Tidak ada iklan yang dipilih.');
+            return redirect()->back();
+        }
+
+        DB::table('vehicle_advertisement')->whereIn('id', $adsId)->update([
+            'updated_posted_date' => now()
+        ]);
+
+        $this->insertLogActivityUsers(__METHOD__);
+        session()->flash('message_success', 'Urutan Iklan berhasil diperbarui!');
+        return redirect()->back();
     }
 
     /**

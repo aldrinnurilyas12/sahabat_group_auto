@@ -50,7 +50,7 @@
                             <h5 style="color: black;"><strong>Data Iklan Unit Kendaraan PT Sahabat Group Auto</strong></h5>
                             
                             <br>
-                            <form action="{{route('advertisement_export')}}" method="POST">
+                            <form style="display: flex;gap:9px;" action="{{route('advertisement_export')}}" method="POST">
                                 @csrf
                                 <input type="text" name="bulan" value="{{$bulan}}" hidden>
                                 <input type="text" name="tahun" value="{{$tahun}}" hidden>
@@ -58,6 +58,10 @@
                                     <i class="fas fa-file-excel"></i>
                                     &nbsp; Download Excel
                                 </button> 
+
+                                <div class="btn-change">
+                                    <a class="btn btn-primary" href="#" data-toggle="modal" data-target="#changeAds">Atur Urutan Iklan</a>
+                                </div>
                             </form>
                             <hr>
 
@@ -144,6 +148,8 @@
                                             <th>Brand</th>
                                             <th>Tahun</th>
                                             <th>Harga</th>
+                                            <th>Status Unit</th>
+                                            <th>Tanggal Perbarui Posting</th>
                                             <th>Created At</th>
                                             <th>Created By</th>
                                             <th>Updated At</th>
@@ -158,14 +164,18 @@
                                         <tr style="width: 200px;">
                                             <td><?php echo $no++ ?></td>
                                             <td>
+                                                @if($vhcl->ads_id == null)
+                                                <a class="btn btn-primary" href="{{route('add_vehicle_advertisement', $vhcl->vehicle_id)}}">Pilih</a>
+                                                @else
                                                 <div style="display:flex; justify-content:center;gap:8px; " class="action">
                                                     <a style="size: 12px;" href="#" data-toggle="modal" data-target="#deleteAds{{$vhcl->vehicle_id}}"><i class="fas fa-trash"></i></a>
-                                                </div></td>
+                                                </div>
+                                                @endif
+                                                </td>
                                             <td><div style="display:flex; justify-content:center;gap:8px; " class="action">
                                                 @if($vhcl->is_active == 'Ya')
                                                 <a class="btn btn-success">Terpasang</a>
                                                 @else
-                                                <a class="btn btn-primary" href="{{route('add_vehicle_advertisement', $vhcl->vehicle_id)}}">Pilih</a>
                                                 @endif    
                                             </td>
                                             <td>
@@ -188,7 +198,9 @@
                                             <td>{{$vhcl->vehicle_registration_number}}</td>
                                             <td>{{$vhcl->unit}}</td>
                                             <td>{{$vhcl->manufacture_year}}</td>   
-                                            <td>{{"Rp " . number_format($vhcl->price)}}</td>      
+                                            <td>{{"Rp " . number_format($vhcl->price)}}</td> 
+                                            <td>{{$vhcl->category_name}}</td> 
+                                            <td>{{$vhcl->updated_posted_date}}</td>    
                                             <td>{{$vhcl->created_at}}</td>
                                             <td>{{$vhcl->created_by}}</td>
                                             <td>{{$vhcl->updated_at}}</td>
@@ -243,6 +255,41 @@
                 {{-- end modal --}}
                 
 
+                {{-- change ads modal --}}
+              
+                <div class="modal fade" id="changeAds" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Atur Urutan Posisi Iklan</h5>
+                                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                
+                            <form method="POST" action="{{ route('updated_ads_position') }}">
+                                @csrf
+                                @method('PUT')
+                                <div style="color: black;" class="modal-body">
+                                    @foreach($availableAds as $vads) 
+                                    <div style="display: flex;align-items:first baseline;gap:8px;padding:6px;" class="content-input">
+                                        <input type="checkbox" value="{{$vads->ads_id}}" name="id[]" multiple>
+                                        <p>{{$vads->unit}}</p>
+                                    </div>
+                                   
+                                    @endforeach
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                                    <button class="btn btn-primary" type="submit">Simpan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            
+
+                {{-- end --}}
             </div>
            
             @include('layouts.admin_views.footer')
@@ -299,7 +346,7 @@
   
     
 
-</body>
+    </body>
     
     <!-- Page level plugins -->
     <script src="{{ asset('assets/vendor/datatables/jquery.dataTables.min.js')}}"></script>
@@ -308,31 +355,7 @@
     <!-- Page level custom scripts -->
     <script src="{{ asset('assets/js/demo/datatables-demo.js')}}"></script>
 
-    @if (Session::has('message_success'))
-    <script>
-        Swal.fire({
-            title: 'Berhasil',
-            text: "{{ Session::get('message_success') }}",
-            icon: 'success',
-            timer:2000,
-            confirmButtonText: 'OK'
-        });
-    </script>
-        
-    @endif
 
-    @if (Session::has('failed_insert'))
-    <script>
-        Swal.fire({
-            title: 'Gagal',
-            text: "{{ Session::get('failed_insert') }}",
-            icon: "error",
-            timer:6000,
-            confirmButtonText: 'OK'
-        });
-    </script>
-        
-    @endif
 
     @if (Session::has('delete_success'))
     <script>
@@ -347,8 +370,8 @@
         
     @endif
 
-@if (Session::has('message_success'))
-<script>
+    @if (Session::has('message_success'))
+    <script>
     Swal.fire({
         title: 'Berhasil',
         text: "{{ Session::get('message_success') }}",
@@ -356,9 +379,9 @@
         timer:2000,
         confirmButtonText: 'OK'
     });
-</script>
+    </script>
     
-@endif
+    @endif
 
 @if (Session::has('failed_insert'))
 <script>

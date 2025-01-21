@@ -78,7 +78,7 @@
 
                             <div class="form-group">
                                 <label >Detail Perbaikan</label>
-                                <textarea  class="form-control" name="maintenance_detail" autocomplete="off" placeholder="Masukan Detail perbaikan"> </textarea>
+                                <textarea class="form-control" name="maintenance_detail" placeholder="Masukan Detail perbaikan"></textarea>
                             </div>
 
                             <div class="form-group">
@@ -108,6 +108,20 @@
                                 @if ($errors->has('mechanic_name'))
                                 <span class="text-danger">{{ $errors->first('mechanic_name') }}</span>
                                 @endif
+                            </div>
+
+                            <div class="form-group">
+                                <label >Nama Bengkel</label>
+                                <input type="text" class="form-control" name="car_repair_shop" autocomplete="off" placeholder="Masukan nama bengkel">
+                            </div>
+
+                            <div class="form-group">
+                                <label >Apakah unit kendaraan sedang dalam perbaikan?</label>
+                               <select class="form-control" name="vehicle_repair" id="">
+                                <option value="">=== Pilih Status ===</option>
+                                <option value="Ya">Ya</option>
+                                <option value="Tidak">Tidak</option>
+                               </select>
                             </div>
 
                            <div class="form-group">

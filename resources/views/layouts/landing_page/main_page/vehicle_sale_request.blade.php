@@ -70,7 +70,7 @@
             <div style="margin: 0; padding:0;" id="content">
                       
                 <div style="display: flex; gap:50px;flex-wrap:wrap;" class="form-group-content">
-                    <form style="width: 60%;" class="form_input" method="POST" action="{{ route('vehicle_request_save')}}">
+                    <form class="form_input" method="POST" action="{{ route('vehicle_request_save')}}">
                         @csrf 
                         
                         <div class="form-group">
@@ -156,12 +156,12 @@
 
                     
 
-                    <div style="width: 400px; height:max-content; padding:8px;" class="card shadow mb-4">
+                    <div style="width: 400px; height:max-content;" class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">Informasi Penawaran Jual Unit Kendaraan</h6>
                         </div>
                         <div class="card-body">
-                            <ul>
+                            <ul style="padding:0;">
                                 <li>Silahkan isi form penawaran Jual Unit Kendaraan</li>
                                 <br>
                                 <li>Maka tim kami akan meninjau permintaan Jual Unit Kendaraan Anda</li>
@@ -296,6 +296,16 @@
         }
         
 
+    .form_input {
+        width: 60%;
+    }
+
+    @media only screen and (max-width: 390px) {
+    .form_input{
+    width: 100%;
+    color: rgb(0, 0, 0);
+    }
+    }
   
   </style>
     

@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\MasterMainMenuController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class MaintenanceUnitController extends Controller
 {
@@ -48,7 +49,7 @@ class MaintenanceUnitController extends Controller
 
 
         $maintenance_data = DB::table('maintenance_unit as mtc')
-            ->select('vehicle_id', 'unit')
+            ->select('vehicle_id', 'unit', DB::raw('SUM(cost) as total_cost'))
             ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')
             ->where('location_name', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
             ->groupBy('vehicle_id', 'unit')
@@ -126,13 +127,18 @@ class MaintenanceUnitController extends Controller
                         'cost' => $request->cost,
                         'maintenance_date' => $request->maintenance_date,
                         'mechanic_name' => $request->mechanic_name,
+                        'car_repair_shop' => $request->car_repair_shop,
+                        'vehicle_repair' => $request->vehicle_repair,
                         'foto' => $path,
                         'created_by' =>  auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                         'updated_by' =>  auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                     ]);
-                    DB::table('vehicle')->where('id', $request->vehicle_id)->update([
-                        'status_vehicle_id' => 4
-                    ]);
+
+                    if ($request->vehicle_repair == 'Ya') {
+                        DB::table('vehicle')->where('id', $request->vehicle_id)->update([
+                            'status_vehicle_id' => 4
+                        ]);
+                    }
                 }
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Berhasil disimpan!');
@@ -153,13 +159,18 @@ class MaintenanceUnitController extends Controller
                     'cost' => $request->cost,
                     'maintenance_date' => $request->maintenance_date,
                     'mechanic_name' => $request->mechanic_name,
+                    'car_repair_shop' => $request->car_repair_shop,
+                    'vehicle_repair' => $request->vehicle_repair,
                     'foto' => $path,
                     'created_by' =>  auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'updated_by' =>  auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
-                DB::table('vehicle')->where('id', $request->vehicle_id)->update([
-                    'status_vehicle_id' => 4
-                ]);
+
+                if ($request->vehicle_repair == 'Ya') {
+                    DB::table('vehicle')->where('id', $request->vehicle_id)->update([
+                        'status_vehicle_id' => 4
+                    ]);
+                }
             }
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
@@ -192,12 +203,12 @@ class MaintenanceUnitController extends Controller
             ->get();
 
         $maintenance_data = DB::table('maintenance_unit as mtc')
-            ->select('mtc.id', 'vehicle_id', 'unit', 'maintenance_type', 'cost', 'maintenance_date', 'maintenance_detail', 'mechanic_name', 'foto', 'mtc.created_at', 'mtc.created_by', 'mtc.updated_at', 'mtc.created_by', 'mtc.updated_by')
+            ->select('mtc.id', 'vehicle_id', 'unit', 'maintenance_type', 'cost', 'maintenance_date', 'maintenance_detail', 'mechanic_name', 'foto', 'mtc.created_at', 'mtc.created_by', 'mtc.updated_at', 'mtc.created_by', 'mtc.updated_by', 'mtc.car_repair_shop')
             ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')
             ->where('mtc.id', $request->id)->get();
-
+        $repair_date = Carbon::parse($maintenance_data->first()->maintenance_date);
         $maintenance_category = DB::table('maintenance_category')->get();
-        return view('layouts.admin_views.maintenance_unit.edit.maintenance_edit', compact('maintenance_data', 'mechanic', 'maintenance_category', 'grouped_sub_menu', 'sidebar_menu'));
+        return view('layouts.admin_views.maintenance_unit.edit.maintenance_edit', compact('maintenance_data', 'mechanic', 'maintenance_category', 'grouped_sub_menu', 'sidebar_menu', 'repair_date'));
     }
 
     /**
@@ -205,9 +216,7 @@ class MaintenanceUnitController extends Controller
      */
     public function update(Request $request)
     {
-        $request->validate([
-            'vehicle_id' => 'required'
-        ]);
+
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
@@ -221,14 +230,25 @@ class MaintenanceUnitController extends Controller
                     'cost' => $request->cost,
                     'maintenance_date' => $request->maintenance_date,
                     'mechanic_name' => $request->mechanic_name,
-                    'foto' => $request->foto,
+                    'car_repair_shop' => $request->car_repair_shop,
+                    'vehicle_repair' => $request->vehicle_repair,
                     'updated_at' => now(),
                     'updated_by' =>  auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
 
+                if ($request->vehicle_repair == 'Ya') {
+                    DB::table('vehicle')->where('id', $request->vehicle_id)->update([
+                        'status_vehicle_id' => 4
+                    ]);
+                } elseif ($request->vehicle_repair == 'Tidak') {
+                    DB::table('vehicle')->where('id', $request->vehicle_id)->update([
+                        'status_vehicle_id' => 1
+                    ]);
+                }
+
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Berhasil disimpan!');
-                return redirect()->route('master_maintenance_unit.index');
+                return redirect()->route('cashbon_detail', ['vehicle_id' => $request->vehicle_id]);
             } else {
                 session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
                 return redirect()->route('master_maintenance_unit.index');
@@ -240,14 +260,25 @@ class MaintenanceUnitController extends Controller
                 'cost' => $request->cost,
                 'maintenance_date' => $request->maintenance_date,
                 'mechanic_name' => $request->mechanic_name,
-                'foto' => $request->foto,
+                'car_repair_shop' => $request->car_repair_shop,
+                'vehicle_repair' => $request->vehicle_repair,
                 'updated_at' => now(),
                 'updated_by' =>  auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
             ]);
 
+            if ($request->vehicle_repair == 'Ya') {
+                DB::table('vehicle')->where('id', $request->vehicle_id)->update([
+                    'status_vehicle_id' => 4
+                ]);
+            } elseif ($request->vehicle_repair == 'Tidak') {
+                DB::table('vehicle')->where('id', $request->vehicle_id)->update([
+                    'status_vehicle_id' => 1
+                ]);
+            }
+
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_maintenance_unit.index');
+            return redirect()->route('cashbon_detail', ['vehicle_id' => $request->vehicle_id]);
         }
     }
 
@@ -349,9 +380,47 @@ class MaintenanceUnitController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id, Request $request)
     {
-        //
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+        $maintenanceId = MaintenanceUnit::find($id);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
+
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                if ($maintenanceId) {
+                    $maintenanceId->delete();
+                }
+
+                if ($maintenanceId->foto) {
+                    $olddocument = public_path('storage/' . $maintenanceId->foto);
+                    if (file_exists($olddocument)) {
+                        unlink($olddocument);
+                    }
+                }
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('delete_success', 'Data maintenance unit Berhasil dihapus!');
+                return redirect()->route('master_maintenance_unit.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->back();
+            }
+        } else {
+            if ($maintenanceId) {
+                $maintenanceId->delete();
+            }
+
+            if ($maintenanceId->foto) {
+                $olddocument = public_path('storage/' . $maintenanceId->foto);
+                if (file_exists($olddocument)) {
+                    unlink($olddocument);
+                }
+            }
+            $this->insertLogActivityUsers(__METHOD__);
+            session()->flash('delete_success', 'Data maintenance unit Berhasil dihapus!');
+            return redirect()->route('master_maintenance_unit.index');
+        }
     }
 
 
@@ -361,13 +430,21 @@ class MaintenanceUnitController extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
+
         $maintenance_data = DB::table('maintenance_unit as m')
-            ->select('vh.unit', 'm.id', 'm.maintenance_type', 'm.maintenance_detail', 'm.cost', 'maintenance_date', 'm.mechanic_name', 'm.foto')
+            ->select('vh.unit', 'm.id', 'm.maintenance_type', 'm.maintenance_detail', 'm.cost', 'maintenance_date', 'm.mechanic_name', 'm.foto', 'm.car_repair_shop', 'm.maintenance_date')
             ->leftJoin('v_vehicle as vh', 'm.vehicle_id', '=', 'vh.id')
             ->where('m.vehicle_id', $request->vehicle_id)
             ->get();
 
+        $repair_date = Carbon::parse($maintenance_data->first()->maintenance_date);
 
-        return view('layouts.admin_views.maintenance_unit.cashbone_detail', compact('maintenance_data', 'sidebar_menu', 'grouped_sub_menu'));
+        $repair_cost = DB::table('maintenance_unit')
+            ->where('vehicle_id', $request->vehicle_id)->sum('cost');
+
+        if (!$maintenance_data) {
+            return redirect()->back();
+        }
+        return view('layouts.admin_views.maintenance_unit.cashbone_detail', compact('maintenance_data', 'sidebar_menu', 'grouped_sub_menu', 'repair_date', 'repair_cost'));
     }
 }

@@ -376,7 +376,8 @@ class MasterAppointment extends Controller
 
         $request_vehicle_data = DB::table('customer_vehicle_request as cr')
             ->select('cr.id', 'cr.vehicle_type', 'cr.name', 'vb.brand_name', 'cr.year', 'cr.vehicle_color', 'cr.email', 'cr.phone_number', 'cr.created_at', 'cr.sending_mail', 'cr.description')
-            ->leftJoin('vehicle_brand as vb', 'cr.brand', '=', 'vb.id')->get();
+            ->leftJoin('vehicle_brand as vb', 'cr.brand', '=', 'vb.id')
+            ->orderBy('created_at', 'DESC')->get();
         return view('layouts.admin_views.customer_vehicle_request.customers_request_vehicle', compact('request_vehicle_data', 'grouped_sub_menu', 'sidebar_menu', 'bulan', 'tahun', 'months', 'years'));
     }
 

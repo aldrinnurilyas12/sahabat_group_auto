@@ -16,16 +16,15 @@
 <body>
 
 @include('layouts.landing_page.navbar.header_new')
-
 <section class="bg-white dark:bg-gray-900">
     <div class="container">
       <div class="card">
           <div class="container-fliud">
               @foreach ($vehicle_data as $vehicle)
-              <div class="wrapper row">
+                <div class="wrapper row">
                   <div style="height: max-content;" class="preview col-md-6">
                       
-                      <div class="preview-pic tab-content">
+                    <div class="preview-pic tab-content">
 
                       {{-- slider images --}}
                          
@@ -51,12 +50,9 @@
                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
                             <span class="sr-only">Next</span>
                         </a>
+                      </div>
                     </div>
-
-                      {{-- end --}}
-
-
-                      </div>    
+                      {{-- end --}} 
                       <ul style="margin-bottom: 30px;" class="preview-thumbnail nav nav-tabs">
                           @foreach($vehicle_fotos as $vehicles)
                         <li class="active"><a data-target="#pic-1" data-toggle="tab"><img src="{{ asset('storage/' . $vehicles->images) }}" /></a></li>
@@ -76,10 +72,8 @@
                             Suara Mesin
                           </a>
                         </div>
-                      </div>
-                    
-                      
-                  </div>
+                      </div>  
+                </div>
 
                   
                   <div style="padding-top:10px; margin-bottom:10px;" class="details col-md-6">
@@ -101,7 +95,7 @@
                       </div>
                     </div>
 
-                    <div class="views">
+                    <div style="margin-bottom: 20px;" class="views">
                       @if($vehicle->clicked)
                       <i style="color: gray;" class="fa fa-eye" aria-hidden="true"> <span style="color: black;">{{$vehicle->clicked}}x dilihat</span></i>
                       @else
@@ -109,10 +103,10 @@
                       @endif
                     </div>
 
-                    <br>
+                    
                     <div style="width: 100%; height:max-content:20px;border-radius:10px;padding-left:0;" class="container">
                       <div class="title">
-                        <h6>Informasi Detail</h6>
+                        <h6><strong>Informasi Detail Unit Kendaraan</strong></h6>
                       </div>
                     <div style="width: 100%; height:max-content;background:#ffffff;padding:20px;border:1.5px solid rgb(241, 241, 241);border-radius:10px;display:flex;flex-wrap:wrap;gap:40px;" class="detail-information">
 

@@ -8,6 +8,7 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\MasterMainMenuController;
 use App\Models\BranchModel;
+use PhpParser\Node\Stmt\Else_;
 
 class SettingsApp extends Controller
 {
@@ -60,13 +61,35 @@ class SettingsApp extends Controller
                 'updated_at' => now(),
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
             ]);
-            session()->flash('message_success', 'Data Berhasil disimpan!');
+            session()->flash('message_success', 'Pengaturan Berhasil disimpan!');
             return redirect()->back();
         } else {
             return abort(403, 'You don`t have access for this services');
         }
     }
 
+
+    public function under_development_setting(Request $request)
+    {
+        $IT_ROLE = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Information Technology';
+
+        if ($IT_ROLE) {
+            DB::table('under_development_setting')->where('id', 1)->update(
+                [
+                    'under_development' => $request->under_development,
+                    'description' => $request->description,
+                    'admin_web' => $request->admin_web,
+                    'landing_page_web' => $request->landing_page_web,
+                    'updated_at' => now(),
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]
+            );
+            session()->flash('message_success', 'Pengaturan Berhasil disimpan!');
+            return redirect()->back();
+        } else {
+            return abort(403, 'You don`t have access for this services');
+        }
+    }
 
     /**
      * Store a newly created resource in storage.

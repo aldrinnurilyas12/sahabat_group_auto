@@ -36,15 +36,15 @@
                 @include('layouts.admin_views.header')
                 
                 <div class="card shadow mb-4">
-                    <div  class="card-header py-3">
-                        <h5>Settings Web Administrator</h5>
+                    <div style="color:black;" class="card-header py-3">
+                        <h5><strong>Settings Web Administrator</strong></h5>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                           <form action="{{route('setting_time')}}" method="POST">
                             @method('PUT')
                             @csrf
-                            <h5> Jam Operasional Web Administrator</h5>
+                            <h5 style="color:black;"> Jam Operasional Web Administrator</h5>
                             <select class="form-control" name="open_schedule_time" id="">
                               <option value="#">==== Pilih ====</option>
                               <option value="on">ON</option>
@@ -57,12 +57,60 @@
                               <p>Setting Time : <span class="text-secondary">Tidak Aktif</span></p> 
                               @endif
                               <br>
-                              <button type="submit" class="btn btn-dark">Simpan Pengaturan</button>
+                              <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
                           </form>
                            
                         </div>
                     </div>
                 </div>
+
+
+                @if(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Information Technology')
+                <div class="card shadow mb-4">
+                  <div style="color:black;" class="card-header py-3">
+                      <h5><strong>Settings Under Development</strong></h5>
+                  </div>
+                  <div class="card-body">
+                      <div class="table-responsive">
+                        <form action="{{route('setting_development')}}" method="POST">
+                          @method('PUT')
+                          @csrf
+                          <label style="color:black;" for="">Pilih Pengaturan</label>
+                          <select class="form-control" name="under_development" id="">
+                            <option value="#">==== Pilih ====</option>
+                            <option value="ya">YA</option>
+                            <option value="tidak">TIDAK</option>
+                          </select>
+                          <br>
+                          <label style="color:black;" for="">Deskripsi Development</label>
+                          <input class="form-control" type="text" name="description">
+                          <br>
+                          <div style="display: block;" class="checkbox-area">
+                            <label style="color:black;" for="">Pilih Web</label>
+                            <br>
+                            <div style="display: flex;gap:10px;" class="input-group">
+                              <input type="checkbox" name="admin_web" value="ya">Admin Web
+                              <input type="checkbox" name="landing_page_web" value="ya">Landing Page
+                            </div>
+                          </div>
+                          
+
+                          <p>
+                            @if($setting_time->open_schedule_time == 'on')
+                           <p>Setting Time : <span class="text-success">Aktif</span></p> 
+                            @else
+                            <p>Setting Time : <span class="text-secondary">Tidak Aktif</span></p> 
+                            @endif
+                            <br>
+                            <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
+                        </form>
+                         
+                      </div>
+                  </div>
+                </div>
+                @else
+                
+                @endif
 
             </div>
            
@@ -198,6 +246,28 @@ input:checked + .slider:before {
        }
    });
 </script>
+
+@if (Session::has('failed_insert'))
+<script>
+    Swal.fire({
+        title: 'Gagal',
+        text: "{{ Session::get('failed_insert') }}",
+        icon: "error",
+        timer:6000,
+        confirmButtonText: 'OK'
+    });
+</script>
+@elseif(Session::has('message_success'))
+<script>
+  Swal.fire({
+      title: 'Berhasil',
+      text: "{{ Session::get('message_success') }}",
+      icon: 'success',
+      timer:2000,
+      confirmButtonText: 'OK'
+  });
+</script>
+@endif
 </body>
     
 </html>

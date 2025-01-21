@@ -290,7 +290,7 @@ class PayrollController extends Controller
     {
 
         $attendance = DB::table('v_payroll')
-            ->select('id', 'total_hadir', 'total_izin', 'total_sakit', 'total_alpha')
+            ->select('id', 'total_hadir', 'total_izin', 'total_sakit', 'total_alpha_ongoing')
             ->where('id', $request->id)
             ->get();
         $attendance_type = ['Hadir', 'Izin', 'Sakit', 'Alpha']; // Menggunakan pluck untuk mendapatkan array
@@ -299,7 +299,7 @@ class PayrollController extends Controller
             'total_hadir' => $attendance->isNotEmpty() ? $attendance : [['total_hadir' => 0]], // Mengambil nilai total_hadir
             'total_izin' => $attendance->isNotEmpty() ? $attendance : [['total_izin' => 0]],   // Mengambil nilai total_izin
             'total_sakit' => $attendance->isNotEmpty() ? $attendance : [['total_sakit' => 0]],
-            'total_alpha' => $attendance->isNotEmpty() ? $attendance : [['total_alpha' => 0]], // Mengambil nilai total_sakit
+            'total_alpha_ongoing' => $attendance->isNotEmpty() ? $attendance : [['total_alpha_ongoing' => 0]], // Mengambil nilai total_sakit
             'attendance_type' => $attendance_type
         ]);
     }
