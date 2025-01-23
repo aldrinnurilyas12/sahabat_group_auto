@@ -104,7 +104,7 @@
                                             <td>{{"Rp " .number_format($spk->price)}}</td>
                                             <td>{{$spk->price_nominal}}</td>
                                             <td>{{$spk->down_payment}}</td>
-                                            <td>{{$spk->customer}}</td>
+                                            <td>{{$spk->name}}</td>
                                             <td>{{$spk->address}}</td>
                                             <td>{{$spk->phone_number}}</td>
                                             <td>{{$spk->email}}</td>

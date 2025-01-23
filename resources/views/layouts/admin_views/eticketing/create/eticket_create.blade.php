@@ -46,7 +46,7 @@
                     
                     <h4 style="text-align:center;color:black;font-weight:bold;">Tambah Data E-Ticket</h4>
                     
-                    <div style="display: flex; gap:50px;flex-wrap:wrap;width:100%;" class="form-group-content">
+                    <div style="display: flex; gap:30px;flex-wrap:wrap;width:100%;" class="form-group-content">
                         <div style="display: block;" class="container-infromation">
                             <div style="width: 300px; height:max-content; padding:8px;" class="card shadow mb-4">
                                 <div class="card-header py-3">
@@ -79,45 +79,52 @@
                             </div>
                         </div>
 
-                        <form class="form_input" method="POST" action="{{ route('master_eticket.store')}}" enctype="multipart/form-data">
-                            @csrf   
-                            <div class="form-group">
-                                <label>Kategory Tiket</label>
-                                <select class="form-control" name="eticket_category" id="">
-                                    <option value="#">=== Pilih Kategori Tiket ===</option>
-                                @foreach ($eticket_category as $category)
-                                    <option value="{{$category->menu_name . ' - ' . $category->submenu_name}}">{{$category->menu_name . ' - ' . $category->submenu_name}}</option>     
-                                @endforeach
-                                </select>
-                                @if ($errors->has('eticket_category'))
-                                <span class="text-danger">{{ $errors->first('eticket_category') }}</span>
-                                @endif
-                            </div>
+                        <div class="card-shadow">
+                            <div class="card shadow mb-4 new">
+                                <div  class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Buat E-Ticket </h6>
+                                </div>
+                                <form class="form_input" method="POST" action="{{ route('master_eticket.store')}}" enctype="multipart/form-data">
+                                    @csrf   
+                                    <div class="form-group">
+                                        <label>Kategory Tiket</label>
+                                        <select class="form-control" name="eticket_category" id="">
+                                            <option value="#">=== Pilih Kategori Tiket ===</option>
+                                        @foreach ($eticket_category as $category)
+                                            <option value="{{$category->menu_name . ' - ' . $category->submenu_name}}">{{$category->menu_name . ' - ' . $category->submenu_name}}</option>     
+                                        @endforeach
+                                        </select>
+                                        @if ($errors->has('eticket_category'))
+                                        <span class="text-danger">{{ $errors->first('eticket_category') }}</span>
+                                        @endif
+                                    </div>
 
-                            <div class="form-group">
-                                <label>Judul</label>
-                                <input type="text" class="form-control" name="title" autocomplete="off" placeholder="Masukan Judul E-Tiket">
-                                @if ($errors->has('title'))
-                                <span class="text-danger">{{ $errors->first('title') }}</span>
-                                @endif
-                            </div>
+                                    <div class="form-group">
+                                        <label>Judul</label>
+                                        <input type="text" class="form-control" name="title" autocomplete="off" placeholder="Masukan Judul E-Tiket">
+                                        @if ($errors->has('title'))
+                                        <span class="text-danger">{{ $errors->first('title') }}</span>
+                                        @endif
+                                    </div>
 
-                            <div class="form-group">
-                                <label>Permasalahan</label>
-                               <textarea class="form-control" name="main_issue" id="" cols="30" rows="5" placeholder="Masukan permasalahan yang dihadapi"></textarea>
-                               @if ($errors->has('main_issue'))
-                               <span class="text-danger">{{ $errors->first('main_issue') }}</span>
-                               @endif
-                            </div>
+                                    <div class="form-group">
+                                        <label>Permasalahan</label>
+                                    <textarea class="form-control" name="main_issue" id="" cols="30" rows="5" placeholder="Masukan permasalahan yang dihadapi"></textarea>
+                                    @if ($errors->has('main_issue'))
+                                    <span class="text-danger">{{ $errors->first('main_issue') }}</span>
+                                    @endif
+                                    </div>
 
-                            <div class="form-group">
-                                <label>Lampiran</label>
-                                <input type="file" class="form-control" name="attachment_files" autocomplete="off">
-                            </div>
+                                    <div class="form-group">
+                                        <label>Lampiran</label>
+                                        <input type="file" class="form-control" name="attachment_files" autocomplete="off">
+                                    </div>
 
-                            
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                        </form>  
+                                    
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </form>  
+                            </div>
+                        </div>
                     </div>
 
                     
@@ -161,6 +168,11 @@
         z-index: 9999; /* Pastikan spinner berada di atas konten lainnya */
       }
       
+    .card-shadow {
+        width: 70%;
+        padding: 12px;
+    }
+     
       .spinner-border {
         color: yellow;
         width: 3rem;
@@ -168,7 +180,8 @@
       }
       
         .form_input {
-            width: 60%;
+            width: 100%;
+            padding: 20px;
         }
 
 
@@ -176,6 +189,10 @@
     .form_input{
     width: 100%;
     color: rgb(0, 0, 0);
+    }
+
+    .card-shadow{
+        width:100%;
     }
     }
     </style>

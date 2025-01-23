@@ -8,6 +8,7 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\MasterMainMenuController;
 use Carbon\Month;
+use FontLib\Table\Type\loca;
 
 class Analytics extends Controller
 {
@@ -76,11 +77,25 @@ class Analytics extends Controller
         return view('layouts.admin_views.analytics.analytics', compact('revenue', 'employee', 'grouped_sub_menu', 'sidebar_menu', 'appointment_total', 'unit_request', 'sale_unit_request', 'vehicle_ads', 'vehicle_total_clicked', 'vehicle_total', 'vehicle_brand', 'years', 'months', 'bulan', 'tahun', 'location_unit'));
     }
 
-    public function get_total_vehicle_ads()
+    public function get_total_vehicle_ads(Request $request)
     {
+
+        $month = $request->month;
+        $year = $request->year;
+        $location = $request->location;
+
         $fetch_data =  DB::table('vehicle_advertisement as va')
-            ->select(DB::raw('concat(vb.brand_name, " ", v.vehicle_type, " ", v.manufacture_year) as unit'), 'va.clicked as total_vehicle_clicked')
-            ->leftJoin('vehicle as v', 'va.vehicle_id', '=', 'v.id')
+            ->select('v.unit', 'va.clicked as total_vehicle_clicked')
+            ->when($location && $location !== 'alldata', function ($query) use ($location) {
+                return $query->where('location_name', $location);
+            })
+            ->when($month && $month !== 'alldata', function ($query) use ($month) {
+                return $query->whereMonth('va.created_at', $month);
+            })
+            ->when($year && $year !== 'alldata', function ($query) use ($year) {
+                return $query->whereYear('va.created_at', $year);
+            })
+            ->leftJoin('v_vehicle as v', 'va.vehicle_id', '=', 'v.id')
             ->leftJoin('vehicle_brand as vb', 'v.brand', '=', 'vb.id')->where('va.is_active', 'Y')->orderBy('va.clicked', 'DESC')->get();
 
         $unit = $fetch_data->pluck('unit');
@@ -110,42 +125,47 @@ class Analytics extends Controller
     // ->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])
 
 
+    // Pastikan untuk menggunakan model yang sesuai
+
     public function get_revenue(Request $request)
     {
-
         $month = $request->month;
         $year = $request->year;
         $location = $request->location;
 
-        $revenue_by_month = DB::table('v_spk')
-            ->select(DB::raw('MONTH(created_at) as month'), DB::raw('SUM(price) as total_revenue'))
+        // Mulai query dengan kondisi yang lebih tepat
+        $query = DB::table('v_spk')
+            ->select(DB::raw('MONTH(created_at  ) as month'), DB::raw('SUM(price) as total_revenue'))
             ->groupBy(DB::raw('MONTH(created_at)'))
-            ->orderBy('month')
-            ->get();
+            ->when($location && $location !== 'alldata', function ($query) use ($location) {
+                return $query->where('location_unit', $location);
+            })
+            ->when($month && $month !== 'alldata', function ($query) use ($month) {
+                return $query->whereRaw('MONTH(created_at) = ?', [$month]);
+            })
+            ->when($year && $year !== 'alldata', function ($query) use ($year) {
+                return $query->whereRaw('YEAR(created_at) = ?', [$year]);
+            });
 
-        if ($location && $month && $year) {
-            $revenue_by_month = DB::table('v_spk')
-                ->select(DB::raw('MONTH(created_at) as month'), DB::raw('SUM(price) as total_revenue'))
-                ->where('location_unit', $location)
-                ->whereRaw('MONTH(created_at) = ?', [$month])
-                ->whereRaw('YEAR(created_at) = ?', [$year])
-                ->groupBy(DB::raw('MONTH(created_at)'))
-                ->orderBy('month')
-                ->get();
-        }
+        // Eksekusi query untuk mendapatkan data pendapatan per bulan
+        $revenue_by_month = $query->get();
 
-
+        // Ambil daftar bulan dari tabel months
         $month_list = DB::table('months')->pluck('month_list');
         $revenue_data = [];
+
+        // Siapkan data pendapatan berdasarkan bulan
         foreach ($revenue_by_month as $revenue) {
             $revenue_data[$revenue->month] = $revenue->total_revenue;
         }
 
+        // Siapkan total pendapatan untuk setiap bulan (1 sampai 12)
         $total_revenue = [];
         for ($i = 1; $i <= 12; $i++) {
             $total_revenue[] = $revenue_data[$i] ?? 0;
         }
 
+        // Kembalikan response dalam format JSON
         return response()->json([
             'price' => $total_revenue,
             'month_list' => $month_list
@@ -153,11 +173,25 @@ class Analytics extends Controller
     }
 
 
+
     public function get_budget_maintenance(Request $request)
     {
 
+        $month = $request->month;
+        $year = $request->year;
+        $location = $request->location;
+
         $maintenance_data = DB::table('maintenance_unit as mtc')
             ->select('vehicle_id', 'unit', DB::raw('SUM(cost) as total_cost'))
+            ->when($location && $location !== 'alldata', function ($query) use ($location) {
+                return $query->where('location_name', $location);
+            })
+            ->when($month && $month !== 'alldata', function ($query) use ($month) {
+                return $query->whereMonth('mtc.created_at', $month);
+            })
+            ->when($year && $year !== 'alldata', function ($query) use ($year) {
+                return $query->whereYear('mtc.created_at', $year);
+            })
             ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')
             ->groupBy('vehicle_id', 'unit')
             ->get();
@@ -258,11 +292,9 @@ class Analytics extends Controller
         $unit_request = DB::table('customer_vehicle_request')->count();
         $sale_unit_request = DB::table('vehicle_sale_request')->count();
 
-
-
-
         $revenue = $this->get_revenue($request);
 
+        // dd($revenue);
         return view('layouts.admin_views.analytics.analytics', compact('revenue', 'employee', 'grouped_sub_menu', 'sidebar_menu', 'appointment_total', 'unit_request', 'sale_unit_request', 'vehicle_ads', 'vehicle_total_clicked', 'vehicle_total', 'vehicle_brand', 'years', 'months', 'bulan', 'tahun', 'location_unit'));
     }
 }

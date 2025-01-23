@@ -44,7 +44,7 @@
 
         <div class="container-name">
             <p>Nama Pelanggan</p>
-            <p>{{$spk->customer}}</p>
+            <p>{{$spk->name}}</p>
         </div>
 
         <div class="container-name">
@@ -84,7 +84,7 @@
                 <br>
                 <p style="margin-bottom: 5px;font-size:12px;" class="text-secondary">Materai</p>
                 <br>
-                 <p style="font-size: 13px;">{{$spk->customer}}</p>
+                 <p style="font-size: 13px;">{{$spk->name}}</p>
              </div>
     
         </div>

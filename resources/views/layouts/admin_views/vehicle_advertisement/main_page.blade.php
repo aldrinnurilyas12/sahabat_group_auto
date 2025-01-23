@@ -145,8 +145,7 @@
                                             <th>Views</th>
                                             <th>Foto</th>
                                             <th>NO.Pol</th>
-                                            <th>Brand</th>
-                                            <th>Tahun</th>
+                                            <th>Unit</th>
                                             <th>Harga</th>
                                             <th>Status Unit</th>
                                             <th>Tanggal Perbarui Posting</th>
@@ -176,12 +175,14 @@
                                                 @if($vhcl->is_active == 'Ya')
                                                 <a class="btn btn-success">Terpasang</a>
                                                 @else
+                                                <p class="text-danger">belum terpasang</p>
                                                 @endif    
                                             </td>
                                             <td>
                                                 @if($vhcl->is_active == 'Ya')
                                                 <a href="{{route('add_vehicle_advertisement', $vhcl->vehicle_id)}}">Ubah</a>
                                                 @else
+                                                <p class="text-danger">iklan belum terpasang</p>
                                                 @endif
                                             </td>
                                             <td>@if($vhcl->clicked)
@@ -197,7 +198,6 @@
                                             @endif</td>
                                             <td>{{$vhcl->vehicle_registration_number}}</td>
                                             <td>{{$vhcl->unit}}</td>
-                                            <td>{{$vhcl->manufacture_year}}</td>   
                                             <td>{{"Rp " . number_format($vhcl->price)}}</td> 
                                             <td>{{$vhcl->category_name}}</td> 
                                             <td>{{$vhcl->updated_posted_date}}</td>    

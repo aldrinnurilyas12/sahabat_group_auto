@@ -149,10 +149,7 @@ class MasterVehicleAdvertisement extends Controller
 
         $bulan = $request->bulan;
         $tahun = $request->tahun;
-
-
-
-
+        $availableAds = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->orderBy('updated_posted_date', 'desc')->get();
         // execute just a month for all data
         if ($bulan === 'alldata') {
             $vehicle_data = DB::table('v_vehicle_advertisement')->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
@@ -178,7 +175,7 @@ class MasterVehicleAdvertisement extends Controller
         if ($tahun === 'alldata' && $bulan === 'alldata') {
             $vehicle_data = DB::table('v_vehicle_advertisement')->orderBy('created_at', 'desc')->get();
         }
-        return view('layouts.admin_views.vehicle_advertisement.main_page', compact('vehicle_data', 'grouped_sub_menu', 'sidebar_menu', 'bulan', 'tahun', 'months', 'years'));
+        return view('layouts.admin_views.vehicle_advertisement.main_page', compact('availableAds', 'vehicle_data', 'grouped_sub_menu', 'sidebar_menu', 'bulan', 'tahun', 'months', 'years'));
     }
 
 

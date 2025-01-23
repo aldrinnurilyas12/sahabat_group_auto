@@ -125,7 +125,7 @@
 
                             <div class="form-group">
                                 <label>Nama Customer</label>
-                                <input type="text" class="form-control" name="customer" autocomplete="off" placeholder="Masukan Nama Customer">
+                                <input type="text" class="form-control" name="name" autocomplete="off" placeholder="Masukan Nama Customer">
                             </div>
 
                             <div class="form-group">

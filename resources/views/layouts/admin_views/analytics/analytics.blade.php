@@ -128,13 +128,13 @@
                 </div>
 
                 <div style="color: black;" class="form-group">
-                    <form  action="{{route('filter_analytics')}}" method="GET">
+                    <form id="formFilter">
 
                         <div style="display: flex;gap:10px;" class="grouped-container">
                             
                             <div style="display: block" class="select-group">
                             <label for="">Bulan</label>
-                            <select class="form-control" name="month" id="status">
+                            <select class="form-control" name="month" id="month">
                                 <option value="">--- Pilih Bulan ---</option>
                                 <option value="alldata">Semua Bulan</option>
                                 @foreach($months as $month)
@@ -149,7 +149,7 @@
                             
                             <div style="display: block" class="select-group">
                                 <label for="">Tahun</label>
-                                <select class="form-control" name="year" id="status">
+                                <select class="form-control" name="year" id="year">
                                     <option value="">--- Pilih Tahun ---</option>
                                     <option value="alldata">Semua Tahun</option>
                                     @foreach($years as $yrs)
@@ -164,7 +164,7 @@
 
                             <div style="display: block" class="select-group">
                                 <label for="">Kantor</label>
-                                <select class="form-control" name="location" id="status">
+                                <select class="form-control" name="location" id="location">
                                     <option value="">--- Pilih Lokasi Cabang ---</option>
                                     <option value="alldata">Semua Lokasi</option>
                                     @foreach($location_unit as $loc)
@@ -375,8 +375,16 @@
 </body>
 
 <script>
-    // total clicked chart
-    fetch('/get_clicked_data').then(response => response.json())
+    document.getElementById('formFilter').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // Ambil nilai filter
+    const month = document.getElementById('month').value;
+    const year = document.getElementById('year').value;
+    const location = document.getElementById('location').value;
+    
+    fetch(`/get_clicked_data?month=${month}&year=${year}&location=${location}`)
+    .then(response => response.json())
     .then(data => {
       var options = {
         chart : {
@@ -400,6 +408,7 @@
 
       var chart = new ApexCharts(document.querySelector("#chart"), options);
     chart.render();
+    });
     });
 
 
@@ -435,49 +444,75 @@
     
 
     // revenue chart
-    fetch('/get_revenue')
+   
+    document.getElementById('formFilter').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // Ambil nilai filter
+    const month = document.getElementById('month').value;
+    const year = document.getElementById('year').value;
+    const location = document.getElementById('location').value;
+
+    fetch(`/get_revenue?month=${month}&year=${year}&location=${location}`)
     .then(response => response.json())
     .then(data => {
-        var options = {
-            series: [{
-                name: "Revenue",
-                data: data.price
-            }],
-            chart: {
-                height: 350,
-                type: 'line',
-                zoom: {
-                    enabled: false
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                curve: 'straight' // Mengubah menjadi 'smooth' untuk tampilan yang lebih baik
-            },
-            title: {
-                align: 'left'
-            },
-            grid: {
-                row: {
-                    colors: ['#f3f3f3', 'transparent'], // Mengatur warna baris
-                    opacity: 0.5
+        if (data.price && data.month_list) {
+            var options = {
+                series: [{
+                    name: "Revenue",
+                    data: data.price
+                }],
+                chart: {
+                    height: 350,
+                    type: 'line',
+                    zoom: {
+                        enabled: false
+                    }
                 },
-            },
-            xaxis: {
-                categories: data.month_list // Menggunakan daftar bulan dari server
-            }
-        };
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth'  // Ubah stroke menjadi 'smooth' untuk tampilan yang lebih baik
+                },
+                title: {
+                    align: 'left'
+                },
+                grid: {
+                    row: {
+                        colors: ['#f3f3f3', 'transparent'], // Mengatur warna baris
+                        opacity: 0.5
+                    },
+                },
+                xaxis: {
+                    categories: data.month_list // Menggunakan daftar bulan dari server
+                }
+            };
 
-        var chart = new ApexCharts(document.querySelector("#revenueChart"), options);
-        chart.render();
+            var chart = new ApexCharts(document.querySelector("#revenueChart"), options);
+            chart.render();
+        } else {
+            console.error('Data yang diterima tidak lengkap');
+        }
     })
     .catch(error => console.error('Error fetching revenue data:', error)); // Menangani error
+    });
 
+    
+    // end chart
+   
     // budgetMaintenance
 
-     fetch('/get_budget_maintenance')
+
+    document.getElementById('formFilter').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // Ambil nilai filter
+    const month = document.getElementById('month').value;
+    const year = document.getElementById('year').value;
+    const location = document.getElementById('location').value;
+    
+    fetch(`/get_budget_maintenance?month=${month}&year=${year}&location=${location}`)
     .then(response => response.json())
     .then(data => {
         var options = {
@@ -509,7 +544,7 @@
         chart.render();
     })
     .catch(error => console.error('Error fetching revenue data:', error));
-
+    });
 </script>
 
 

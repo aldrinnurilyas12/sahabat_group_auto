@@ -230,8 +230,19 @@
     }
     
     </style>
-</body>
 
+    @if (Session::has('failed_insert'))
+    <script>
+        Swal.fire({
+            title: 'Data tidak ada',
+            text: "{{ Session::get('failed_insert') }}",
+            icon: "error",
+            timer:3000
+        });
+    </script>
+        
+    @endif
+</body>
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');

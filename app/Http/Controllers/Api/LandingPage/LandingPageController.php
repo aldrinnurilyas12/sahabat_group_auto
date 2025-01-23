@@ -82,12 +82,18 @@ class LandingPageController extends Controller
         $brands = DB::table('vehicle_brand')->get();
         $lowerprice = $request->lower_price;
         $highprice = $request->high_price;
+        $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->get();
         $search = $request->input('search');
-
+        $result = DB::table('v_vehicle_advertisement')->where('unit', 'like', '%' . $search . '%')->paginate();
         if ($search) {
             $result = DB::table('v_vehicle_advertisement')->where('unit', 'like', '%' . $search . '%')->paginate();
+            if ($result->isEmpty()) {
+                session()->flash('failed_insert', 'Pencarian unit ' . $search . ' tidak tersedia');
+                return view('layouts.landing_page.main_page.all_vehicle', compact('result', 'vehicle_ads', 'brand', 'brands', 'lowerprice', 'highprice', 'search'));
+            }
+        } else {
+            $result = DB::table('v_vehicle_advertisement')->where('unit', 'like', '%' . $search . '%')->paginate();
         }
-        $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->get();
         return view('layouts.landing_page.main_page.all_vehicle', compact('result', 'vehicle_ads', 'brand', 'brands', 'lowerprice', 'highprice', 'search'));
     }
 

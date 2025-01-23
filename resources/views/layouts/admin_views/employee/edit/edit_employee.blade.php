@@ -28,7 +28,7 @@
                     @method('PUT')
                     <div class="form-group">
                     <label>NIK <span style="color: red">*</span></label>
-                    <input type="text" class="form-control" name="nik" value="{{$emp->nik }}" readonly autocomplete="off">
+                    <input type="text" class="form-control" name="nik" value="{{$emp->nik }}" autocomplete="off">
                     @if ($errors->has('nik'))
                     <span class="text-danger">{{ $errors->first('nik') }}</span>
                     @endif

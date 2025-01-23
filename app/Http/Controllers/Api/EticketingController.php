@@ -117,7 +117,7 @@ class EticketingController extends Controller
                 session()->flash('message_success', 'Data Berhasil disimpan!');
                 return redirect()->route('master_eticket.index');
             } else {
-                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan E-Ticket: 08.00 wib - 15.00 wib');
                 return redirect()->route('master_eticket.index');
             }
         } else {
@@ -238,7 +238,9 @@ class EticketingController extends Controller
                     DB::table('eticket')->where('id', $request->id)->update([
                         'scheduled' => $request->scheduled,
                         'approval_by_it' => $request->approval_by_it,
-                        'status' => $request->status
+                        'status' => $request->status,
+                        'updated_at' => now(),
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                     ]);
                     $this->insertLogActivityUsers(__METHOD__);
                     session()->flash('message_success', 'Data Berhasil disimpan!');
@@ -256,7 +258,9 @@ class EticketingController extends Controller
                 DB::table('eticket')->where('id', $request->id)->update([
                     'scheduled' => $request->scheduled,
                     'approval_by_it' => $request->approval_by_it,
-                    'status' => $request->status
+                    'status' => $request->status,
+                    'updated_at' => now(),
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Berhasil disimpan!');
@@ -281,7 +285,9 @@ class EticketingController extends Controller
                 if ($IT_ROLE) {
                     DB::table('eticket')->where('id', $request->id)->update([
                         'status' => $request->status,
-                        'task_complete_date' => $request->task_complete_date
+                        'task_complete_date' => $request->task_complete_date,
+                        'updated_at' => now(),
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                     ]);
                     $this->insertLogActivityUsers(__METHOD__);
                     session()->flash('message_success', 'Data Berhasil disimpan!');
@@ -298,7 +304,9 @@ class EticketingController extends Controller
             if ($IT_ROLE) {
                 DB::table('eticket')->where('id', $request->id)->update([
                     'status' => $request->status,
-                    'task_complete_date' => $request->task_complete_date
+                    'task_complete_date' => $request->task_complete_date,
+                    'updated_at' => now(),
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Berhasil disimpan!');

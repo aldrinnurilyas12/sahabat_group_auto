@@ -19,7 +19,7 @@ class SpkUnitModel extends Model
         'price',
         'price_nominal',
         'down_payment',
-        'customer',
+        'name',
         'address',
         'phone_number',
         'email',
