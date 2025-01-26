@@ -472,8 +472,11 @@
                 dataLabels: {
                     enabled: false
                 },
+                marker:{
+                    size:0,
+                },
                 stroke: {
-                    curve: 'smooth'  // Ubah stroke menjadi 'smooth' untuk tampilan yang lebih baik
+                    curve: 'straight'  // Ubah stroke menjadi 'smooth' untuk tampilan yang lebih baik
                 },
                 title: {
                     align: 'left'

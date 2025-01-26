@@ -29,6 +29,8 @@ use App\Http\Controllers\Api\MasterVehicleData;
 use App\Http\Controllers\Api\VerifyEmailController;
 use App\Http\Controllers\Api\MasterAppointment;
 use App\Http\Controllers\Api\DepartmentController;
+use App\Http\Controllers\Api\EmailMarketing;
+use App\Http\Controllers\Api\EmailMarketingVehicle;
 use App\Http\Controllers\Api\EticketingController;
 use App\Http\Controllers\Api\MaintenanceUnitController;
 use App\Http\Controllers\Api\PayrollController;
@@ -266,6 +268,14 @@ Route::middleware('auth')->group(function () {
     Route::apiResource('master_vehicle_sale', App\Http\Controllers\Api\CustomerRequestVehicleSale::class);
     Route::get('customer_vehicle_sale_mail/{id}', [CustomerRequestVehicleSale::class, 'sendMailVehicleSaleRequest'])->name('customer_vehicle_sale_mail');
     Route::put('response_customers_request_sale/{id}', [CustomerRequestVehicleSale::class, 'response_customers_request_sale'])->name('response_customers_request_sale');
+
+
+    // Email Marketing
+    Route::apiResource('email_marketing', App\Http\Controllers\Api\EmailMarketing::class);
+    Route::get('email_create', [EmailMarketing::class, 'email_create'])->name('email_create');
+    Route::get('email_marketing_vehicle/{id}', [EmailMarketingVehicle::class, 'email_marketing_vehicle_create'])->name('email_marketing_vehicle');
+    Route::apiResource('email_marketing_vehicle', App\Http\Controllers\Api\EmailMarketingVehicle::class);
+
 
     // Analytics DashboardController
     Route::get('master_analytics', [Analytics::class, 'index'])->name('master_analytics');

@@ -181,7 +181,13 @@
                                                 @foreach($vehicle as $cars)
                                                 <tr>
                                                     <td><?php echo $no++ ?></td>
-                                                    <td> <a class="btn btn-info" href="{{route('detail_vehicle', $cars->id)}}">Detail</a></td>
+                                                    <td style="display: flex;gap:8px;"> 
+                                                        <a class="btn btn-info" href="{{route('detail_vehicle', $cars->id)}}">Detail</a>
+                                                        @if($cars->category_name =='Unit Terjual' || $cars->category_name=='Unit Dalam Perbaikan' || $cars->category_name=='Unit Booked' )
+                                                        @else
+                                                        <a class="btn btn-primary" href="{{route('email_marketing_vehicle', $cars->id)}}">Promosikan</a>
+                                                        @endif
+                                                    </td>
                                                     <td><div style="display:flex; justify-content:center;gap:8px; " class="action">
                                                         <a href="{{route('edit_vehicle', $cars->id)}}"><i class="fas fa-edit"></i></a>
                                                         <a style="size: 12px;" href="#" data-toggle="modal" data-target="#deleteUnit{{$cars->id}}"><i class="fas fa-trash"></i></a>
@@ -191,6 +197,10 @@
                                                     <td>{{$cars->vehicle_registration_number}}</td>
                                                     <td>
                                                         @if($cars->category_name == 'Unit Terjual')
+                                                        <p class="text-danger">
+                                                            {{$cars->category_name}}
+                                                        </p>
+                                                        @elseif($cars->category_name == 'Unit Booked')
                                                         <p class="text-danger">
                                                             {{$cars->category_name}}
                                                         </p>

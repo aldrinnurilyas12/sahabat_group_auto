@@ -119,9 +119,77 @@ class MasterVehicleData extends Controller
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:4048',
             'document_files.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:4048'
         ]);
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7  && $insertTime <= 20) {
-            $save_data = VehicleModel::create([
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7  && $insertTime <= 20) {
+                VehicleModel::create([
+                    'vehicle_registration_number' => $request->vehicle_registration_number,
+                    'vehicle_type' => $request->vehicle_type,
+                    'price' => $request->price,
+                    'credit_price' => $request->credit_price,
+                    'current_km' => $request->current_km,
+                    'brand' => $request->brand,
+                    'manufacture_year' => $request->manufacture_year,
+                    'vehicle_category' => $request->vehicle_category,
+                    'model' => $request->model,
+                    'color' => $request->color,
+                    'fuel_type' => $request->fuel_type,
+                    'cylinder_capacity' => $request->cylinder_capacity,
+                    'transmission' => $request->transmission,
+                    'vehicle_identity_number' => $request->vehicle_identity_number,
+                    'engine_number' => $request->engine_number,
+                    'coding_number' => $request->coding_number,
+                    'licence_plate_color' => $request->licence_plate_color,
+                    'old_vin' => $request->old_vin,
+                    'registration_year' => $request->registration_year,
+                    'bpkb_number' => $request->bpkb_number,
+                    'location_code' => $request->location_code,
+                    'registration_queue_number' => $request->registration_queue_number,
+                    'name_of_owner' => $request->name_of_owner,
+                    'address' => $request->address,
+                    'location_branch_vehicle' => $request->location_branch_vehicle,
+                    'status_vehicle_id' => $request->status_vehicle_id,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+
+                ]);
+
+                // if ($request->hasFile('images')) {
+                //     foreach ($request->file('images') as $image) {
+                //         $imagePath = $image->storeAs('vehicle_images', uniqid() . '.' . $image->getClientOriginalExtension(), 'public');
+                //         VehicleFotos::create([
+                //             'vehicle_id' => $save_data->id,
+                //             'images' => $imagePath,
+                //             'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                //             'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                //         ]);
+                //     }
+                // }
+
+
+                // if ($request->hasFile('document_files')) {
+                //     foreach ($request->file('document_files') as $document) {
+                //         $documentPath = $document->storeAs('document', uniqid() . '.' . $document->getClientOriginalExtension(), 'public');
+                //         DocumentModel::create([
+                //             'vehicle_id' => $save_data->id,
+                //             'document_files' => $documentPath,
+                //             'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                //             'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                //         ]);
+                //     }
+                // }
+
+
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_vehicle_data.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_vehicle_data.index');
+            }
+        } else {
+            VehicleModel::create([
                 'vehicle_registration_number' => $request->vehicle_registration_number,
                 'vehicle_type' => $request->vehicle_type,
                 'price' => $request->price,
@@ -152,38 +220,8 @@ class MasterVehicleData extends Controller
                 'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
 
             ]);
-
-            // if ($request->hasFile('images')) {
-            //     foreach ($request->file('images') as $image) {
-            //         $imagePath = $image->storeAs('vehicle_images', uniqid() . '.' . $image->getClientOriginalExtension(), 'public');
-            //         VehicleFotos::create([
-            //             'vehicle_id' => $save_data->id,
-            //             'images' => $imagePath,
-            //             'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-            //             'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-            //         ]);
-            //     }
-            // }
-
-
-            // if ($request->hasFile('document_files')) {
-            //     foreach ($request->file('document_files') as $document) {
-            //         $documentPath = $document->storeAs('document', uniqid() . '.' . $document->getClientOriginalExtension(), 'public');
-            //         DocumentModel::create([
-            //             'vehicle_id' => $save_data->id,
-            //             'document_files' => $documentPath,
-            //             'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-            //             'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-            //         ]);
-            //     }
-            // }
-
-
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_vehicle_data.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
             return redirect()->route('master_vehicle_data.index');
         }
         // Ensure this is a return statement
@@ -272,8 +310,49 @@ class MasterVehicleData extends Controller
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 18) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 18) {
+                $updateData = DB::table('vehicle')->where('id', $request->id)->update([
+                    'vehicle_registration_number' => $request->vehicle_registration_number,
+                    'vehicle_type' => $request->vehicle_type,
+                    'price' => $request->price,
+                    'credit_price' => $request->credit_price,
+                    'brand' => $request->brand,
+                    'current_km' => $request->current_km,
+                    'manufacture_year' => $request->manufacture_year,
+                    'vehicle_category' => $request->vehicle_category,
+                    'model' => $request->model,
+                    'color' => $request->color,
+                    'fuel_type' => $request->fuel_type,
+                    'cylinder_capacity' => $request->cylinder_capacity,
+                    'transmission' => $request->transmission,
+                    'vehicle_identity_number' => $request->vehicle_identity_number,
+                    'engine_number' => $request->engine_number,
+                    'coding_number' => $request->coding_number,
+                    'licence_plate_color' => $request->licence_plate_color,
+                    'old_vin' => $request->old_vin,
+                    'registration_year' => $request->registration_year,
+                    'tax_date' => $request->tax_date,
+                    'bpkb_number' => $request->bpkb_number,
+                    'location_code' => $request->location_code,
+                    'registration_queue_number' => $request->registration_queue_number,
+                    'name_of_owner' => $request->name_of_owner,
+                    'address' => $request->address,
+                    'location_branch_vehicle' => $request->location_branch_vehicle,
+                    'status_vehicle_id' => $request->status_vehicle_id,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_at' => now()
+                ]);
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_vehicle_data.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_vehicle_data.index');
+            }
+        } else {
             $updateData = DB::table('vehicle')->where('id', $request->id)->update([
                 'vehicle_registration_number' => $request->vehicle_registration_number,
                 'vehicle_type' => $request->vehicle_type,
@@ -308,9 +387,6 @@ class MasterVehicleData extends Controller
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
             return redirect()->route('master_vehicle_data.index');
-        } else {
-            session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->route('master_vehicle_data.index');
         }
     }
 
@@ -318,8 +394,24 @@ class MasterVehicleData extends Controller
     {
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 24) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 24) {
+                DB::table('vehicle')->where('id', $request->id)->update([
+                    'status_vehicle_id' => $request->status_vehicle_id,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_at' => now()
+                ]);
+
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil diupdate!');
+                return redirect()->back();
+            } else {
+                session()->flash('failed_insert', 'Data gagal diupdate, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_vehicle_data.index')->with('success', 'Data berhasil disimpan.');
+            }
+        } else {
             DB::table('vehicle')->where('id', $request->id)->update([
                 'status_vehicle_id' => $request->status_vehicle_id,
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
@@ -329,9 +421,6 @@ class MasterVehicleData extends Controller
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil diupdate!');
             return redirect()->back();
-        } else {
-            session()->flash('failed_insert', 'Data gagal diupdate, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->route('master_vehicle_data.index')->with('success', 'Data berhasil disimpan.');
         }
     }
 
@@ -350,8 +439,24 @@ class MasterVehicleData extends Controller
     {
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
+        $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        if ($insertTime >= 7 && $insertTime <= 24) {
+        if ($SETTING_TIME->open_schedule_time == 'on') {
+            if ($insertTime >= 7 && $insertTime <= 24) {
+                DB::table('vehicle')->where('id', $request->id)->update([
+                    'payment_method' => $request->payment_method,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_at' => now()
+                ]);
+
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil diupdate!');
+                return redirect()->route('detail_vehicle', $request->id);
+            } else {
+                session()->flash('failed_insert', 'Data gagal diupdate, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('detail_vehicle', $request->id)->with('success', 'Data berhasil disimpan.');
+            }
+        } else {
             DB::table('vehicle')->where('id', $request->id)->update([
                 'payment_method' => $request->payment_method,
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
@@ -361,9 +466,6 @@ class MasterVehicleData extends Controller
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil diupdate!');
             return redirect()->route('detail_vehicle', $request->id);
-        } else {
-            session()->flash('failed_insert', 'Data gagal diupdate, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-            return redirect()->route('detail_vehicle', $request->id)->with('success', 'Data berhasil disimpan.');
         }
     }
 
