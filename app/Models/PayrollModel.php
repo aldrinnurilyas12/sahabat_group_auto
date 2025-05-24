@@ -12,6 +12,7 @@ class PayrollModel extends Model
     protected $table = 'payroll';
     protected $fillable = [
         'employee_id',
+        'payroll_code',
         'status',
         'payroll_file',
         'created_by',

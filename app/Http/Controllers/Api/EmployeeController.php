@@ -353,7 +353,6 @@ class EmployeeController extends Controller
                 'is_active' => $request->is_active,
                 'birth_date' => $request->birth_date,
                 'start_date' => $request->start_date,
-                'resign_date' => $request->resign_date,
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                 'updated_at' => now()
             ]);

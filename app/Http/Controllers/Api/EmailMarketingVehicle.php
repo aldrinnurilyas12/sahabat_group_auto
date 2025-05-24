@@ -71,7 +71,7 @@ class EmailMarketingVehicle extends Controller
                         'title' => $request->title,
                         'subject' => $request->subject,
                         'description' => $request->description,
-                        'link' => $urlPath . '/' . $request->link,
+                        'link' => $urlPath . '/vehicle_detail/' . $request->link,
                         'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                         'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                     ]);
@@ -100,7 +100,7 @@ class EmailMarketingVehicle extends Controller
                     'title' => $request->title,
                     'subject' => $request->subject,
                     'description' => $request->description,
-                    'link' => $urlPath . '/' . $request->link,
+                    'link' => $urlPath . '/vehicle_detail/' . $request->link,
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);

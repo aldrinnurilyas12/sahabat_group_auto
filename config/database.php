@@ -41,6 +41,7 @@ return [
             'journal_mode' => null,
             'synchronous' => null,
         ],
+        // old : 'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
 
         'mysql' => [
             'driver' => 'mysql',
