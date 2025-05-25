@@ -31,6 +31,7 @@ use App\Http\Controllers\Api\MasterAppointment;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmailMarketing;
 use App\Http\Controllers\Api\EmailMarketingVehicle;
+use App\Http\Controllers\Api\EmployeeResign;
 use App\Http\Controllers\Api\EticketingController;
 use App\Http\Controllers\Api\MaintenanceUnitController;
 use App\Http\Controllers\Api\PayrollController;
@@ -39,6 +40,7 @@ use App\Http\Controllers\Api\SpkUnitController;
 use App\Http\Controllers\Api\VehicleSalesRequest;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserControl;
+use App\Http\Resources\EmployeeResource;
 use App\Mail\SendEmailAppointment;
 use App\Models\CreditSimulation;
 use App\Models\MasterVehicleAdvertisementModel;
@@ -166,8 +168,13 @@ Route::middleware('auth')->group(function () {
     Route::put('upload_update_signature/{employee_id}', [EmployeeController::class, 'update_signature'])->name('upload_update_signature');
     Route::delete('delete_signature/{employee_id}', [EmployeeController::class, 'delete_signature'])->name('delete_signature');
     Route::delete('delete_foto/{employee_id}', [EmployeeController::class, 'delete_foto'])->name('delete_foto');
-    Route::get('resign_employee/{id}', [EmployeeController::class, 'employee_resign_layout'])->name('resign_employee');
-    Route::put('resign_approval/{id}', [EmployeeController::class, 'resign_approval'])->name('resign_approval');
+    Route::get('resign_employee', [EmployeeResign::class, 'employee_resign_layout'])->name('resign_employee');
+
+    // EMPLOYEE RESIGN
+
+    Route::apiResource('employee_resign', App\Http\Controllers\Api\EmployeeResign::class);
+    Route::put('confirm_employee_resign/{id}', [EmployeeResign::class, 'confirm_employee_resign'])->name('confirm_employee_resign');
+    Route::get('get_resignation_letter/{id}', [EmployeeResign::class, 'download_resignation_letter'])->name('get_resignation_letter');
 
 
     // ROUTE FOR API employee

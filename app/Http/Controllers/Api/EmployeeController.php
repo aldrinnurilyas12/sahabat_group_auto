@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\Cast\Array_;
 use App\Http\Resources\EmployeeResource;
 use App\Models\EmployeeBankAccount;
+use App\Models\EmployeeResignModel;
 use App\Models\EmployeeSignature;
 
 class EmployeeController extends Controller
@@ -642,65 +643,12 @@ class EmployeeController extends Controller
             ->select('nik', 'name', 'signature')
             ->leftJoin('employee as e', 'se.employee_id', '=', 'e.id')->where('nik', auth()->user()->nik)->get();
         $user = app('App\Http\Controllers\Api\LoginAdminController')->getUsers();
-        return view('layouts.admin_views.employee_profile.edit.edit_profile', compact('employee', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu', 'user', 'start_date', 'birth_date', 'user_picture', 'signature_employee'));
+
+        $checking_employee_resign_status = DB::table('v_employee_resign')->where('employee_id', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id)->get();
+        return view('layouts.admin_views.employee_profile.edit.edit_profile', compact('employee', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu', 'user', 'start_date', 'birth_date', 'user_picture', 'signature_employee', 'checking_employee_resign_status'));
     }
 
-    // RESIGN EMPLOYEE
 
-    public function employee_resign_layout(Request $request, $employee_id): View
-    {
-        $master_menus = $this->MasterMainMenuController->master_display_menus();
-        $sidebar_menu = $master_menus['sidebar_menu'];
-        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
-
-        $emp = EmployeeModel::find($employee_id);
-        $start_date = Carbon::parse($emp->start_date);
-
-        $employee = DB::table('v_employee')->where('id', $request->id)->get();
-        $main_menu = DB::table('v_main_menu')->get();
-        return view('layouts.admin_views.employee.edit.employee_resign', compact('employee', 'start_date', 'grouped_sub_menu', 'sidebar_menu'));
-    }
-
-    public function resign_approval(Request $request)
-    {
-        date_default_timezone_set('Asia/Jakarta');
-        $insertTime = (int) date('H');
-
-        $request->validate([
-            'resign_reasons' => 'required',
-            'resign_date'   => 'required'
-        ]);
-        $SETTING_TIME = DB::table('settings_schedule_time')->first();
-
-        if ($SETTING_TIME->open_schedule_time == 'on') {
-            if ($insertTime >= 7 && $insertTime <= 18) {
-                DB::table('employee')->where('id', $request->id)->update([
-                    'resign_reasons' => $request->resign_reasons,
-                    'is_active' => $request->is_active,
-                    'resign_date' => $request->resign_date,
-                    'updated_at' => now(),
-                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-                ]);
-                $this->insertLogActivityUsers(__METHOD__);
-                session()->flash('message_success', 'Data Berhasil disimpan!');
-                return redirect()->route('master_employee.index');
-            } else {
-                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 wib - 18.00 wib');
-                return redirect()->route('master_employee.index');
-            }
-        } else {
-            DB::table('employee')->where('id', $request->id)->update([
-                'resign_reasons' => $request->resign_reasons,
-                'is_active' => $request->is_active,
-                'resign_date' => $request->resign_date,
-                'updated_at' => now(),
-                'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-            ]);
-            $this->insertLogActivityUsers(__METHOD__);
-            session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_employee.index');
-        }
-    }
 
     public function users_log_activity(Request $request): View
     {
