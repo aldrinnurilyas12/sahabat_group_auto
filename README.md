@@ -25,6 +25,7 @@ This project start build at september 10,2024 until now for development, Using L
 - Department Master Data
 - Job Position Master Data
 - Payroll System **(Under Development)*
+- Employee Resignation 
 - Employee Attendance Master Data 
 - Agenda Master Data
 - Blog Master Data 
