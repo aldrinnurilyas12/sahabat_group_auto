@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Illuminate\Support\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
 
 
 class EmployeeResign extends Controller
@@ -39,8 +40,19 @@ class EmployeeResign extends Controller
         $offices = $request->office;
         $departments = $request->department;
 
+        $branch_head_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name === 'Head of Branch Operations';
+        $hr_head_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name === 'Head of Human Resource';
+        $branch_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id;
 
-        $employee_resign = DB::table('v_employee_resign')->get();
+        if ($hr_head_login) {
+            $employee_resign = DB::table('v_employee_resign')->get();
+        } elseif ($branch_head_login) {
+            $employee_resign = DB::table('v_employee_resign')->where('branch_emp_id', $branch_id)->get();
+        } else {
+            $employee_resign = DB::table('v_employee_resign')->get();
+        }
+
+
         return view('layouts.admin_views.employee_resign.employee_resign_main', compact('employee_resign', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'department', 'departments'));
     }
 
@@ -62,7 +74,7 @@ class EmployeeResign extends Controller
         $insertTime = (int) date('H');
 
         $request->validate([
-            'resign_attachment' => 'required|mimes:pdf, jpeg, jpg, png|max:10000',
+            'resign_attachment' => 'required|mimes:pdf|max:10000',
             'resign_reasons' => 'required',
             'resign_date'   => 'required'
         ]);
@@ -172,6 +184,8 @@ class EmployeeResign extends Controller
 
         $hr_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource';
         $head_branch_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations';
+        $head_branch_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id;
+
 
 
         if ($hr_login) {
@@ -181,39 +195,44 @@ class EmployeeResign extends Controller
             ]);
         } elseif ($head_branch_login) {
             DB::table('employee_resign')->where('id', $request->id)->update([
-                'approval_by_branch_head' => 'confirmed'
+                'approval_by_branch_head' => 'confirmed',
+                'branch_head_id' => $head_branch_id
             ]);
         }
 
-        $checking_data_confirmed = DB::table('employee_resign')->first();
+        $checking_data_confirmed = DB::table('employee_resign')->where('id', $request->id)->first();
+        $emp_id = $checking_data_confirmed->employee_id;
 
+        if (!$checking_data_confirmed) {
+            session()->flash('message_error', 'Data tidak ditemukan.');
+            return redirect()->back();
+        }
 
-        if ($checking_data_confirmed->approval_by_branch_head == 'pending' && $checking_data_confirmed->approval_by_branch_head == 'pending') {
-            session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->back();
-        } elseif ($checking_data_confirmed->approval_by_branch_head == 'confirmed' && $checking_data_confirmed->approval_by_branch_head == 'pending') {
-            session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->back();
-        } elseif ($checking_data_confirmed->approval_by_branch_head == 'pending' && $checking_data_confirmed->approval_by_branch_head == 'confirmed') {
-            session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->back();
-        } elseif ($checking_data_confirmed->approval_by_branch_head == 'confirmed' && $checking_data_confirmed->approval_by_branch_head == 'confirmed') {
+        $branch_head_approval = $checking_data_confirmed->approval_by_branch_head;
+        $hrd_approval = $checking_data_confirmed->approval_by_hr_head;
 
+        if ($branch_head_approval == 'pending' && $hrd_approval == 'pending') {
+            session()->flash('message_success', 'Data berhasil disimpan!');
+            return redirect()->back();
+        } elseif (
+            ($branch_head_approval == 'confirmed' && $hrd_approval == 'pending') ||
+            ($branch_head_approval == 'pending' && $hrd_approval == 'confirmed')
+        ) {
+            session()->flash('message_success', 'Data berhasil disimpan!');
+            return redirect()->back();
+        } elseif ($branch_head_approval === 'confirmed' && $hrd_approval === 'confirmed') {
             EmployeeResignModel::where('id', $request->id)->update([
-                'resign_status' => 'Sudah Konfirmasi',
+                'resign_status' => 'sudah konfirmasi',
                 'updated_at' => now()
             ]);
 
-            EmployeeModel::where('id', $request->id)->update([
+            EmployeeModel::where('id', $emp_id)->update([
                 'is_active' => 'N'
             ]);
 
             // User::where('employee_id', $request->id)->update([
             //     'is_active' => 'N'
             // ]);
-
-
-
             session()->flash('message_success', 'Data Berhasil disimpan!');
             return redirect()->back();
         }
@@ -252,28 +271,50 @@ class EmployeeResign extends Controller
     {
 
         $employee_resign = DB::table('v_employee_resign')->where('id', $id)->get()->toArray();
+
+        $e_id = $employee_resign[0] ?? null;
+
+        $emp_id = $e_id->employee_id;
+
         $head_branch_signature = DB::table('employee as e')
-            ->select('nik', 'name', 'position_name', 'signature')
+            ->select('e.nik', 'e.name', 'jp.position_name', 'signature')
             ->leftJoin('branch as b', 'e.branch_id', '=', 'b.id')
             ->leftJoin('job_position as jp', 'e.job_position', '=', 'jp.id')
+            ->leftJoin('v_employee_resign as ver', 'b.id', '=', 'ver.branch_head_id')
             ->join('employee_signature as es', 'e.id', '=', 'es.employee_id')
-            ->where('b.location_name', '=', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
-            ->where('jp.position_name', 'Head of Branch Operations');
+            ->where('ver.branch_head_id', '=', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id)
+            ->where('jp.position_name', 'Head of Branch Operations')->get();
 
         $head_hr_signature = DB::table('employee as e')
-            ->select('nik', 'name', 'position_name', 'signature')
+            ->select('e.nik', 'e.name', 'jp.position_name', 'signature')
             ->leftJoin('branch as b', 'e.branch_id', '=', 'b.id')
             ->leftJoin('job_position as jp', 'e.job_position', '=', 'jp.id')
             ->join('employee_signature as es', 'e.id', '=', 'es.employee_id')
-            ->where('jp.position_name', 'Head of Human Resource');
+            ->where('jp.position_name', 'Head of Human Resource')->get();
+
+        $employee_signature = DB::table('employee as e')
+            ->select('e.nik', 'e.name', 'jp.position_name', 'signature')
+            ->leftJoin('branch as b', 'e.branch_id', '=', 'b.id')
+            ->leftJoin('job_position as jp', 'e.job_position', '=', 'jp.id')
+            ->join('employee_signature as es', 'e.id', '=', 'es.employee_id')
+            ->where('e.id', '=', $emp_id)->get();
+
 
         $resignation_letter = Pdf::loadView('layouts.pdf.resign_letter', [
             'employee_resign' => $employee_resign,
             'head_branch_signature' => $head_branch_signature,
-            'head_hr_signature' => $head_hr_signature
+            'head_hr_signature' => $head_hr_signature,
+            'employee_signature' => $employee_signature
         ]);
 
-        return $resignation_letter->download();
+        $first = $employee_resign[0] ?? null;
+
+        $nik = $first->nik ?? '';
+        $name = Str::slug($first->name ?? '');
+
+        $filename = 'surat_resign_karyawan_' . $nik . '-' . $name . '.pdf';
+
+        return $resignation_letter->download($filename);
     }
 
     /**

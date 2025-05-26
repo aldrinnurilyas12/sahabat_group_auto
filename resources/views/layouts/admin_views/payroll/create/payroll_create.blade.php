@@ -242,8 +242,19 @@
                                         <span>Tanggal Bayar : {{ $payroll_detail->first()->created_at }}</span>
                                         <br>
                                         <span>Oleh : {{ $payroll_detail->first()->created_by }}</span>
+                                        <br>
+                                        <br>
+                                        <div class="show-payment">
+                                            <a style="color: black;" class="btn btn-warning" href="#"
+                                                data-toggle="modal"
+                                                data-target="#showPayment{{ $payroll_detail->first()->id }}"><i
+                                                    class="fa fa-eye" aria-hidden="true"></i>
+                                                Lihat bukti bayar</a>
+                                        </div>
                                     </div>
                                 @endif
+
+
                                 {{-- @else --}}
                                 {{-- <div style="padding: 40px;" class="attachment-file">
                                     <h5 style="color: black;">Pembayaran Payroll Karyawan setiap tanggal 25.</h5>
@@ -257,7 +268,23 @@
                                         @if ($payroll_detail->first()->payroll_file == null)
                                             <p class="text-danger">Belum melakukan pembayaran oleh Finance</p>
                                         @else
-                                            <p class="text-success">Sudah</p>
+                                            <div style="padding: 40px;" class="attachment-file">
+                                                <span>Status : <span class="success" style="color: green;">Sudah
+                                                        bayar</span></span>
+                                                <br>
+                                                <span>Tanggal Bayar : {{ $payroll_detail->first()->created_at }}</span>
+                                                <br>
+                                                <span>Oleh : {{ $payroll_detail->first()->created_by }}</span>
+                                                <br>
+                                                <br>
+                                                <div class="show-payment">
+                                                    <a style="color: black;" class="btn btn-warning" href="#"
+                                                        data-toggle="modal"
+                                                        data-target="#showPayment{{ $payroll_detail->first()->id }}"><i
+                                                            class="fa fa-eye" aria-hidden="true"></i>
+                                                        Lihat bukti bayar</a>
+                                                </div>
+                                            </div>
                                         @endif
                                     </div>
                                 </div>
@@ -298,8 +325,8 @@
                                                 </div>
                                             @elseif(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource')
                                                 <div class="confirmed">
-                                                    <h5 style="color: black;"><strong> Konfirmasi Pembayaran
-                                                            Payroll by Head of Human Resource </strong></h5>
+                                                    <h5 style="color: black;"><strong> Konfirmasi Pembayaran Payroll by
+                                                            Head of Human Resource </strong></h5>
                                                     <input hidden class="form-control" value="confirmed"
                                                         type="text" name="approval_by_head_of_human_resource"
                                                         id="">
@@ -324,21 +351,30 @@
                                                 @if ($payroll_detail->first()->approval_by_head_of_human_resource == 'confirmed')
                                                     <p class="text-success">Sudah Konfirmasi</p>
                                                 @else
-                                                    <button type="submit" class="btn btn-primary">Konfirmasi
-                                                        Payroll by Head of HR</button>
+                                                    <label style="color: black;" for=""><strong>Konfirmasi
+                                                            Payroll by Head of Human Resource</strong></label>
+                                                    <br>
+                                                    <button type="submit" class="btn btn-primary">
+                                                        Konfirmasi Payroll by Head of HR</button>
                                                 @endif
                                             @elseif(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations')
                                                 @if ($payroll_detail->first()->approval_by_head_of_branch == 'confirmed')
                                                     <p class="text-success">Sudah Konfirmasi</p>
                                                 @else
-                                                    <button type="submit" class="btn btn-primary">Konfirmasi
-                                                        Payroll by Head of Branch</button>
+                                                    <label style="color: black;" for=""><strong>Konfirmasi
+                                                            Payroll by
+                                                            Head of Branch</strong></label>
+                                                    <br>
+                                                    <button type="submit" class="btn btn-primary">Konfirmasi Payroll
+                                                        by Head of Branch</button>
                                                 @endif
                                             @endif
                                         @endif
                                     </form>
                                 @endif
                         @endif
+
+
                     </div>
                     {{-- @else
                     @endif --}}
@@ -400,6 +436,32 @@
             /* Pastikan tinggi spinner diatur */
         }
     </style>
+
+
+    {{-- MODAL SHOW PAYMENT --}}
+    @foreach ($payroll_detail as $emp)
+        <div class="modal fade" id="showPayment{{ $emp->id }}" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalLabel{{ $emp->id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 style="color: black;" class="modal-title" id="exampleModalLabel{{ $emp->id }}">
+                            Bukti pembayaran Gaji Karyawan {{ $emp->nik . ' - ' . $emp->name }}</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+
+                    <div class="img-attachment">
+                        <iframe style="height: 600px;width:100%;" src="{{ '../storage/' . $emp->payroll_file }}"
+                            alt=""></iframe>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    @endforeach
+    {{-- END MODAL --}}
 
 
 </body>

@@ -45,9 +45,6 @@
                             <h5 style="color: black;"><strong>Data Karyawan Resign PT Sahabat Group Auto</strong></h5>
                             <br>
                             <div style="display: flex; gap:10px; font-family:inter,sans-serif;" class="btn-content">
-                                <a href="{{ route('add_employee') }}" class="btn btn-primary">
-                                    <i class="fas fa-plus-circle"></i>&nbsp;Tambah Karyawan
-                                </a>
 
                                 @if ($employee_resign->isNotEmpty())
                                     <form action="{{ route('export_employee') }}" method="POST">
@@ -69,7 +66,7 @@
 
                             </div>
                             <br>
-                            <div style="color: black;" class="form-group">
+                            {{-- <div style="color: black;" class="form-group">
                                 <form action="{{ route('filter_employee') }}" method="GET">
 
                                     <div style="display: flex;gap:10px;" class="grouped-container">
@@ -135,7 +132,7 @@
 
 
 
-                            </div>
+                            </div> --}}
                         </div>
 
                         <ul class="nav nav-tabs mb-3" id="ex1" role="tablist">
@@ -184,30 +181,35 @@
                                                 @foreach ($employee_resign as $emp)
                                                     <tr>
                                                         <td><?php echo $no++; ?></td>
-                                                        <td>
-                                                            <div style="display:flex; justify-content:center;gap:8px; "
-                                                                class="action">
-                                                                @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations')
-                                                                    @if ($emp->approval_by_branch_head == 'pending')
-                                                                        <a class="btn btn-primary" href="#"
-                                                                            data-toggle="modal"
-                                                                            data-target="#confirmResign{{ $emp->id }}">Konfirmasi</a>
+                                                        @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource' ||
+                                                                app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations')
+                                                            <td>
+                                                                <div style="display:flex; justify-content:center;gap:8px; "
+                                                                    class="action">
+                                                                    @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations')
+                                                                        @if ($emp->approval_by_branch_head == 'pending')
+                                                                            <a class="btn btn-primary" href="#"
+                                                                                data-toggle="modal"
+                                                                                data-target="#confirmResign{{ $emp->id }}">Konfirmasi</a>
+                                                                        @else
+                                                                            <a class="btn btn-secondary"
+                                                                                href="####">Sudah Konfirmasi</a>
+                                                                        @endif
+                                                                    @elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource')
+                                                                        @if ($emp->approval_by_hr_head == 'pending')
+                                                                            <a class="btn btn-primary" href="#"
+                                                                                data-toggle="modal"
+                                                                                data-target="#confirmResign{{ $emp->id }}">Konfirmasi</a>
+                                                                        @else
+                                                                            <a class="btn btn-secondary"
+                                                                                href="####">Sudah Konfirmasi</a>
+                                                                        @endif
                                                                     @else
-                                                                        <a class="btn btn-secondary"
-                                                                            href="####">Sudah Konfirmasi</a>
                                                                     @endif
-                                                                @elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource')
-                                                                    @if ($emp->approval_by_hr_head == 'pending')
-                                                                        <a class="btn btn-primary" href="#"
-                                                                            data-toggle="modal"
-                                                                            data-target="#confirmResign{{ $emp->id }}">Konfirmasi</a>
-                                                                    @else
-                                                                        <a class="btn btn-secondary"
-                                                                            href="####">Sudah Konfirmasi</a>
-                                                                    @endif
-                                                                @endif
 
-                                                        </td>
+                                                            </td>
+                                                        @else
+                                                        @endif
                                                         <td>{{ $emp->nik }}</td>
                                                         <td>{{ Str::upper($emp->name) }}</td>
                                                         <td>{{ $emp->location_name }}</td>
@@ -215,18 +217,37 @@
                                                         <td>{{ $emp->department_name }}</td>
                                                         <td>
                                                             @if ($emp->resign_attachment)
-                                                                <a class="btn btn-primary" href="#"
-                                                                    data-toggle="modal"
-                                                                    data-target="#showAttachment{{ $emp->id }}">lihat</a>
+                                                                <a style="color: black;" class="btn btn-warning"
+                                                                    href="#" data-toggle="modal"
+                                                                    data-target="#showAttachment{{ $emp->id }}"><i
+                                                                        class="fa fa-eye" aria-hidden="true"></i>
+                                                                    lihat</a>
                                                             @else
                                                                 <span class="text-danger">Belum upload</span>
                                                             @endif
                                                         </td>
                                                         <td>{{ $emp->resign_reasons }}</td>
-                                                        <td>{{ $emp->resign_date }}</td>
-                                                        <td>{{ $emp->approval_by_branch_head }}</td>
-                                                        <td>{{ $emp->approval_by_hr_head }}</td>
-                                                        <td>{{ $emp->resign_status }}</td>
+                                                        <td>{{ \Carbon\Carbon::parse($emp->resign_date)->translatedFormat('d F Y') }}
+                                                        </td>
+                                                        @if ($emp->approval_by_branch_head == 'confirmed')
+                                                            <td class="text-success">
+                                                                {{ $emp->approval_by_branch_head }}</td>
+                                                        @else
+                                                            <td class="text-secondary">
+                                                                {{ $emp->approval_by_branch_head }}</td>
+                                                        @endif
+                                                        @if ($emp->approval_by_hr_head == 'confirmed')
+                                                            <td class="text-success">
+                                                                {{ $emp->approval_by_hr_head }}</td>
+                                                        @else
+                                                            <td class="text-secondary">
+                                                                {{ $emp->approval_by_hr_head }}</td>
+                                                        @endif
+                                                        @if ($emp->resign_status == 'sudah konfirmasi')
+                                                            <td class="text-success">{{ $emp->resign_status }}</td>
+                                                        @else
+                                                            <td class="text-danger">{{ $emp->resign_status }}</td>
+                                                        @endif
                                                         <td>{{ $emp->last_day_of_work }}</td>
                                                         <td>{{ $emp->return_company_property }}</td>
                                                         <td>{{ $emp->created_at }}</td>
@@ -270,9 +291,10 @@
                                     </div>
 
                                     <div style="padding-top: 0px; padding-bottom: 0px;" class="modal-body">
-                                        <input type="checkbox"> <span style="color: black";>Setuju </span>
+                                        <input type="checkbox"> <span style="color: black";>Setujui persetujuan resign
+                                            & tanda tangan</span>
                                     </div>
-
+                                    <br>
                                     @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource')
                                         <div class="modal-body">
                                             <label style="color: black;" for=""><strong>Berikan

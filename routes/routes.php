@@ -317,7 +317,7 @@ Route::middleware('auth')->group(function () {
 
     // ROUTES MASTER PAYROLL
     Route::apiResource('master_payroll', App\Http\Controllers\Api\PayrollController::class);
-    Route::get('get_payroll_detail/{id}', [PayrollController::class, 'payrol_detail_layout'])->name('get_payroll_detail');
+    Route::get('get_payroll_detail/{id}', [PayrollController::class, 'payroll_detail_layout'])->name('get_payroll_detail');
     Route::get('get_attendance/{id}', [PayrollController::class, 'get_attendance'])->name('get_attendance');
     Route::put('confirmed_payroll/{payroll_id}', [PayrollController::class, 'confirmed_payroll'])->name('confirmed_payroll');
     Route::get('show_payroll', [PayrollController::class, 'payroll_history'])->name('show_payroll');

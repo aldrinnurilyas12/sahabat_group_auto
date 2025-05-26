@@ -101,7 +101,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="">Upload Surat Resign (Wajib) <span
+                                <label for="">Upload Surat Resign (Format Surat : PDF) <span
                                         style="color: red">*</span></label>
                                 <input class="form-control" type="file" name="resign_attachment">
                                 @if ($errors->has('resign_attachment'))
@@ -110,7 +110,8 @@
                             </div>
 
                             <div class="form-group">
-                                <input type="checkbox"> Dengan ini saya menyatakan pengajuan pengunduran diri saya
+                                <input type="checkbox"> Dengan ini saya menyatakan pengajuan pengunduran diri saya <br>
+                                dan serta menandatangani surat pernyataan resign
                                 kepada perusahaan PT Sahabat Group Auto.
                             </div>
 

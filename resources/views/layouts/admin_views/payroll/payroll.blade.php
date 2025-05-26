@@ -95,12 +95,38 @@
                                             <td><?php echo $no++; ?></td>
                                             <td>
 
-                                                @if ($payroll->status == 'Sudah Konfirmasi')
-                                                    <a class="btn btn-secondary" style="size: 12px;"
-                                                        href="{{ route('get_payroll_detail', $payroll->id) }}">Approved</a>
+                                                @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Finance Operation')
+                                                    @if ($payroll->approval_by_head_of_finance == 'confirmed')
+                                                        <a class="btn btn-secondary" style="size: 12px;"
+                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approved</a>
+                                                    @else
+                                                        <a class="btn btn-primary" style="size: 12px;"
+                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approve</a>
+                                                    @endif
+                                                @elseif(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource')
+                                                    @if ($payroll->approval_by_head_of_human_resource == 'confirmed')
+                                                        <a class="btn btn-secondary" style="size: 12px;"
+                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approved</a>
+                                                    @else
+                                                        <a class="btn btn-primary" style="size: 12px;"
+                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approve</a>
+                                                    @endif
+                                                @elseif(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations')
+                                                    @if ($payroll->approval_by_head_of_branch == 'confirmed')
+                                                        <a class="btn btn-secondary" style="size: 12px;"
+                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approved</a>
+                                                    @else
+                                                        <a class="btn btn-primary" style="size: 12px;"
+                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approve</a>
+                                                    @endif
                                                 @else
-                                                    <a class="btn btn-primary" style="size: 12px;"
-                                                        href="{{ route('get_payroll_detail', $payroll->id) }}">Approve</a>
+                                                    @if ($payroll->status == 'Sudah Konfirmasi')
+                                                        <a class="btn btn-secondary" style="size: 12px;"
+                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approved</a>
+                                                    @else
+                                                        <a class="btn btn-primary" style="size: 12px;"
+                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approve</a>
+                                                    @endif
                                                 @endif
                                             </td>
                                             <td>{{ $payroll->nik }}</td>

@@ -14,6 +14,7 @@ class EmployeeResignModel extends Model
     protected $table = 'employee_resign';
     protected $fillable = [
         'employee_id',
+        'branch_head_id',
         'resign_reasons',
         'resign_date',
         'last_day_of_work',

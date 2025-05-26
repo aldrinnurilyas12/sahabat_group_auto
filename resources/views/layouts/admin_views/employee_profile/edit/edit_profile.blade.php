@@ -146,6 +146,17 @@
                             <br>
                             <hr>
 
+
+                            <div class="signature-img">
+                                <label style="color: black;" for=""><strong>Pengajuan Cuti
+                                        Karyawan</strong></label>
+                                <br>
+                                <a class="btn btn-primary" href="{{ route('show_payroll') }}">Pengajuan Cuti</a>
+                            </div>
+
+                            <br>
+                            <hr>
+
                             <div class="resign-employee">
                                 <label style="color: black;" for=""><strong>Pengajuan Resign Karyawan
                                     </strong></label>
@@ -154,7 +165,7 @@
                                     <div style="display: flex; gap:5px;" class="pdf-resign-download">
                                         <a class="btn btn-secondary" href="">Sudah Pengajuan Resign</a>
 
-                                        @if ($checking_employee_resign_status->first()->resign_status == 'Sudah Konfirmasi')
+                                        @if ($checking_employee_resign_status->first()->resign_status == 'sudah konfirmasi')
                                             <a class="btn btn-primary"
                                                 href="{{ route('get_resignation_letter', $checking_employee_resign_status->first()->id) }}"><i
                                                     class="fa fa-file"></i>&nbsp;<span>Unduh</span></a>
@@ -194,6 +205,10 @@
                                             @else
                                                 <br><strong><span class="text-danger">belum upload</span></strong>
                                             @endif
+                                        </span>
+
+                                        <span style="color: black;font-size:13px;">Tanggal Konfirmasi :
+                                            <br><strong>{{ \Carbon\Carbon::parse($checking_employee_resign_status->first()->updated_at)->translatedFormat('d F Y | h:m ') }}</strong>
                                         </span>
 
                                     </div>
@@ -296,6 +311,15 @@
                                                 value="{{ old('start_date', $emp->start_date ? $start_date->format('Y-m-d') : null) }}"
                                                 autocomplete="off" readonly>
                                         </div>
+
+
+                                        <div class="form-group">
+                                            <label>Status Akun</label>
+                                            <input type="text" class="form-control" id="start_date"
+                                                value="{{ $emp->is_active == 'Ya' ? 'Aktif' : 'Tidak Aktif' }}"
+                                                autocomplete="off" readonly>
+                                        </div>
+
                                         <span class="text-secondary">*Jika anda ingin merubah seluruh data, maka
                                             lakukan perubahan di <a style="text-decoration: underline;"
                                                 href="{{ route('edit_employee', $emp->id) }}"> Data Master
