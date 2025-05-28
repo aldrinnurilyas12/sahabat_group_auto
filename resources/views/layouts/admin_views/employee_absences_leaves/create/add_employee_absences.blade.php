@@ -6,7 +6,7 @@
 <!-- Custom styles for this template-->
 <link href="{{ asset('assets/css/sb-admin-2.min.css') }}" rel="stylesheet">
 <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-<title>Resign Karyawan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
+<title>Cuti Karyawan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
 
 <body>
     <div id="wrapper">
@@ -18,11 +18,11 @@
             <!-- Main Content -->
             <div id="content">
                 @include('layouts.admin_views.header')
-                <h4 style="text-align:center;color:black;font-weight:bold;">PERNYATAAN RESIGN KARYAWAN</h4>
+                <h4 style="text-align:center;color:black;font-weight:bold;">PERNYATAAN CUTI KARYAWAN</h4>
                 <div class="form-group-content">
 
                     @foreach ($employee as $emp)
-                        <form class="form_input" method="POST" action="{{ route('employee_resign.store') }}"
+                        <form class="form_input" method="POST" action="{{ route('employee_leaves.store') }}"
                             enctype="multipart/form-data">
                             @csrf
                             <div class="form-group">
@@ -36,9 +36,16 @@
                                 <input type="text" class="form-control" value="{{ $emp->name }}" readonly
                                     autocomplete="off">
                             </div>
+
                             <div class="form-group">
-                                <label>Alamat </label>
-                                <input type="text" class="form-control" value="{{ $emp->address }}" readonly
+                                <label>Cabang</label>
+                                <input type="text" class="form-control" value="{{ $emp->location_name }}" readonly
+                                    autocomplete="off">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Department</label>
+                                <input type="text" class="form-control" value="{{ $emp->department_name }}" readonly
                                     autocomplete="off">
                             </div>
 
@@ -47,73 +54,63 @@
                                 <input type="text" class="form-control" value="{{ $emp->job_position }}" readonly
                                     autocomplete="off">
                             </div>
-
-                            <div class="form-group">
-                                <label>Tanggal Mulai Bekerja</label>
-                                <input readonly type="date" class="form-control" id="start_date" name="start_date"
-                                    value="{{ old('start_date', $emp->start_date ? $start_date->format('Y-m-d') : null) }}"
-                                    autocomplete="off">
-
-                            </div>
-
                             <hr>
-                            <h5 style="color: black;"><strong>Silahkan isi form Pengajuan Resign Karyawan</strong></h5>
+                            <h5 style="color: black;"><strong>Silahkan isi form Pengajuan Cuti Karyawan</strong></h5>
                             <hr>
 
                             <div class="form-group">
-                                <label for="">Alasan Resign<span style="color: red">*</span></label>
-                                <select class="form-control" name="resign_reasons" id="kategori_resign">
-                                    <option value="">=== Pilih Alasan Resign ===</option>
-                                    <option value="Alasan Pribadi">Alasan Pribadi</option>
-                                    <option value="Alasan Karier">Alasan Karier</option>
-                                    <option value="Masalah Lingkungan Kerja">Masalah Lingkungan Kerja</option>
-                                    <option value="Masalah Kompensasi dan Tunjangan">Masalah Kompensasi dan Tunjangan
-                                    </option>
-                                    <option value="Perubahan dalam Perusahaan">Perubahan dalam Perusahaan</option>
-                                    <option value="Memulai Usaha Sendiri">Memulai Usaha Sendiri</option>
-                                    <option value="Pensiun">Pensiun</option>
-                                    <option value="Ketidakpuasan dengan Pengembangan Karier">Ketidakpuasan dengan
-                                        Pengembangan Karier</option>
-                                    <option value="Masalah Kesehatan">Masalah Kesehatan</option>
-                                    <option value="Kelelahan atau Burnout">Kelelahan atau Burnout</option>
+                                <label for="">Tipe Cuti<span style="color: red">*</span></label>
+                                <select class="form-control" name="type_of_leave">
+                                    <option value="">-- Pilih Alasan Cuti --</option>
+                                    <option value="sakit">Sakit</option>
+                                    <option value="izin_keluarga">Keperluan Keluarga</option>
+                                    <option value="melahirkan">Cuti Melahirkan</option>
+                                    <option value="menikah">Menikah</option>
+                                    <option value="urusan_pribadi">Urusan Pribadi</option>
+                                    <option value="berduka">Keluarga Meninggal Dunia</option>
+                                    <option value="cuti_tahunan">Cuti Tahunan</option>
+                                    <option value="cuti_besar">Cuti Besar</option>
+                                    <option value="ibadah">Ibadah (misalnya Umrah/Haji)</option>
+                                    <option value="pendidikan">Keperluan Pendidikan</option>
+                                    <option value="force_majeure">Keadaan Darurat / Force Majeure</option>
                                 </select>
-                                @if ($errors->has('resign_reasons'))
-                                    <span class="text-danger">{{ $errors->first('resign_reasons') }}</span>
-                                @endif
                             </div>
 
                             <div class="form-group">
-                                <label>Tanggal Resign<span style="color: red">*</span></label>
-                                <input type="date" class="form-control" id="start_date" name="resign_date"
+                                <label>Alasan Cuti </label>
+                                <textarea class="form-control" name="reason" id="" cols="30" rows="3"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Tanggal Mulai Cuti<span style="color: red">*</span></label>
+                                <input type="date" class="form-control" id="start_date" name="start_date"
                                     autocomplete="off">
-                                @if ($errors->has('resign_date'))
-                                    <span class="text-danger">{{ $errors->first('resign_date') }}</span>
+                                @if ($errors->has('start_date'))
+                                    <span class="text-danger">{{ $errors->first('start_date') }}</span>
                                 @endif
                             </div>
 
                             <div class="form-group">
-                                <label>Tanggal Terakhir Kerja<span style="color: red">*</span></label>
-                                <input type="date" class="form-control" name="last_day_of_work" autocomplete="off">
+                                <label>Tanggal Akhir Cuti<span style="color: red">*</span></label>
+                                <input type="date" class="form-control" id="start_date" name="end_date"
+                                    autocomplete="off">
+                                @if ($errors->has('end_date'))
+                                    <span class="text-danger">{{ $errors->first('end_date') }}</span>
+                                @endif
                             </div>
 
                             <div class="form-group">
-                                <label>Pengembalian Properti Perusahaan<span style="color: red">*</span></label>
-                                <input type="text" class="form-control" name="return_company_property"
-                                    autocomplete="off" placeholder="Barang-barang perusahaan yang dikembalikan">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="">Upload Surat Resign (Format Surat : PDF) <span
+                                <label for="">Upload Surat Cuti (Format Surat : PDF) <span
                                         style="color: red">*</span></label>
-                                <input class="form-control" type="file" name="resign_attachment">
-                                @if ($errors->has('resign_attachment'))
-                                    <span class="text-danger">{{ $errors->first('resign_attachment') }}</span>
+                                <input class="form-control" type="file" name="attachment">
+                                @if ($errors->has('attachment'))
+                                    <span class="text-danger">{{ $errors->first('attachment') }}</span>
                                 @endif
                             </div>
 
                             <div class="form-group">
-                                <input type="checkbox"> Dengan ini saya menyatakan pengajuan pengunduran diri saya
-                                dan serta menandatangani surat pernyataan resign
+                                <input type="checkbox"> Dengan ini saya menyatakan pengajuan Cuti diri saya
+                                dan serta menandatangani surat pernyataan Cuti Karyawan
                                 kepada perusahaan PT Sahabat Group Auto.
                             </div>
 

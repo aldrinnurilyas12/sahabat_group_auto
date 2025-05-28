@@ -6,7 +6,7 @@
 <!-- Custom styles for this template-->
 <link href="{{ asset('assets/css/sb-admin-2.min.css') }}" rel="stylesheet">
 <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-<title>Resign Karyawan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
+<title>Edit data Karyawan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
 
 <body>
     <div id="wrapper">
@@ -22,9 +22,9 @@
                 <div class="form-group-content">
 
                     @foreach ($employee as $emp)
-                        <form class="form_input" method="POST" action="{{ route('employee_resign.store') }}"
-                            enctype="multipart/form-data">
+                        <form class="form_input" method="POST" action="{{ route('resign_approval', $emp->id) }}">
                             @csrf
+                            @method('PUT')
                             <div class="form-group">
                                 <label>NIK</label>
                                 <input type="text" class="form-control" value="{{ $emp->nik }}" readonly
@@ -44,7 +44,7 @@
 
                             <div class="form-group">
                                 <label>Posisi Pekerjaan </label>
-                                <input type="text" class="form-control" value="{{ $emp->job_position }}" readonly
+                                <input type="text" class="form-control" value="{{ $emp->address }}" readonly
                                     autocomplete="off">
                             </div>
 
@@ -56,8 +56,6 @@
 
                             </div>
 
-                            <hr>
-                            <h5 style="color: black;"><strong>Silahkan isi form Pengajuan Resign Karyawan</strong></h5>
                             <hr>
 
                             <div class="form-group">
@@ -91,33 +89,13 @@
                                 @endif
                             </div>
 
-                            <div class="form-group">
-                                <label>Tanggal Terakhir Kerja<span style="color: red">*</span></label>
-                                <input type="date" class="form-control" name="last_day_of_work" autocomplete="off">
-                            </div>
+
 
                             <div class="form-group">
-                                <label>Pengembalian Properti Perusahaan<span style="color: red">*</span></label>
-                                <input type="text" class="form-control" name="return_company_property"
-                                    autocomplete="off" placeholder="Barang-barang perusahaan yang dikembalikan">
-                            </div>
 
-                            <div class="form-group">
-                                <label for="">Upload Surat Resign (Format Surat : PDF) <span
-                                        style="color: red">*</span></label>
-                                <input class="form-control" type="file" name="resign_attachment">
-                                @if ($errors->has('resign_attachment'))
-                                    <span class="text-danger">{{ $errors->first('resign_attachment') }}</span>
-                                @endif
+                                {{-- <input type="text" name="is_active" value="N" hidden> --}}
                             </div>
-
-                            <div class="form-group">
-                                <input type="checkbox"> Dengan ini saya menyatakan pengajuan pengunduran diri saya
-                                dan serta menandatangani surat pernyataan resign
-                                kepada perusahaan PT Sahabat Group Auto.
-                            </div>
-
-                            <button type="submit" class="btn btn-primary">Simpan</button>
+                            <button type="submit" class="btn btn-primary">Ubah</button>
                         </form>
                     @endforeach
 

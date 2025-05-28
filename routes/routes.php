@@ -31,6 +31,7 @@ use App\Http\Controllers\Api\MasterAppointment;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmailMarketing;
 use App\Http\Controllers\Api\EmailMarketingVehicle;
+use App\Http\Controllers\Api\EmployeeLeaves;
 use App\Http\Controllers\Api\EmployeeResign;
 use App\Http\Controllers\Api\EticketingController;
 use App\Http\Controllers\Api\MaintenanceUnitController;
@@ -174,7 +175,13 @@ Route::middleware('auth')->group(function () {
 
     Route::apiResource('employee_resign', App\Http\Controllers\Api\EmployeeResign::class);
     Route::put('confirm_employee_resign/{id}', [EmployeeResign::class, 'confirm_employee_resign'])->name('confirm_employee_resign');
-    Route::get('get_resignation_letter/{id}', [EmployeeResign::class, 'download_resignation_letter'])->name('get_resignation_letter');
+    Route::get('get_resignation_letter/{resign_code}', [EmployeeResign::class, 'download_resignation_letter'])->name('get_resignation_letter');
+
+    // EMPLOYEE LEAVES
+    Route::apiResource('employee_leaves', App\Http\Controllers\Api\EmployeeLeaves::class);
+    Route::get('employee_absences_leaves', [EmployeeLeaves::class, 'employee_absences_leaves'])->name('employee_absences_leaves');
+    Route::put('confirm_employee_leaves/{id}', [EmployeeLeaves::class, 'confirm_employee_leaves'])->name('confirm_employee_leaves');
+    Route::get('get_absences_letter/{absences_code}', [EmployeeLeaves::class, 'download_absences_letter'])->name('get_absences_letter');
 
 
     // ROUTE FOR API employee
@@ -339,4 +346,8 @@ Route::middleware('auth')->group(function () {
     Route::get('master_it_eticketing', [EticketingController::class, 'it_eticketing_layouts'])->name('master_it_eticketing');
     Route::put('confirmed_eticket/{id}', [EticketingController::class, 'confirmed_eticket_it'])->name('confirmed_eticket');
     Route::put('confirmed_eticket_done/{id}', [EticketingController::class, 'confirmed_eticket_it_done'])->name('confirmed_eticket_done');
+
+    Route::get('/inactive-info', function () {
+        return 'Akun Anda tidak aktif. Hubungi HRD atau admin.';
+    })->name('inactive-info');
 });

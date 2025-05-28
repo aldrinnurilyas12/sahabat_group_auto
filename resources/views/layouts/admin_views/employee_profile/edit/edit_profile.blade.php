@@ -10,8 +10,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-
-
 <body>
     <div id="wrapper">
 
@@ -28,7 +26,7 @@
                 <div style="display: flex; flex-wrap:wrap;gap:30px;justify-content:center;width:100%;"
                     class="form-group-content">
 
-                    <div style="width: 320px; height:max-content; padding:8px;" class="card shadow mb-4">
+                    <div class="card-shadow-profile">
                         <div class="card-header py-3">
                             <h6 class="mb-2 font-weight-bold text-primary">Informasi akun</h6>
                         </div>
@@ -151,7 +149,68 @@
                                 <label style="color: black;" for=""><strong>Pengajuan Cuti
                                         Karyawan</strong></label>
                                 <br>
-                                <a class="btn btn-primary" href="{{ route('show_payroll') }}">Pengajuan Cuti</a>
+
+                                @if ($checking_absences_status->isNotEmpty())
+                                    <div style="display: flex; gap:5px;" class="pdf-resign-download">
+                                        <a class="btn btn-secondary" href="">Sudah Pengajuan Cuti</a>
+
+                                        @if ($checking_absences_status->first()->status == 'sudah konfirmasi')
+                                            <a class="btn btn-primary"
+                                                href="{{ route('get_absences_letter', $checking_absences_status->first()->absences_code) }}"><i
+                                                    class="fa fa-file"></i>&nbsp;<span>Unduh</span></a>
+                                        @else
+                                        @endif
+                                    </div>
+                                    <br>
+
+                                    <div style="display: flex;flex-wrap:wrap; gap:20px;" class="resign-date">
+                                        <span style="color: black;font-size:13px;">Tanggal Mulai Cuti :
+                                            <br>
+                                            <strong>
+                                                {{ \Carbon\Carbon::parse($checking_absences_status->first()->start_date)->translatedFormat('d F Y') }}</strong></span>
+
+                                        <span style="color: black;font-size:13px;">Tanggal Akhir Cuti :
+                                            <br>
+                                            <strong>
+                                                {{ \Carbon\Carbon::parse($checking_absences_status->first()->end_date)->translatedFormat('d F Y') }}</strong></span>
+
+                                        <span style="color: black;font-size:13px;">Cuti Attachment :
+                                            @if ($checking_absences_status->first()->attachment)
+                                                <br><strong>Ada </strong>
+                                            @else
+                                                <br><strong><span class="text-danger">-</span></strong>
+                                            @endif
+                                        </span>
+
+                                        <span style="color: black;font-size:13px;">Status Cuti :
+                                            <br><strong>{{ $checking_absences_status->first()->status }}</strong>
+                                        </span>
+
+                                        <span style="color: black;font-size:13px;">HR Confirmed :
+                                            <br><strong>{{ $checking_absences_status->first()->approval_by_hr_head }}
+                                            </strong>
+                                        </span>
+
+                                        <span style="color: black;font-size:13px;">Branch Confirmed :
+                                            <br><strong>{{ $checking_absences_status->first()->approval_by_branch_head }}</strong>
+                                        </span>
+
+
+                                        <span style="color: black;font-size:13px;">Tanggal buat :
+                                            <br>
+                                            <strong>{{ \Carbon\Carbon::parse($checking_absences_status->first()->created_at)->translatedFormat('d F Y | h:m ') }}</strong>
+                                        </span>
+
+                                        <span style="color: black;font-size:13px;">Tanggal Konfirmasi :
+                                            <br><strong>{{ \Carbon\Carbon::parse($checking_absences_status->first()->updated_at)->translatedFormat('d F Y | h:m ') }}</strong>
+                                        </span>
+
+                                    </div>
+                                @else
+                                    <a class="btn btn-primary"
+                                        href="{{ route('employee_absences_leaves') }}">Pengajuan
+                                        Cuti</a>
+                                @endif
                             </div>
 
                             <br>
@@ -167,7 +226,7 @@
 
                                         @if ($checking_employee_resign_status->first()->resign_status == 'sudah konfirmasi')
                                             <a class="btn btn-primary"
-                                                href="{{ route('get_resignation_letter', $checking_employee_resign_status->first()->id) }}"><i
+                                                href="{{ route('get_resignation_letter', $checking_employee_resign_status->first()->resign_code) }}"><i
                                                     class="fa fa-file"></i>&nbsp;<span>Unduh</span></a>
                                         @else
                                         @endif
@@ -185,6 +244,18 @@
                                             <strong>{{ \Carbon\Carbon::parse($checking_employee_resign_status->first()->created_at)->translatedFormat('d F Y | h:m ') }}</strong>
                                         </span>
 
+                                        <span style="color: black;font-size:13px;">Resign Attachment :
+                                            @if ($checking_employee_resign_status->first()->resign_attachment)
+                                                <br><strong>Sudah Upload </strong>
+                                            @else
+                                                <br><strong><span class="text-danger">belum upload</span></strong>
+                                            @endif
+                                        </span>
+
+                                        <span style="color: black;font-size:13px;">Status Resign :
+                                            <br><strong>{{ $checking_employee_resign_status->first()->resign_status }}</strong>
+                                        </span>
+
 
                                         <span style="color: black;font-size:13px;">HR Confirmed :
                                             <br><strong>{{ $checking_employee_resign_status->first()->approval_by_hr_head }}
@@ -195,17 +266,6 @@
                                             <br><strong>{{ $checking_employee_resign_status->first()->approval_by_branch_head }}</strong>
                                         </span>
 
-                                        <span style="color: black;font-size:13px;">Status Resign :
-                                            <br><strong>{{ $checking_employee_resign_status->first()->resign_status }}</strong>
-                                        </span>
-
-                                        <span style="color: black;font-size:13px;">Resign Attachment :
-                                            @if ($checking_employee_resign_status->first()->resign_attachment)
-                                                <br><strong>Sudah Upload </strong>
-                                            @else
-                                                <br><strong><span class="text-danger">belum upload</span></strong>
-                                            @endif
-                                        </span>
 
                                         <span style="color: black;font-size:13px;">Tanggal Konfirmasi :
                                             <br><strong>{{ \Carbon\Carbon::parse($checking_employee_resign_status->first()->updated_at)->translatedFormat('d F Y | h:m ') }}</strong>
@@ -320,13 +380,19 @@
                                                 autocomplete="off" readonly>
                                         </div>
 
-                                        <span class="text-secondary">*Jika anda ingin merubah seluruh data, maka
-                                            lakukan perubahan di <a style="text-decoration: underline;"
-                                                href="{{ route('edit_employee', $emp->id) }}"> Data Master
-                                                Karyawan</a></span>
-                                        <br>
-                                        <br>
-                                        <button type="submit" class="btn btn-primary">Ubah</button>
+                                        @if ($emp->is_active == 'Ya')
+                                            <span class="text-secondary">*Jika anda ingin merubah seluruh data, maka
+                                                lakukan perubahan di <a style="text-decoration: underline;"
+                                                    href="{{ route('edit_employee', $emp->id) }}"> Data Master
+                                                    Karyawan</a></span>
+                                            <br>
+                                            <br>
+                                            <button type="submit" class="btn btn-primary">Ubah</button>
+                                        @else
+                                            <span class="text-secondary">*Saat ini anda tidak bisa merubah informasi
+                                                data diri anda karena akun anda sudah tidak aktif</span>
+                                        @endif
+
                                     </form>
                                 @endforeach
                             </div>
@@ -365,17 +431,21 @@
                                                 name="password_confirmation" type="password" autocomplete="off">
                                         </div>
 
+                                        @if ($emp->is_active == 'Ya')
+                                            <div class="flex items-center gap-4">
+                                                <button class="btn btn-primary">Ubah Password</button>
 
-                                        <div class="flex items-center gap-4">
-                                            <button class="btn btn-primary">Ubah Password</button>
-
-                                            @if (session('status') === 'password-updated')
-                                                <div class="alert alert-success" role="alert">
-                                                    <p x-data="{ show: true }" x-show="show" x-transition
-                                                        x-init="setTimeout(() => show = false, 2000)">
-                                                        {{ __('Password anda berhasil diperbarui.') }}</p>
-                                            @endif
-                                        </div>
+                                                @if (session('status') === 'password-updated')
+                                                    <div class="alert alert-success" role="alert">
+                                                        <p x-data="{ show: true }" x-show="show" x-transition
+                                                            x-init="setTimeout(() => show = false, 2000)">
+                                                            {{ __('Password anda berhasil diperbarui.') }}</p>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <span class="text-secondary">*Saat ini anda tidak bisa merubah password
+                                                anda karena akun anda sudah tidak aktif</span>
+                                        @endif
                                     </form>
                                 </div>
                             </div>
@@ -439,6 +509,24 @@
         </div>
     </div>
 </body>
+
+<style>
+    .card-shadow-profile {
+        width: 320px;
+        box-shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15) !important;
+        height: max-content;
+    }
+
+
+    @media only screen and (max-width: 475px) {
+
+        .card-shadow-profile {
+            width: 100%;
+            box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+        }
+
+    }
+</style>
 
 
 

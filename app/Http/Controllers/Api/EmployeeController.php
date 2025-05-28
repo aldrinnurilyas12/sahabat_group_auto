@@ -645,7 +645,9 @@ class EmployeeController extends Controller
         $user = app('App\Http\Controllers\Api\LoginAdminController')->getUsers();
 
         $checking_employee_resign_status = DB::table('v_employee_resign')->where('employee_id', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id)->get();
-        return view('layouts.admin_views.employee_profile.edit.edit_profile', compact('employee', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu', 'user', 'start_date', 'birth_date', 'user_picture', 'signature_employee', 'checking_employee_resign_status'));
+        $checking_absences_status = DB::table('v_employee_leaves')->where('employee_id', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id)->get();
+
+        return view('layouts.admin_views.employee_profile.edit.edit_profile', compact('employee', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu', 'user', 'start_date', 'birth_date', 'user_picture', 'signature_employee', 'checking_employee_resign_status', 'checking_absences_status'));
     }
 
 

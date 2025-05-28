@@ -56,7 +56,7 @@
 
                             </div>
 
-                            <hr>
+
 
                             <div class="form-group">
                                 <label for="">Alasan Resign<span style="color: red">*</span></label>

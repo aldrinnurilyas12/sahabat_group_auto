@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Data Karyawan Resign - SAHABAT GROUP AUTO ADMINISTRATOR</title>
+    <title>Data Cuti Karyawan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
 
     <!-- Custom fonts for this template-->
     <link href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
@@ -42,11 +42,12 @@
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h5 style="color: black;"><strong>Data Karyawan Resign PT Sahabat Group Auto</strong></h5>
+                            <h5 style="color: black;"><strong>Data Cuti Karyawan PT Sahabat Group Auto</strong></h5>
                             <br>
                             <div style="display: flex; gap:10px; font-family:inter,sans-serif;" class="btn-content">
 
-                                @if ($employee_resign->isNotEmpty())
+
+                                @if ($employee_leaves->isNotEmpty())
                                     <form action="{{ route('export_employee') }}" method="POST">
                                         @csrf
                                         <input type="text" name="office" value="{{ $offices }}" hidden>
@@ -66,7 +67,7 @@
 
                             </div>
                             <br>
-                            {{-- <div style="color: black;" class="form-group">
+                            <div style="color: black;" class="form-group">
                                 <form action="{{ route('filter_employee') }}" method="GET">
 
                                     <div style="display: flex;gap:10px;" class="grouped-container">
@@ -111,7 +112,7 @@
 
                                 </form>
                                 <div style="font-size:14px;" class="result-selected">
-                                    @if ($employee_resign->isNotEmpty())
+                                    @if ($employee_leaves->isNotEmpty())
                                         <strong>
                                             Data terpilih:
                                         </strong>
@@ -122,7 +123,7 @@
                                             Department :{{ $offices }}
                                             <!-- Menampilkan tahun yang dipilih dari array $year -->
                                         </div>
-                                    @elseif($employee_resign->isEmpty())
+                                    @elseif($employee_leaves->isEmpty())
                                         <div class="alert alert-warning">
                                             Tidak ada data dipilih
                                         </div>
@@ -132,8 +133,9 @@
 
 
 
-                            </div> --}}
+                            </div>
                         </div>
+
 
 
 
@@ -153,23 +155,22 @@
                                             <th>Attachment</th>
                                             <th>NIK</th>
                                             <th>Nama</th>
-                                            <th>Cabang</th>
                                             <th>Posisi</th>
                                             <th>Department</th>
-                                            <th>Alasan Resign</th>
-                                            <th>Tanggal Resign</th>
-                                            <th>Approval by Branch</th>
-                                            <th>Approval by HR</th>
-                                            <th>Status Resign</th>
-                                            <th>Tanggal terakhir kerja</th>
-                                            <th>Barang perusahaan yang dikembalikan</th>
-                                            <th>Tanggal dibuat</th>
+                                            <th>Tanggal Mulai Cuti</th>
+                                            <th>Tanggal Akhir Cuti</th>
+                                            <th>Durasi Cuti</th>
+                                            <th>Alasan Cuti</th>
+                                            <th>Status Cuti</th>
+                                            <th>Aproved by Branch Head</th>
+                                            <th>Approved by HR</th>
+                                            <th>Created at</th>
                                         </tr>
                                     </thead>
 
                                     <tbody>
                                         <?php $no = 1; ?>
-                                        @foreach ($employee_resign as $emp)
+                                        @foreach ($employee_leaves as $emp)
                                             <tr>
                                                 <td><?php echo $no++; ?></td>
                                                 @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource' ||
@@ -202,9 +203,9 @@
                                                 @else
                                                 @endif
                                                 <td>
-                                                    @if ($emp->resign_attachment)
-                                                        <a style="color: black;" class="btn btn-warning" href="#"
-                                                            data-toggle="modal"
+                                                    @if ($emp->attachment)
+                                                        <a style="color: black;" class="btn btn-warning"
+                                                            href="#" data-toggle="modal"
                                                             data-target="#showAttachment{{ $emp->id }}"><i
                                                                 class="fa fa-eye" aria-hidden="true"></i>
                                                             lihat</a>
@@ -214,33 +215,31 @@
                                                 </td>
                                                 <td>{{ $emp->nik }}</td>
                                                 <td>{{ Str::upper($emp->name) }}</td>
-                                                <td>{{ $emp->location_name }}</td>
                                                 <td>{{ $emp->position_name }}</td>
                                                 <td>{{ $emp->department_name }}</td>
-                                                <td>{{ $emp->resign_reasons }}</td>
-                                                <td>{{ \Carbon\Carbon::parse($emp->resign_date)->translatedFormat('d F Y') }}
+                                                <td>{{ old('start_date', $emp->start_date ? \Carbon\Carbon::parse($emp->start_date)->format('d-m-Y') : '') }}
                                                 </td>
+                                                <td>{{ old('end_date', $emp->end_date ? \Carbon\Carbon::parse($emp->end_date)->format('d-m-Y') : '') }}
+                                                </td>
+                                                <td>{{ $emp->duration_of_leaves . ' Hari' }}</td>
+                                                <td>{{ $emp->reason }}</td>
+                                                @if ($emp->status == 'sudah konfirmasi')
+                                                    <td class="text-success"> {{ $emp->status }}</td>
+                                                @else
+                                                    <td class="text-danger"> {{ $emp->status }}</td>
+                                                @endif
+
                                                 @if ($emp->approval_by_branch_head == 'confirmed')
-                                                    <td class="text-success">
-                                                        {{ $emp->approval_by_branch_head }}</td>
+                                                    <td class="text-success"> {{ $emp->approval_by_branch_head }}</td>
                                                 @else
-                                                    <td class="text-secondary">
-                                                        {{ $emp->approval_by_branch_head }}</td>
+                                                    <td class="text-danger"> {{ $emp->approval_by_branch_head }}</td>
                                                 @endif
+
                                                 @if ($emp->approval_by_hr_head == 'confirmed')
-                                                    <td class="text-success">
-                                                        {{ $emp->approval_by_hr_head }}</td>
+                                                    <td class="text-success"> {{ $emp->approval_by_hr_head }}</td>
                                                 @else
-                                                    <td class="text-secondary">
-                                                        {{ $emp->approval_by_hr_head }}</td>
+                                                    <td class="text-danger"> {{ $emp->approval_by_hr_head }}</td>
                                                 @endif
-                                                @if ($emp->resign_status == 'sudah konfirmasi')
-                                                    <td class="text-success">{{ $emp->resign_status }}</td>
-                                                @else
-                                                    <td class="text-danger">{{ $emp->resign_status }}</td>
-                                                @endif
-                                                <td>{{ $emp->last_day_of_work }}</td>
-                                                <td>{{ $emp->return_company_property }}</td>
                                                 <td>{{ $emp->created_at }}</td>
                                             </tr>
                                         @endforeach
@@ -249,50 +248,41 @@
                                 </table>
                             </div>
                         </div>
-                    </div>
 
+                    </div>
                 </div>
 
                 {{-- modal change status --}}
-                @foreach ($employee_resign as $emp)
+
+                @foreach ($employee_leaves as $emp)
                     <div class="modal fade" id="confirmResign{{ $emp->id }}" tabindex="-1" role="dialog"
                         aria-labelledby="exampleModalLabel{{ $emp->id }}" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="exampleModalLabel{{ $emp->id }}">Konfirmasi
-                                        persetujuan Resign Karyawan {{ $emp->nik . ' - ' . $emp->name }}</h5>
+                                        persetujuan Cuti Karyawan {{ $emp->nik . ' - ' . $emp->name }}</h5>
                                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">×</span>
                                     </button>
                                 </div>
 
-                                <form method="POST" action="{{ route('confirm_employee_resign', $emp->id) }}">
+                                <form method="POST" action="{{ route('confirm_employee_leaves', $emp->id) }}">
                                     @csrf
                                     @method('PUT')
                                     <div style="color: black;" class="modal-body">
-                                        <strong> Apakah Anda ingin konfirmasi Resign Karyawan:
+                                        <strong> Apakah Anda ingin konfirmasi persetujuan Cuti Karyawan:
                                             <br>
                                             {{ $emp->nik . ' - ' . $emp->name }} ?
                                         </strong>
                                     </div>
 
                                     <div style="padding-top: 0px; padding-bottom: 0px;" class="modal-body">
-                                        <input type="checkbox"> <span style="color: black";>Setujui persetujuan resign
+                                        <input type="checkbox"> <span style="color: black";>Setujui persetujuan Cuti
+                                            Karyawan
                                             & tanda tangan</span>
                                     </div>
                                     <br>
-                                    @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource')
-                                        <div class="modal-body">
-                                            <label style="color: black;" for=""><strong>Berikan
-                                                    feedback/ucapan kepada karyawan
-                                                    (opsional)
-                                                </strong>
-                                            </label>
-                                            <textarea class="form-control" name="feedback" id="" cols="30" rows="4"></textarea>
-                                        </div>
-                                    @else
-                                    @endif
 
                                     <div class="modal-footer">
                                         <button class="btn btn-secondary" type="button"
@@ -304,19 +294,18 @@
                         </div>
                     </div>
                 @endforeach
+
                 {{-- end modal --}}
 
-
                 {{-- Modal show attachment --}}
-
-                @foreach ($employee_resign as $emp)
+                @foreach ($employee_leaves as $emp)
                     <div class="modal fade" id="showAttachment{{ $emp->id }}" tabindex="-1" role="dialog"
                         aria-labelledby="exampleModalLabel{{ $emp->id }}" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 style="color: black;" class="modal-title"
-                                        id="exampleModalLabel{{ $emp->id }}">Surat Resign
+                                        id="exampleModalLabel{{ $emp->id }}">Surat Cuti
                                         Karyawan {{ $emp->nik . ' - ' . $emp->name }}</h5>
                                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">×</span>
@@ -325,19 +314,18 @@
 
                                 <div class="img-attachment">
                                     <iframe style="height: 600px;width:100%;"
-                                        src="{{ 'storage/' . $emp->resign_attachment }}" alt=""> </iframe>
+                                        src="{{ 'storage/' . $emp->attachment }}" alt=""> </iframe>
                                 </div>
 
                             </div>
                         </div>
                     </div>
                 @endforeach
-
                 {{-- END --}}
 
             </div>
 
-
+            @include('layouts.admin_views.footer')
 
         </div>
         <!-- End of Content Wrapper -->

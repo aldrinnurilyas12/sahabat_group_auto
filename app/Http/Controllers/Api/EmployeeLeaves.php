@@ -3,24 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\EmployeeModel;
-use App\Models\EmployeeResignModel;
-use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Api\MasterMainMenuController;
+use App\Models\LeavesAbsences;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
-use Illuminate\Support\Carbon;
+use PhpParser\Node\Stmt\Return_;
+use Ramsey\Uuid\Uuid;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
-use Ramsey\Uuid\Uuid;
 
-
-class EmployeeResign extends Controller
+class EmployeeLeaves extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-
     protected $MasterMainController;
 
     public function __construct(MasterMainMenuController $MasterMainMenuController)
@@ -29,33 +23,53 @@ class EmployeeResign extends Controller
     }
 
 
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+
+        $branch_login_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations';
+        $hr_login_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations';
+        $branch_id_login_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id;
+
+
+        if ($branch_login_session) {
+            $employee_leaves = DB::table('v_employee_leaves')->where('branch_id', $branch_id_login_session)->get();
+        } elseif ($hr_login_session) {
+            $employee_leaves = DB::table('v_employee_leaves')->get();
+        } else {
+            $employee_leaves = DB::table('v_employee_leaves')->get();
+        }
 
         $office = DB::table('branch')->get();
         $department = DB::table('department')->get();
         $offices = $request->office;
         $departments = $request->department;
+        return view('layouts.admin_views.employee_absences_leaves.employee_leaves_data', compact('employee_leaves', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'department', 'departments'));
+    }
 
-        $branch_head_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name === 'Head of Branch Operations';
-        $hr_head_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name === 'Head of Human Resource';
-        $branch_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id;
+    public function employee_absences_leaves(Request $request): View
+    {
 
-        if ($hr_head_login) {
-            $employee_resign = DB::table('v_employee_resign')->get();
-        } elseif ($branch_head_login) {
-            $employee_resign = DB::table('v_employee_resign')->where('branch_emp_id', $branch_id)->get();
-        } else {
-            $employee_resign = DB::table('v_employee_resign')->get();
+        if (auth()->user()->nik  !== auth()->user()->nik) {
+            abort(403, 'Ooops unauthorized nik');
         }
 
+        $employees = DB::table('v_employee')->where('nik', auth()->user()->nik)->get();
+        if ($employees->isEmpty()) {
+            abort(403, 'Ooops unauthorized nik');
+        }
 
-        return view('layouts.admin_views.employee_resign.employee_resign_main', compact('employee_resign', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'department', 'departments'));
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+        $main_menu = DB::table('v_main_menu')->get();
+
+        $employee = DB::table('v_employee')->where('nik', auth()->user()->nik)->get();
+        return view('layouts.admin_views.employee_absences_leaves.create.add_employee_absences', compact('employee', 'grouped_sub_menu', 'sidebar_menu'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -68,16 +82,14 @@ class EmployeeResign extends Controller
     /**
      * Store a newly created resource in storage.
      */
-
     public function store(Request $request)
     {
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
 
         $request->validate([
-            'resign_attachment' => 'required|mimes:pdf|max:10000',
-            'resign_reasons' => 'required',
-            'resign_date'   => 'required'
+            'attachment' => 'required|mimes:pdf|max:10000',
+            'reason' => 'required'
         ]);
 
         $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id;
@@ -86,36 +98,34 @@ class EmployeeResign extends Controller
 
         if ($SETTING_TIME->open_schedule_time == 'on') {
             if ($insertTime >= 7 && $insertTime <= 18) {
-                if ($request->hasFile('resign_attachment')) {
-                    $attachment = $request->file('resign_attachment');
-                    $resignAttachmentPath = $attachment->storeAs('resign_attachment', uniqid() . '.' . $attachment->getClientOriginalExtension(), 'public');
+                if ($request->hasFile('attachment')) {
+                    $attachment = $request->file('attachment');
+                    $leavesAttachmentPath = $attachment->storeAs('leaves_attachment', uniqid() . '.' . $attachment->getClientOriginalExtension(), 'public');
 
-                    EmployeeResignModel::create([
+                    LeavesAbsences::create([
                         'employee_id' => $employee_id,
-                        'resign_code' => Uuid::uuid4()->toString(),
-                        'resign_reasons' => $request->resign_reasons,
-                        'is_active' => $request->is_active,
-                        'resign_date' => $request->resign_date,
-                        'last_day_of_work' => $request->last_day_of_work,
-                        'return_company_property' => $request->return_company_property,
+                        'absences_code' => Uuid::uuid4()->toString(),
+                        'type_of_leave' => $request->type_of_leave,
+                        'start_date' => $request->start_date,
+                        'end_date' => $request->end_date,
+                        'reason' => $request->reason,
+                        'status' => 'belum konfirmasi',
+                        'attachment' => $leavesAttachmentPath,
                         'approval_by_branch_head' => 'pending',
                         'approval_by_hr_head' => 'pending',
-                        'resign_status' => 'belum konfirmasi',
-                        'resign_attachment' => $resignAttachmentPath,
                         'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                     ]);
                 } else {
-                    EmployeeResignModel::create([
+                    LeavesAbsences::create([
                         'employee_id' => $employee_id,
-                        'resign_code' => Uuid::uuid4()->toString(),
-                        'resign_reasons' => $request->resign_reasons,
-                        'is_active' => $request->is_active,
-                        'resign_date' => $request->resign_date,
-                        'last_day_of_work' => $request->last_day_of_work,
-                        'return_company_property' => $request->return_company_property,
+                        'absences_code' => Uuid::uuid4()->toString(),
+                        'type_of_leave' => $request->type_of_leave,
+                        'start_date' => $request->start_date,
+                        'end_date' => $request->end_date,
+                        'reason' => $request->reason,
+                        'status' => 'belum konfirmasi',
                         'approval_by_branch_head' => 'pending',
                         'approval_by_hr_head' => 'pending',
-                        'resign_status' => 'belum konfirmasi',
                         'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                     ]);
                 }
@@ -127,36 +137,34 @@ class EmployeeResign extends Controller
                 return redirect()->route('profile');
             }
         } else {
-            if ($request->hasFile('resign_attachment')) {
-                $attachment = $request->file('resign_attachment');
-                $resignAttachmentPath = $attachment->storeAs('resign_attachment', uniqid() . '.' . $attachment->getClientOriginalExtension(), 'public');
+            if ($request->hasFile('attachment')) {
+                $attachment = $request->file('attachment');
+                $leavesAttachmentPath = $attachment->storeAs('leaves_attachment', uniqid() . '.' . $attachment->getClientOriginalExtension(), 'public');
 
-                EmployeeResignModel::create([
+                LeavesAbsences::create([
                     'employee_id' => $employee_id,
-                    'resign_code' => Uuid::uuid4()->toString(),
-                    'resign_reasons' => $request->resign_reasons,
-                    'is_active' => $request->is_active,
-                    'resign_date' => $request->resign_date,
-                    'last_day_of_work' => $request->last_day_of_work,
-                    'return_company_property' => $request->return_company_property,
+                    'absences_code' => Uuid::uuid4()->toString(),
+                    'type_of_leave' => $request->type_of_leave,
+                    'start_date' => $request->start_date,
+                    'end_date' => $request->end_date,
+                    'reason' => $request->reason,
+                    'status' => 'belum konfirmasi',
+                    'attachment' => $leavesAttachmentPath,
                     'approval_by_branch_head' => 'pending',
                     'approval_by_hr_head' => 'pending',
-                    'resign_status' => 'belum konfirmasi',
-                    'resign_attachment' => $resignAttachmentPath,
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
             } else {
-                EmployeeResignModel::create([
+                LeavesAbsences::create([
                     'employee_id' => $employee_id,
-                    'resign_code' => Uuid::uuid4()->toString(),
-                    'resign_reasons' => $request->resign_reasons,
-                    'is_active' => $request->is_active,
-                    'resign_date' => $request->resign_date,
-                    'last_day_of_work' => $request->last_day_of_work,
-                    'return_company_property' => $request->return_company_property,
+                    'absences_code' => Uuid::uuid4()->toString(),
+                    'type_of_leave' => $request->type_of_leave,
+                    'start_date' => $request->start_date,
+                    'end_date' => $request->end_date,
+                    'reason' => $request->reason,
+                    'status' => 'belum konfirmasi',
                     'approval_by_branch_head' => 'pending',
                     'approval_by_hr_head' => 'pending',
-                    'resign_status' => 'belum konfirmasi',
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
             }
@@ -166,29 +174,8 @@ class EmployeeResign extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
 
-    public function insertLogActivityUsers($log_activity)
-    {
-        DB::table('log_activity_users')->insert([
-            'user_id' => app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->id,
-            'ip_address' => \Request::ip(),
-            'log_activity' => $log_activity,
-            'created_at' => now(),
-            'created_by'   => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function confirm_employee_resign(string $id, Request $request)
+    public function confirm_employee_leaves(Request $request)
     {
 
         $hr_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource';
@@ -198,18 +185,16 @@ class EmployeeResign extends Controller
 
 
         if ($hr_login) {
-            DB::table('employee_resign')->where('id', $request->id)->update([
-                'approval_by_hr_head' => 'confirmed',
-                'feedback' => $request->feedback
+            DB::table('leave_of_absences')->where('id', $request->id)->update([
+                'approval_by_hr_head' => 'confirmed'
             ]);
         } elseif ($head_branch_login) {
-            DB::table('employee_resign')->where('id', $request->id)->update([
-                'approval_by_branch_head' => 'confirmed',
-                'branch_head_id' => $head_branch_id
+            DB::table('leave_of_absences')->where('id', $request->id)->update([
+                'approval_by_branch_head' => 'confirmed'
             ]);
         }
 
-        $checking_data_confirmed = DB::table('employee_resign')->where('id', $request->id)->first();
+        $checking_data_confirmed = DB::table('leave_of_absences')->where('id', $request->id)->first();
         $emp_id = $checking_data_confirmed->employee_id;
 
         if (!$checking_data_confirmed) {
@@ -230,18 +215,10 @@ class EmployeeResign extends Controller
             session()->flash('message_success', 'Data berhasil disimpan!');
             return redirect()->back();
         } elseif ($branch_head_approval === 'confirmed' && $hrd_approval === 'confirmed') {
-            EmployeeResignModel::where('id', $request->id)->update([
-                'resign_status' => 'sudah konfirmasi',
+            LeavesAbsences::where('id', $request->id)->update([
+                'status' => 'sudah konfirmasi',
                 'updated_at' => now()
             ]);
-
-            EmployeeModel::where('id', $emp_id)->update([
-                'is_active' => 'N'
-            ]);
-
-            // User::where('employee_id', $request->id)->update([
-            //     'is_active' => 'N'
-            // ]);
             session()->flash('message_success', 'Data Berhasil disimpan!');
             return redirect()->back();
         }
@@ -251,37 +228,14 @@ class EmployeeResign extends Controller
         return redirect()->back();
     }
 
-    public function employee_resign_layout(Request $request): View
+
+
+    public function download_absences_letter($id, Request $request)
     {
 
+        $employee_leaves = DB::table('v_employee_leaves')->where('absences_code', $request->absences_code)->get()->toArray();
 
-        if (auth()->user()->nik  !== auth()->user()->nik) {
-            abort(403, 'Ooops unauthorized nik');
-        }
-
-        $employees = DB::table('v_employee')->where('nik', auth()->user()->nik)->get();
-        if ($employees->isEmpty()) {
-            abort(403, 'Ooops unauthorized nik');
-        }
-
-
-        $master_menus = $this->MasterMainMenuController->master_display_menus();
-        $sidebar_menu = $master_menus['sidebar_menu'];
-        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
-
-        $start_date = Carbon::parse($employees->first()->start_date);
-
-        $employee = DB::table('v_employee')->where('nik', auth()->user()->nik)->get();
-        $main_menu = DB::table('v_main_menu')->get();
-        return view('layouts.admin_views.employee_resign.edit.employee_resign', compact('employee', 'start_date', 'grouped_sub_menu', 'sidebar_menu'));
-    }
-
-    public function download_resignation_letter($id, Request $request)
-    {
-
-        $employee_resign = DB::table('v_employee_resign')->where('resign_code', $request->resign_code)->get()->toArray();
-
-        $e_id = $employee_resign[0] ?? null;
+        $e_id = $employee_leaves[0] ?? null;
 
         $emp_id = $e_id->employee_id;
 
@@ -309,21 +263,50 @@ class EmployeeResign extends Controller
             ->where('e.id', '=', $emp_id)->get();
 
 
-        $resignation_letter = Pdf::loadView('layouts.pdf.resign_letter', [
-            'employee_resign' => $employee_resign,
+        $absences_letter = Pdf::loadView('layouts.pdf.absences_letter', [
+            'employee_leaves' => $employee_leaves,
             'head_branch_signature' => $head_branch_signature,
             'head_hr_signature' => $head_hr_signature,
             'employee_signature' => $employee_signature
         ]);
 
-        $first = $employee_resign[0] ?? null;
+        $first = $employee_leaves[0] ?? null;
 
         $nik = $first->nik ?? '';
         $name = Str::slug($first->name ?? '');
 
-        $filename = 'surat_resign_karyawan_' . $nik . '-' . $name . '.pdf';
+        $filename = 'surat_cuti_karyawan_' . $nik . '-' . $name . '.pdf';
 
-        return $resignation_letter->download($filename);
+        return $absences_letter->download($filename);
+    }
+
+    public function insertLogActivityUsers($log_activity)
+    {
+        DB::table('log_activity_users')->insert([
+            'user_id' => app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->id,
+            'ip_address' => \Request::ip(),
+            'log_activity' => $log_activity,
+            'created_at' => now(),
+            'created_by'   => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+        ]);
+    }
+
+
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
     }
 
     /**

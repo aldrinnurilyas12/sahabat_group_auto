@@ -88,6 +88,7 @@ class LoginAdminController extends Controller
                 'branch.location_name',
                 'employee.job_position',
                 'employee.email',
+                'employee.is_active',
                 'up.users_foto',
                 'jp.position_name',
                 'd.department_name'
