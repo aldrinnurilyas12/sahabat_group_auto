@@ -13,8 +13,11 @@ use App\Models\AppointmentModel;
 use App\Models\MasterVehicleAdvertisementModel;
 use App\Mail\RequestVehicleMail;
 use App\Mail\SendEmailAppointment;
+use App\Models\TestimonialModel;
+use App\Models\WebVisitor;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\Calculation\Statistical\Averages;
 
 class LandingPageController extends Controller
 {
@@ -37,7 +40,21 @@ class LandingPageController extends Controller
         $vehicle_request = DB::table('customer_vehicle_request')
             ->select('vehicle_type', 'brand_name', 'year', 'vehicle_color', 'name', 'description', 'updated_at')
             ->leftJoin('vehicle_brand as vb', 'customer_vehicle_request.brand', '=', 'vb.id')->where('unique_tokens', $token)->get();
-        return view('layouts.landing_page.main_page.home_page', compact('vehicle_ads', 'blog_data', 'brand', 'branch', 'vehicle_request'));
+        $testimonial_data = DB::table('customers_testimonial')->orderBy('created_at', 'desc')->limit(8)->get();
+        $avg_rating = TestimonialModel::avg('rating');
+        $rating_total = TestimonialModel::count('id');
+        $ip = $request->ip();
+
+        $check_available_ipaddress = WebVisitor::where('ip_address', $ip)->exists();
+
+        if (!$check_available_ipaddress) {
+            WebVisitor::create([
+                'ip_address' => $request->ip()
+            ]);
+        }
+
+
+        return view('layouts.landing_page.main_page.home_page', compact('vehicle_ads', 'blog_data', 'brand', 'branch', 'vehicle_request', 'testimonial_data', 'avg_rating', 'rating_total'));
     }
 
 

@@ -22,35 +22,16 @@
                 <p>Tanggal Payroll</p>
                 <p>{{ $payroll->created_at }}</p>
             </div>
-
             <div class="container-name">
                 <p>Kode Payroll</p>
                 <p>{{ $payroll->payroll_code }}</p>
             </div>
-
             <div class="container-name">
                 <p>Nama</p>
                 <p>{{ $payroll->name }}</p>
             </div>
-
-            <div class="container-name">
-                <p>Total gaji yang dibayarkan</p>
-                <p>Rp.{{ number_format($payroll->salary_total) }}</p>
-            </div>
-
-            <div class="container-name">
-                <p>Bank asal</p>
-                <p>{{ $payroll->bank }}</p>
-            </div>
-
-            <div class="container-name">
-                <p>Nomor Rekening Bank</p>
-                <p>{{ $payroll->bank_account }}</p>
-            </div>
-
-            <br>
-
-            <div class="container-name">
+            <hr>
+            <div style="margin-bottom: 0;" class="container-name">
                 <div class="table-payroll">
                     <label for="">Rincian Gaji</label>
                     <table>
@@ -79,8 +60,7 @@
 
                     </table>
                 </div>
-                <br>
-                <br>
+
                 <div class="table-presensi">
                     <label for="">Rincian Presensi</label>
                     <table>
@@ -110,14 +90,25 @@
                 </div>
             </div>
 
-            <br>
+
+
+            <div class="payment-received">
+                <h5 style="text-decoration:underline;text-align:center;">Bukti Pembayaran</h5>
+                <div style="display: flex; justify-content:center;" class="image-content">
+
+                    <img style="width: 100%;height:200px;"
+                        src="{{ 'storage/' . $payroll_data->first()->payroll_file }}" alt="">
+                </div>
+
+            </div>
+
+
 
             <div style="margin-bottom: 70px;" class="signature-approval">
                 <div style="float: left; margin-right: 5rem;" class="head-finance-sign">
                     <p style="font-size: 13px;"><strong>Kepala Keuangan</strong></p>
                     <img width="80" height="80"
                         src="{{ public_path('storage/' . $head_of_finance_sign->first()->signature) }}" alt="">
-                    <br>
                     <p style="font-size: 13px;">{{ $head_of_finance_sign->first()->name }}</p>
                 </div>
 
@@ -125,7 +116,6 @@
                     <p style="font-size: 13px;"><strong>Kepala Sumber Daya Manusia</strong></p>
                     <img width="80" height="80"
                         src="{{ public_path('storage/' . $head_of_hr_sign->first()->signature) }}" alt="">
-                    <br>
                     <p style="font-size: 13px;">{{ $head_of_hr_sign->first()->name }}</p>
                 </div>
 
@@ -134,7 +124,6 @@
                     <p style="font-size: 13px;"><strong>Kepala Cabang</strong></p>
                     <img width="80" height="80"
                         src="{{ public_path('storage/' . $head_of_branch_sign->first()->signature) }}" alt="">
-                    <br>
                     <p style="font-size: 13px;">{{ $head_of_branch_sign->first()->name }}</p>
                 </div>
             </div>
@@ -146,7 +135,7 @@
     <br>
     <br>
     <br>
-    <br>
+
     <footer>
         <div class="body-footer">
             <h5>PT Sahabat Group Auto</h5>

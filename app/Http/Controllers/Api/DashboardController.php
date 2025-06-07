@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\MasterMainMenuController;
+use App\Models\WebVisitor;
+use App\Models\TestimonialModel;
 
 class DashboardController extends Controller
 {
@@ -31,7 +33,7 @@ class DashboardController extends Controller
         $vehicle_ads = DB::table('vehicle_advertisement')->where('is_active', 'Y')->count();
         $users_online = DB::table('users')->whereNotNull('last_seen')->count();
 
-
+        $visitorweb_landingpage = WebVisitor::count();
 
         $it_department = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Information Technology';
         $finance_department = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Finance';
@@ -86,7 +88,7 @@ class DashboardController extends Controller
                     ->whereDate('agenda_date', '=', now()->toDateString())
                     ->get();
             } else {
-                echo "Not Have Data";
+                $agenda = DB::table('agenda')->get();
             }
         } elseif ($permata_abadi_motor) {
             if ($it_department) {
@@ -130,7 +132,7 @@ class DashboardController extends Controller
                     ->whereDate('agenda_date', '=', now()->toDateString())
                     ->get();
             } else {
-                echo "Not Have Data";
+                $agenda = DB::table('agenda')->get();
             }
         } elseif ($kurnia_abadi_motor) {
             if ($it_department) {
@@ -174,7 +176,7 @@ class DashboardController extends Controller
                     ->whereDate('agenda_date', '=', now()->toDateString())
                     ->get();
             } else {
-                echo "Not Have Data";
+                $agenda = DB::table('agenda')->get();
             }
         } elseif ($mega_abadi_motor) {
             if ($it_department) {
@@ -218,13 +220,15 @@ class DashboardController extends Controller
                     ->whereDate('agenda_date', '=', now()->toDateString())
                     ->get();
             } else {
-                echo "Not Have Data";
+                $agenda = DB::table('agenda')->get();
             }
         }
 
 
+        $testimonial_total = TestimonialModel::count();
+
         // Kirim data ke view
-        return view('layouts.admin_views.dashboard', compact('grouped_sub_menu', 'sidebar_menu', 'employee_total', 'vehicle_total', 'vehicle_ads', 'users_online', 'agenda'));
+        return view('layouts.admin_views.dashboard', compact('grouped_sub_menu', 'sidebar_menu', 'employee_total', 'vehicle_total', 'vehicle_ads', 'users_online', 'agenda', 'visitorweb_landingpage', 'testimonial_total'));
     }
 
     /**

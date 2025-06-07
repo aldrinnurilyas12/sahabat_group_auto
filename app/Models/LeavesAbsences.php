@@ -21,6 +21,8 @@ class LeavesAbsences extends Model
         'attachment',
         'approval_by_branch_head',
         'approval_by_hr_head',
+        'branch_head_reason_of_reject',
+        'hr_reason_of_reject',
         'created_by'
     ];
 }

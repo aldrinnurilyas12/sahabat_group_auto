@@ -150,67 +150,118 @@
                                         Karyawan</strong></label>
                                 <br>
 
-                                @if ($checking_absences_status->isNotEmpty())
-                                    <div style="display: flex; gap:5px;" class="pdf-resign-download">
-                                        <a class="btn btn-secondary" href="">Sudah Pengajuan Cuti</a>
 
-                                        @if ($checking_absences_status->first()->status == 'sudah konfirmasi')
+                                @php
+                                    use Carbon\Carbon;
+                                    $absence = $checking_absences_status;
+                                    $endDate = $absence ? Carbon::parse($absence->end_date) : null;
+                                @endphp
+
+                                @if ($checking_absences_status)
+
+
+                                    @if ($endDate && $endDate->lt(Carbon::today()))
+                                        <div style="display: flex; gap:7px;" class="dflex-cuti">
+
                                             <a class="btn btn-primary"
-                                                href="{{ route('get_absences_letter', $checking_absences_status->first()->absences_code) }}"><i
-                                                    class="fa fa-file"></i>&nbsp;<span>Unduh</span></a>
-                                        @else
-                                        @endif
-                                    </div>
-                                    <br>
+                                                href="{{ route('employee_absences_leaves') }}">Ajukan
+                                                Cuti</a>
 
-                                    <div style="display: flex;flex-wrap:wrap; gap:20px;" class="resign-date">
-                                        <span style="color: black;font-size:13px;">Tanggal Mulai Cuti :
-                                            <br>
-                                            <strong>
-                                                {{ \Carbon\Carbon::parse($checking_absences_status->first()->start_date)->translatedFormat('d F Y') }}</strong></span>
+                                            <a style="color: black;" class="btn btn-warning"
+                                                href="{{ asset('assets/word_files/SuratCutiKaryawanSahabatGroupAuto.docx') }}"
+                                                download><i class="fas fa-file-word"></i> Surat Cuti</a>
+                                        </div>
+                                    @else
+                                        <div style="display: flex; gap:5px;" class="pdf-resign-download">
+                                            <a class="btn btn-secondary" href="">Sudah Pengajuan Cuti</a>
 
-                                        <span style="color: black;font-size:13px;">Tanggal Akhir Cuti :
-                                            <br>
-                                            <strong>
-                                                {{ \Carbon\Carbon::parse($checking_absences_status->first()->end_date)->translatedFormat('d F Y') }}</strong></span>
-
-                                        <span style="color: black;font-size:13px;">Cuti Attachment :
-                                            @if ($checking_absences_status->first()->attachment)
-                                                <br><strong>Ada </strong>
+                                            @if ($checking_absences_status->status == 'sudah konfirmasi')
+                                                <a class="btn btn-primary"
+                                                    href="{{ route('get_absences_letter', $checking_absences_status->absences_code) }}"><i
+                                                        class="fa fa-file"></i>&nbsp;<span>Unduh</span></a>
                                             @else
-                                                <br><strong><span class="text-danger">-</span></strong>
                                             @endif
-                                        </span>
+                                        </div>
+                                        <br>
 
-                                        <span style="color: black;font-size:13px;">Status Cuti :
-                                            <br><strong>{{ $checking_absences_status->first()->status }}</strong>
-                                        </span>
+                                        <div style="display: flex;flex-wrap:wrap; gap:20px;" class="resign-date">
+                                            <span style="color: black;font-size:13px;">Tanggal Mulai Cuti :
+                                                <br>
+                                                <strong>
+                                                    {{ \Carbon\Carbon::parse($checking_absences_status->start_date)->translatedFormat('d F Y') }}</strong></span>
 
-                                        <span style="color: black;font-size:13px;">HR Confirmed :
-                                            <br><strong>{{ $checking_absences_status->first()->approval_by_hr_head }}
-                                            </strong>
-                                        </span>
+                                            <span style="color: black;font-size:13px;">Tanggal Akhir Cuti :
+                                                <br>
+                                                <strong>
+                                                    {{ \Carbon\Carbon::parse($checking_absences_status->end_date)->translatedFormat('d F Y') }}</strong></span>
 
-                                        <span style="color: black;font-size:13px;">Branch Confirmed :
-                                            <br><strong>{{ $checking_absences_status->first()->approval_by_branch_head }}</strong>
-                                        </span>
+                                            <span style="color: black;font-size:13px;">Cuti Attachment :
+                                                @if ($checking_absences_status->attachment)
+                                                    <br><strong>Ada </strong>
+                                                @else
+                                                    <br><strong><span class="text-danger">-</span></strong>
+                                                @endif
+                                            </span>
+
+                                            @if ($checking_absences_status->status == 'sudah konfirmasi')
+                                                <span style="color:black;font-size:13px;">Status Cuti :
+                                                    <br><strong> <span
+                                                            class="text-success">{{ $checking_absences_status->status }}</span></strong>
+                                                </span>
+                                            @else
+                                                <span style="color:black;font-size:13px;">Status Cuti :
+                                                    <br>
+                                                    <strong><span
+                                                            class="text-danger">{{ $checking_absences_status->status }}</span></strong>
+                                                </span>
+                                            @endif
+
+                                            <span style="color: black;font-size:13px;">HR Confirmed :
+                                                <br><strong>{{ $checking_absences_status->approval_by_hr_head }}
+                                                </strong>
+                                            </span>
+
+                                            <span style="color: black;font-size:13px;">Branch Confirmed :
+                                                <br><strong>{{ $checking_absences_status->approval_by_branch_head }}</strong>
+                                            </span>
 
 
-                                        <span style="color: black;font-size:13px;">Tanggal buat :
-                                            <br>
-                                            <strong>{{ \Carbon\Carbon::parse($checking_absences_status->first()->created_at)->translatedFormat('d F Y | h:m ') }}</strong>
-                                        </span>
+                                            <span style="color: black;font-size:13px;">Tanggal buat :
+                                                <br>
+                                                <strong>{{ \Carbon\Carbon::parse($checking_absences_status->created_at)->translatedFormat('d F Y | h:m ') }}</strong>
+                                            </span>
 
-                                        <span style="color: black;font-size:13px;">Tanggal Konfirmasi :
-                                            <br><strong>{{ \Carbon\Carbon::parse($checking_absences_status->first()->updated_at)->translatedFormat('d F Y | h:m ') }}</strong>
-                                        </span>
+                                            <span style="color: black;font-size:13px;">Tanggal Konfirmasi :
+                                                <br><strong>{{ \Carbon\Carbon::parse($checking_absences_status->updated_at)->translatedFormat('d F Y | h:m ') }}</strong>
+                                            </span>
 
-                                    </div>
+                                            @if ($checking_absences_status->status == 'cuti ditolak')
+                                                <span style="color: black;font-size:13px;">alasan HR Head :
+                                                    <br><strong>{{ $checking_absences_status->hr_reason_of_reject }}</strong>
+                                                </span>
+
+                                                <span style="color: black;font-size:13px;">alasan Branch Head :
+                                                    <br><strong>{{ $checking_absences_status->branch_head_reason_of_reject }}</strong>
+                                                </span>
+                                            @else
+                                            @endif
+
+
+                                        </div>
+                                    @endif
                                 @else
-                                    <a class="btn btn-primary"
-                                        href="{{ route('employee_absences_leaves') }}">Pengajuan
-                                        Cuti</a>
+                                    <div style="display: flex; gap:7px;" class="dflex-cuti">
+
+                                        <a class="btn btn-primary"
+                                            href="{{ route('employee_absences_leaves') }}">Ajukan
+                                            Cuti</a>
+
+                                        <a style="color: black;" class="btn btn-warning"
+                                            href="{{ asset('assets/word_files/SuratCutiKaryawanSahabatGroupAuto.docx') }}"
+                                            download><i class="fas fa-file-word"></i> Surat Cuti</a>
+                                    </div>
                                 @endif
+
                             </div>
 
                             <br>
@@ -273,8 +324,15 @@
 
                                     </div>
                                 @else
-                                    <a class="btn btn-primary" href="{{ route('resign_employee') }}">Pengajuan
-                                        Resign</a>
+                                    <div style="display: flex; gap:7px;" class="dflex-cuti">
+
+                                        <a class="btn btn-primary" href="{{ route('resign_employee') }}">Ajukan
+                                            Resign</a>
+
+                                        <a style="color: black;" class="btn btn-warning"
+                                            href="{{ asset('assets/word_files/SuratResignKaryawanSahabatGroupAuto.docx') }}"
+                                            download><i class="fas fa-file-word"></i> Surat Resign</a>
+                                    </div>
                                 @endif
                             </div>
 
@@ -354,6 +412,13 @@
                                         </div>
 
                                         <div class="form-group">
+                                            <label>Status Karyawan</label>
+                                            <input type="text" class="form-control" id="start_date"
+                                                value="{{ $emp->is_active == 'Ya' ? 'Aktif' : 'Tidak Aktif' }}"
+                                                autocomplete="off" readonly>
+                                        </div>
+
+                                        <div class="form-group">
                                             <label>Bank</label>
                                             <input type="text" class="form-control" value="{{ $emp->bank }}"
                                                 autocomplete="off" readonly>
@@ -372,11 +437,10 @@
                                                 autocomplete="off" readonly>
                                         </div>
 
-
                                         <div class="form-group">
                                             <label>Status Akun</label>
                                             <input type="text" class="form-control" id="start_date"
-                                                value="{{ $emp->is_active == 'Ya' ? 'Aktif' : 'Tidak Aktif' }}"
+                                                value="{{ $emp->is_active == 'Ya' ? 'Aktif' : 'Tidak Aktif (akun anda tidak dapat digunakan setelah 10 Menit Resign diSetujui)' }}"
                                                 autocomplete="off" readonly>
                                         </div>
 

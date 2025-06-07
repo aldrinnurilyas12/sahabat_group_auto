@@ -15,7 +15,7 @@
         rel="stylesheet">
 
     <!-- Custom styles for this template-->
-    <link href="{{ asset('assets/css/sb-admin-2.min.css')}}" rel="stylesheet">
+    <link href="{{ asset('assets/css/sb-admin-2.min.css') }}" rel="stylesheet">
 
 </head>
 
@@ -25,7 +25,8 @@
     <div id="wrapper">
 
         <!-- Sidebar -->
-        <ul style="background: rgb(27, 0, 180);" class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul style="background: rgb(27, 0, 180);" class="navbar-nav sidebar sidebar-dark accordion"
+            id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
@@ -40,50 +41,77 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('dashboard')}}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></a>
+                <a class="nav-link" href="{{ route('dashboard') }}">
+                    <i class="fas fa-home"></i>
+                    <span>Beranda</span></a>
             </li>
 
             <!-- Divider -->
             <hr class="sidebar-divider">
 
             <!-- Nav Item - Pages Collapse Menu -->
+
+
+            @php
+                $currentUrl = request()->path(); // atau request()->segment(1) tergantung struktur URL kamu
+            @endphp
+
             <ul class="navbar-nav">
-                @foreach($sidebar_menu as $main)
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse{{ $main->id }}" aria-expanded="true" aria-controls="collapse{{ $main->id }}">
-                        <i class="{{ $main->menu_icon }}"></i>
-                        <span>{{ $main->menu_name }}</span>
-                    </a>
-                    <div id="collapse{{ $main->id }}" class="collapse" aria-labelledby="heading{{ $main->id }}" data-parent="#accordionSidebar">
-                        <div class="py-2 collapse-inner rounded" style="padding: 10px;background:rgb(24, 0, 161);color:white;">
-                            @foreach($grouped_sub_menu[$main->id] ?? [] as $sub)
-                            <div style="display: flex;align-items:center;" class="grouped-icons">
-                                <i class="{{ $sub->submenu_icons }}"></i>
-                                <a style="color: white;hover:blue;" class="collapse-item" href="../../{{ $sub->submenu_link }}">{{ $sub->submenu_name }}</a>
+                @foreach ($sidebar_menu as $main)
+                    @php
+                        $hasActiveSubmenu = false;
+                        foreach ($grouped_sub_menu[$main->id] ?? [] as $sub) {
+                            if (Str::contains($currentUrl, $sub->submenu_link)) {
+                                $hasActiveSubmenu = true;
+                                break;
+                            }
+                        }
+                    @endphp
+
+                    <li class="nav-item">
+                        <a class="nav-link {{ $hasActiveSubmenu ? '' : 'collapsed' }}" href="#"
+                            data-toggle="collapse" data-target="#collapse{{ $main->id }}"
+                            aria-expanded="{{ $hasActiveSubmenu ? 'true' : 'false' }}"
+                            aria-controls="collapse{{ $main->id }}">
+                            <i class="{{ $main->menu_icon }}"></i>
+                            <span>{{ $main->menu_name }}</span>
+                        </a>
+
+                        <div id="collapse{{ $main->id }}" class="collapse {{ $hasActiveSubmenu ? 'show' : '' }}"
+                            aria-labelledby="heading{{ $main->id }}" data-parent="#accordionSidebar">
+                            <div class="py-2 collapse-inner rounded"
+                                style="padding: 10px;background:rgb(24, 0, 161);color:white;">
+                                @foreach ($grouped_sub_menu[$main->id] ?? [] as $sub)
+                                    <div style="display: flex;align-items:center;" class="grouped-icons">
+                                        <i class="{{ $sub->submenu_icons }}"></i>
+                                        <a style="color: white;"
+                                            class="collapse-item {{ Str::contains($currentUrl, $sub->submenu_link) ? 'active' : '' }}"
+                                            href="../../{{ $sub->submenu_link }}">{{ $sub->submenu_name }}</a>
+                                    </div>
+                                @endforeach
                             </div>
-                            @endforeach
                         </div>
-                    </div>
-                </li>
+                    </li>
                 @endforeach
             </ul>
-            
 
-           
+
+            {{-- END --}}
+
+
             <!-- Divider -->
             <hr class="sidebar-divider">
 
-            
-            <a style="color: rgb(255, 255, 255); background:rgba(17, 16, 16, 0.379);" class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+
+            <a style="color: rgb(255, 255, 255); background:rgba(17, 16, 16, 0.379);" class="dropdown-item"
+                href="#" data-toggle="modal" data-target="#logoutModal">
                 Logout
                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
             </a>
 
             <!-- Divider -->
             <hr class="sidebar-divider">
-          
+
 
             <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">
@@ -93,7 +121,7 @@
         </ul>
         <!-- End of Sidebar -->
 
-      
+
 
     </div>
     <!-- End of Page Wrapper -->
@@ -105,12 +133,19 @@
 
 
     <!-- Bootstrap core JavaScript-->
-    <script src="{{ asset('assets/vendor/jquery/jquery.min.js')}}"></script>
-    <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{ asset('assets/vendor/jquery-easing/jquery.easing.min.js')}}"></script>
-    <script src="{{asset('assets/js/sb-admin-2.js')}}"></script>
+    <script src="{{ asset('assets/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+    <script src="{{ asset('assets/js/sb-admin-2.js') }}"></script>
     {{-- <script src="{{url('bootstrap/dist/js/bootstrap.bundle.min.js')}}"></script>  --}}
-    
+
+    <style>
+        .collapse-item.active {
+            font-weight: bold;
+            background-color: #1100ff;
+            color: rgb(255, 255, 255) !important;
+        }
+    </style>
 
 </body>
 

@@ -44,32 +44,91 @@ class PayrollController extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
+        $finance_head_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Finance Operation';
+        $hr_head_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource';
+
+
         $branch_head_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations';
-        if ($branch_head_login) {
-            $payroll_data = DB::table('v_payroll')
-                ->where('emp_branch_id', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id)
+        if ($branch_head_login || $finance_head_session || $hr_head_session) {
+            $employee_data = DB::table('v_employee')
+                ->where('branch_id', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id)
                 ->orderBy('created_at', 'desc')
                 ->get();
         } else {
-
-            $payroll_data = DB::table('v_payroll')->orderBy('created_at', 'desc')->get();
+            $employee_data = DB::table('v_employee')->orderBy('created_at', 'desc')->get();
         }
 
-        return view('layouts.admin_views.payroll.payroll', compact('payroll_data', 'grouped_sub_menu', 'sidebar_menu'));
+        return view('layouts.admin_views.payroll.payroll', compact('employee_data', 'grouped_sub_menu', 'sidebar_menu', 'branch_head_login', 'finance_head_session', 'hr_head_session'));
     }
 
-    /**
-     * DATE :24/05/25
-     * LAKUKAN UPDATE TAMPILKAN TANDA TANGAN HR BY BRANCH EMPLOYEE 
-     * 
-     */
-    public function payroll_detail_layout($id): View
+    // controller lihat payroll yang sudah bayar
+    public function employee_payroll_detail(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
-        $payroll_detail = DB::table('v_payroll')->where('id', $id)->get();
-        return view('layouts.admin_views.payroll.create.payroll_create', compact('payroll_detail', 'grouped_sub_menu', 'sidebar_menu'));
+
+        $finance_head_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Finance Operation';
+        $hr_head_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource';
+
+        $branch_head_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations';
+        if ($branch_head_login || $finance_head_session || $hr_head_session) {
+            $payroll_data = DB::table('v_payroll')
+                ->where('id', $request->id)
+                ->whereNot('payroll_code', 'not null')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } else {
+            $payroll_data = DB::table('v_payroll')
+                ->where('id', $request->id)
+                ->orderBy('created_at', 'desc')->get();
+        }
+
+        return view('layouts.admin_views.payroll.payroll_detail', compact('payroll_data', 'grouped_sub_menu', 'sidebar_menu', 'branch_head_login', 'finance_head_session', 'hr_head_session'));
+    }
+
+    /**
+     * DATE :24/05/25
+     * LAKUKAN UPDATE TAMPILKAN TANDA TANGAN HR BY BRANCH EMPLOYEE [DONE!!!!]
+     * 
+     */
+
+    //  CONTROLLER PAYROLL YANG SUDAH BAYAR
+    public function payroll_detail_layout($payroll_code, Request $request): View
+    {
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+        $payroll_detail = DB::table('v_payroll')->where('payroll_code', $payroll_code)->orderBy('created_at', 'Desc')->get();
+        return view('layouts.admin_views.payroll.create.show_payroll_detail', compact('payroll_detail', 'grouped_sub_menu', 'sidebar_menu'));
+    }
+
+
+    // ROLE : FINANCE STAFF
+    // CONTROLLER MEMBUAT PAYROLL BARU
+    public function create_payroll_layout($payroll_code, Request $request): View
+    {
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+        $employee_data = DB::table('v_employee')->where('id', $request->id)->get();
+
+
+        $payroll_detail = DB::table('v_payroll')->where('payroll_id', $request->payroll_id)->get();
+
+
+
+        // new:
+        // $payroll_detail = DB::table('v_payroll')->where('id', $request->id)->orderBy('payroll_approval_date', 'desc')->latest()->first();
+
+        $finance_staff_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Finance Staff';
+
+        if (!$finance_staff_session) {
+            session()->flash('session_failed', 'Anda tidak bisa akses Modul ini');
+            return view('layouts.admin_views.payroll.payroll', compact('payroll_detail', 'employee_data', 'grouped_sub_menu', 'sidebar_menu'));
+        }
+
+        return view('layouts.admin_views.payroll.create.payroll_create', compact('payroll_detail', 'employee_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     /**
@@ -109,11 +168,11 @@ class PayrollController extends Controller
                     }
                     $this->insertLogActivityUsers(__METHOD__);
                     session()->flash('message_success', 'Payroll Berhasil Disimpan!');
-                    return redirect()->route('master_payroll.index');
+                    return redirect()->back();
                 }
             } else {
                 session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-                return redirect()->route('master_payroll.index');
+                return redirect()->back();
             }
         } else {
             if ($request->hasFile('payroll_file')) {
@@ -138,7 +197,7 @@ class PayrollController extends Controller
                 }
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Payroll Berhasil Disimpan!');
-                return redirect()->route('master_payroll.index');
+                return redirect()->back();
             }
         }
     }
@@ -158,7 +217,7 @@ class PayrollController extends Controller
             abort(403, 'Ooops unauthorized nik');
         }
 
-        $payroll_data = DB::table('v_payroll')->where('nik', auth()->user()->nik)->get();
+        $payroll_data = DB::table('v_payroll')->where('nik', auth()->user()->nik)->orderBy('payroll_approval_date', 'desc')->get();
         return view('layouts.admin_views.payroll.payroll_history', compact('employee', 'payroll_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -226,12 +285,11 @@ class PayrollController extends Controller
         //
     }
 
-    public function confirmed_payroll(Request $request, $payroll_id)
+    public function confirmed_payroll(Request $request)
     {
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
         $SETTING_TIME = DB::table('settings_schedule_time')->first();
-
         $branch_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id;
 
         if ($SETTING_TIME->open_schedule_time == 'on') {
@@ -257,38 +315,12 @@ class PayrollController extends Controller
                     ]);
                 }
 
-
-                // revised code :
-                // $checking_data_confirmed = DB::table('payroll_approval')->first();
-
-                // $finance = $checking_data_confirmed->approval_by_head_of_finance;
-                // $hr = $checking_data_confirmed->approval_by_head_of_human_resource;
-                // $branch = $checking_data_confirmed->approval_by_head_of_branch;
-
-                // $all_pending = ($finance === 'pending' && $hr === 'pending' && $branch === 'pending');
-                // $hr_confirmed_only = ($finance === 'pending' && $hr === 'confirmed' && $branch === 'pending');
-                // $finance_confirmed_only = ($finance === 'confirmed' && $hr === 'pending' && $branch === 'pending');
-                // $branch_confirmed_only = ($finance === 'pending' && $hr === 'pending' && $branch === 'confirmed');
-                // $all_confirmed = ($finance === 'confirmed' && $hr === 'confirmed' && $branch === 'confirmed');
-
-                // if ($all_pending || $hr_confirmed_only || $finance_confirmed_only || $branch_confirmed_only) {
-                //     session()->flash('message_success', 'Data Berhasil disimpan!');
-                //     return redirect()->route('master_payroll.index');
-                // } elseif ($all_confirmed) {
-                //     PayrollModel::where('id', $request->payroll_id)->update([
-                //         'status' => 'Sudah Konfirmasi New',
-                //         'updated_at' => now(),
-                //         'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-                //     ]);
-                // }
-
-
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Payroll berhasil dikonfirmasi!');
-                return redirect()->route('master_payroll.index');
+                return redirect()->back();
             } else {
                 session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-                return redirect()->route('master_payroll.index');
+                return redirect()->back();
             }
         } else {
             if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Finance Operation') {
@@ -309,32 +341,10 @@ class PayrollController extends Controller
                 ]);
             }
 
-            // $checking_data_confirmed = DB::table('payroll_approval')->first();
 
-            // $finance = $checking_data_confirmed->approval_by_head_of_finance;
-            // $hr = $checking_data_confirmed->approval_by_head_of_human_resource;
-            // $branch = $checking_data_confirmed->approval_by_head_of_branch;
-
-            // $all_pending = ($finance === 'pending' && $hr === 'pending' && $branch === 'pending');
-            // $hr_confirmed_only = ($finance === 'pending' && $hr === 'confirmed' && $branch === 'pending');
-            // $finance_confirmed_only = ($finance === 'confirmed' && $hr === 'pending' && $branch === 'pending');
-            // $branch_confirmed_only = ($finance === 'pending' && $hr === 'pending' && $branch === 'confirmed');
-
-
-            // FIX THIS BUG!!!! date :26/05/2025
-            // $all_confirmed = ($finance === 'confirmed' && $hr === 'confirmed' && $branch === 'confirmed');
-
-
-            // if ($all_confirmed) {
-            //     PayrollModel::where('id', $request->payroll_id)->update([
-            //         'status' => 'Sudah Konfirmasi New banget',
-            //         'updated_at' => now(),
-            //         'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-            //     ]);
-            // }
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Payroll berhasil dikonfirmasi!');
-            return redirect()->route('master_payroll.index');
+            return redirect()->back();
         }
     }
 

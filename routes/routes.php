@@ -38,6 +38,7 @@ use App\Http\Controllers\Api\MaintenanceUnitController;
 use App\Http\Controllers\Api\PayrollController;
 use App\Http\Controllers\Api\SettingsApp;
 use App\Http\Controllers\Api\SpkUnitController;
+use App\Http\Controllers\Api\TestimonialCustomers;
 use App\Http\Controllers\Api\VehicleSalesRequest;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserControl;
@@ -91,6 +92,9 @@ Route::middleware('guest')->group(function () {
     Route::get('/get_status', [VehicleSalesRequest::class, 'check_status'])->name('get_status');
 
     Route::get('/get_status_request', [LandingPageController::class, 'check_status_request'])->name('get_status_request');
+
+    Route::apiResource('customer_testimonial', App\Http\Controllers\Api\TestimonialCustomers::class);
+    Route::get('all_testimonial', [TestimonialCustomers::class, 'all_testimonial_show'])->name('all_testimonial');
 });
 
 
@@ -324,11 +328,15 @@ Route::middleware('auth')->group(function () {
 
     // ROUTES MASTER PAYROLL
     Route::apiResource('master_payroll', App\Http\Controllers\Api\PayrollController::class);
-    Route::get('get_payroll_detail/{id}', [PayrollController::class, 'payroll_detail_layout'])->name('get_payroll_detail');
+
     Route::get('get_attendance/{id}', [PayrollController::class, 'get_attendance'])->name('get_attendance');
     Route::put('confirmed_payroll/{payroll_id}', [PayrollController::class, 'confirmed_payroll'])->name('confirmed_payroll');
     Route::get('show_payroll', [PayrollController::class, 'payroll_history'])->name('show_payroll');
     Route::get('get_payroll/{payroll_code}', [PayrollController::class, 'download_payroll'])->name('get_payroll');
+    Route::get('create_payroll/{id}', [PayrollController::class, 'create_payroll_layout'])->name('create_payroll');
+    Route::get('get_payroll_detail/{payroll_code}', [PayrollController::class, 'payroll_detail_layout'])->name('get_payroll_detail');
+    Route::get('get_employee_detail/{id}', [PayrollController::class, 'employee_payroll_detail'])->name('get_employee_detail');
+
 
     // ROUTES BLOG
     Route::apiResource('master_blog', App\Http\Controllers\Api\Blog::class);
@@ -350,4 +358,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/inactive-info', function () {
         return 'Akun Anda tidak aktif. Hubungi HRD atau admin.';
     })->name('inactive-info');
+
+    Route::get('get_employee_resign/{id}', [EmployeeResign::class, 'get_resign'])->name('get_employee_resign');
+
+    Route::get('show_testimonial', [Analytics::class, 'show_testimonial_data'])->name('show_testimonial');
 });

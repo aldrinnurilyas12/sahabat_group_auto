@@ -73,6 +73,12 @@ class LoginRequest extends FormRequest
 
             RateLimiter::hit($this->throttleKey());
 
+            if ($user->is_active === 'N') {
+                throw ValidationException::withMessages([
+                    'nik' => 'User ' . $user->nik . ' Akun anda sudah tidak aktif'
+                ]);
+            }
+
             throw ValidationException::withMessages([
                 'nik' => 'User ' . $user->nik . ' tidak dapat digunakan'
             ]);

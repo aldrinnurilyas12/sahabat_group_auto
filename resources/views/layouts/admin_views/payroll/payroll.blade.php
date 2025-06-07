@@ -72,127 +72,35 @@
                                         <th>Kantor</th>
                                         <th>Email</th>
                                         <th>Posisi</th>
-                                        <th>Gaji Pokok</th>
-                                        <th>Tunj.Transport</th>
-                                        <th>Tunj.Kesehatan</th>
-                                        <th>Tunj.Lainnya</th>
-                                        <th>Total Gaji</th>
-                                        <th>Status Bayar</th>
-                                        <th>Status Payroll</th>
-                                        <th>Detail Presensi</th>
-                                        <th>Approve Head of Finance</th>
-                                        <th>Approve Head of Human Resource</th>
-                                        <th>Approve Head of Branch </th>
+                                        <th>Sudah Bayar</th>
+                                        <th>Belum Bayar</th>
                                         <th>Created At</th>
                                         <th>Created By</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
-                                    <?php $no = 1; ?>
-                                    @foreach ($payroll_data as $payroll)
+                                    <?php $no = 1;
+                                    $finance_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Finance Staff';
+                                    ?>
+
+
+                                    @foreach ($employee_data as $emp)
                                         <tr style="width: 200px;">
                                             <td><?php echo $no++; ?></td>
-                                            <td>
 
-                                                @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Finance Operation')
-                                                    @if ($payroll->approval_by_head_of_finance == 'confirmed')
-                                                        <a class="btn btn-secondary" style="size: 12px;"
-                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approved</a>
-                                                    @else
-                                                        <a class="btn btn-primary" style="size: 12px;"
-                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approve</a>
-                                                    @endif
-                                                @elseif(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource')
-                                                    @if ($payroll->approval_by_head_of_human_resource == 'confirmed')
-                                                        <a class="btn btn-secondary" style="size: 12px;"
-                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approved</a>
-                                                    @else
-                                                        <a class="btn btn-primary" style="size: 12px;"
-                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approve</a>
-                                                    @endif
-                                                @elseif(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations')
-                                                    @if ($payroll->approval_by_head_of_branch == 'confirmed')
-                                                        <a class="btn btn-secondary" style="size: 12px;"
-                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approved</a>
-                                                    @else
-                                                        <a class="btn btn-primary" style="size: 12px;"
-                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approve</a>
-                                                    @endif
-                                                @else
-                                                    @if ($payroll->status == 'Sudah Konfirmasi')
-                                                        <a class="btn btn-secondary" style="size: 12px;"
-                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approved</a>
-                                                    @else
-                                                        <a class="btn btn-primary" style="size: 12px;"
-                                                            href="{{ route('get_payroll_detail', $payroll->id) }}">Approve</a>
-                                                    @endif
-                                                @endif
+                                            <td><a class="btn btn-primary"
+                                                    href="{{ route('get_employee_detail', $emp->id) }}">Konfirmasi</a>
                                             </td>
-                                            <td>{{ $payroll->nik }}</td>
-                                            <td>{{ $payroll->name }}</td>
-                                            <td>{{ $payroll->location_name }}</td>
-                                            <td>{{ $payroll->email }}</td>
-                                            <td>{{ $payroll->position_name }}</td>
-                                            <td>{{ 'Rp.' . number_format($payroll->salary) }}</td>
-                                            <td>{{ 'Rp.' . number_format($payroll->tunjangan_transport) }}</td>
-                                            <td>{{ 'Rp.' . number_format($payroll->tunjangan_kesehatan) }}</td>
-                                            <td>{{ 'Rp.' . number_format($payroll->tunjangan_lainnya) }}</td>
-                                            <td>{{ 'Rp.' . number_format($payroll->salary_total) }}</td>
-                                            @if ($payroll->status)
-                                                <td style="color: green">{{ $payroll->pay_status }}
-                                                    <span style="color: gray;"> tgl bayar :
-                                                        {{ $payroll->created_at }}</span>
-                                                </td>
-                                            @else
-                                                <td style="color: rgb(128, 0, 0)">Belum bayar</td>
-                                            @endif
-                                            <td>{{ $payroll->status }}</td>
-                                            <td>
-
-                                                <table style="font-size: 14px; color:black;"
-                                                    class="table table-bordered" id="dataTable" width="100%"
-                                                    cellspacing="0">
-
-                                                    <tr>
-
-                                                        <th>Total Hadir</th>
-                                                        <th>Total Izin</th>
-                                                        <th>Total Sakit</th>
-
-                                                    </tr>
-
-                                                    <tr>
-                                                        <td>{{ $payroll->total_hadir }}</td>
-                                                        <td>{{ $payroll->total_izin }}</td>
-                                                        <td>{{ $payroll->total_sakit }}</td>
-                                                    </tr>
-
-                                                </table>
-
-                                            </td>
-                                            <td>
-                                                @if ($payroll->approval_by_head_of_finance == 'confirmed')
-                                                    <p class="text-success">Confirmed</p>
-                                                @else
-                                                    <p class="text-danger">Pending</p>
-                                                @endif
-                                            <td>
-                                                @if ($payroll->approval_by_head_of_human_resource == 'confirmed')
-                                                    <p class="text-success">Confirmed</p>
-                                                @else
-                                                    <p class="text-danger">Pending</p>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if ($payroll->approval_by_head_of_branch == 'confirmed')
-                                                    <p class="text-success">Confirmed</p>
-                                                @else
-                                                    <p class="text-danger">Pending</p>
-                                                @endif
-                                            </td>
-                                            <td>{{ $payroll->created_at }}</td>
-                                            <td>{{ $payroll->created_by }}</td>
+                                            <td>{{ $emp->nik }}</td>
+                                            <td>{{ $emp->name }}</td>
+                                            <td>{{ $emp->location_name }}</td>
+                                            <td>{{ $emp->email }}</td>
+                                            <td>{{ $emp->job_position }}</td>
+                                            <td>1</td>
+                                            <td>2</td>
+                                            <td>{{ $emp->created_at }}</td>
+                                            <td>{{ $emp->created_by }}</td>
                                         </tr>
                                     @endforeach
 
@@ -358,6 +266,18 @@
         Swal.fire({
             title: 'Gagal',
             text: "{{ Session::get('failed_insert') }}",
+            icon: "error",
+            timer: 6000,
+            confirmButtonText: 'OK'
+        });
+    </script>
+@endif
+
+@if (Session::has('session_failed'))
+    <script>
+        Swal.fire({
+            title: 'Gagal',
+            text: "{{ Session::get('session_failed') }}",
             icon: "error",
             timer: 6000,
             confirmButtonText: 'OK'

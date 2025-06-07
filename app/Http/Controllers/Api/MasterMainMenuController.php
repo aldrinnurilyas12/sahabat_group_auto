@@ -116,6 +116,7 @@ class MasterMainMenuController extends Controller
         $finance_dept = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Finance';
         $business_dev_dept = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Business Development';
         $IT_DEV = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Information Technology';
+        $OTHER_DEPT = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Lainnya';
 
 
         if ($marketing_dept || $finance_dept || $business_dev_dept) {
@@ -154,20 +155,15 @@ class MasterMainMenuController extends Controller
                     return compact('grouped_sub_menu', 'sidebar_menu');
                 }
             }
-        } elseif (!$IT_DEV) {
-            if ($admin_role) {
-                $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->where('id', '<>', '4')->get();
-                $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->whereNotIn('id', ['17', '15'])->orderBy('submenu_name', 'asc')->get();
+        } elseif (!$IT_DEV || $OTHER_DEPT) {
+            if ($admin_role || $superadmin_role) {
+                $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->whereNotIn('id', ['2', '3', '4'])->get();
+                $sub_menu = DB::table('submenu')->whereNotIn('id', ['17', '18', '9'])->orderBy('submenu_name', 'asc')->get();
                 $grouped_sub_menu = $sub_menu->groupBy('parent_id');
                 return compact('grouped_sub_menu', 'sidebar_menu');
             } elseif ($head_branch) {
                 $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->where('id', '<>', '4')->get();
                 $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->where('branch_head_role', '<>', 'N')->orderBy('submenu_name', 'asc')->get();
-                $grouped_sub_menu = $sub_menu->groupBy('parent_id');
-                return compact('grouped_sub_menu', 'sidebar_menu');
-            } elseif ($superadmin_role) {
-                $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->where('id', '<>', '4')->get();
-                $sub_menu = DB::table('submenu')->where('id', '<>', '17')->orderBy('submenu_name', 'asc')->get();
                 $grouped_sub_menu = $sub_menu->groupBy('parent_id');
                 return compact('grouped_sub_menu', 'sidebar_menu');
             }

@@ -224,21 +224,31 @@
                                                 <td>{{ $emp->duration_of_leaves . ' Hari' }}</td>
                                                 <td>{{ $emp->reason }}</td>
                                                 @if ($emp->status == 'sudah konfirmasi')
-                                                    <td class="text-success"> {{ $emp->status }}</td>
+                                                    <td> <button class="btn btn-outline-info"
+                                                            disabled>{{ $emp->status }}</button></td>
                                                 @else
-                                                    <td class="text-danger"> {{ $emp->status }}</td>
+                                                    <td> <button class="btn btn-outline-secondary"
+                                                            disabled>{{ $emp->status }}</button></td>
                                                 @endif
 
                                                 @if ($emp->approval_by_branch_head == 'confirmed')
-                                                    <td class="text-success"> {{ $emp->approval_by_branch_head }}</td>
+                                                    <td>
+                                                        <button class="btn btn-outline-success"
+                                                            disabled>{{ $emp->approval_by_branch_head }}</button>
+                                                    </td>
                                                 @else
-                                                    <td class="text-danger"> {{ $emp->approval_by_branch_head }}</td>
+                                                    <td> <button class="btn btn-outline-danger"
+                                                            disabled>{{ $emp->approval_by_hr_head }}</button></td>
                                                 @endif
 
                                                 @if ($emp->approval_by_hr_head == 'confirmed')
-                                                    <td class="text-success"> {{ $emp->approval_by_hr_head }}</td>
+                                                    <td>
+                                                        <button class="btn btn-outline-success"
+                                                            disabled>{{ $emp->approval_by_hr_head }}</button>
+                                                    </td>
                                                 @else
-                                                    <td class="text-danger"> {{ $emp->approval_by_hr_head }}</td>
+                                                    <td> <button class="btn btn-outline-danger"
+                                                            disabled>{{ $emp->approval_by_hr_head }}</button></td>
                                                 @endif
                                                 <td>{{ $emp->created_at }}</td>
                                             </tr>
@@ -278,9 +288,48 @@
                                     </div>
 
                                     <div style="padding-top: 0px; padding-bottom: 0px;" class="modal-body">
-                                        <input type="checkbox"> <span style="color: black";>Setujui persetujuan Cuti
+                                        <input value="approved" name="status_approve" type="radio"> <span
+                                            style="color: black";>Setujui persetujuan Cuti
                                             Karyawan
                                             & tanda tangan</span>
+                                    </div>
+                                    <br>
+
+                                    <hr>
+                                    <div style="padding-top: 0px; padding-bottom: 0px;" class="modal-body">
+                                        <input value="reject" name="status_reject" type="radio"> <span
+                                            style="color: black";>Tolak
+                                            persetujuan Cuti
+                                            Karyawan
+                                            & tanda tangan</span>
+
+                                        <br>
+
+                                        @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations')
+                                            <div style="margin-top:10px;" class="reason-reject">
+
+                                                <label style="color: black;" for=""><strong>Beri Alasan tolak
+                                                        Cuti
+                                                        Karyawan
+                                                    </strong></label>
+                                                <br>
+                                                <textarea class="form-control" name="branch_head_reason_of_reject" id="">
+    
+                                            </textarea>
+                                            </div>
+                                        @elseif(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource')
+                                            <div style="margin-top:10px;" class="reason-reject">
+
+                                                <label style="color: black;" for=""><strong>Beri Alasan tolak
+                                                        Cuti
+                                                        Karyawan
+                                                    </strong></label>
+                                                <br>
+                                                <textarea class="form-control" name="hr_reason_of_reject" id="">
+    
+                                            </textarea>
+                                            </div>
+                                        @endif
                                     </div>
                                     <br>
 

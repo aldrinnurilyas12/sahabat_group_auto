@@ -24,6 +24,7 @@ class EmployeeResignModel extends Model
         'approval_by_hr_head',
         'resign_status',
         'feedback',
-        'resign_attachment'
+        'resign_attachment',
+        'created_by'
     ];
 }

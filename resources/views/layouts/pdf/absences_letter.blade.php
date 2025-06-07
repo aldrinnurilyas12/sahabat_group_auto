@@ -19,7 +19,7 @@
     <div class="spk-information">
         @foreach ($employee_leaves as $emp)
             <div class="container-name">
-                <p>Tanggal Resign</p>
+                <p>Tanggal Buat Pengajuan Cuti</p>
                 <p>{{ $emp->created_at }}</p>
             </div>
 

@@ -260,15 +260,11 @@
                                                     <th>Posisi</th>
                                                     <th>Department</th>
                                                     <th>Kantor</th>
-                                                    <th>Gaji Pokok</th>
-                                                    <th>Tunjangan Transport</th>
-                                                    <th>Tunjangan Kesehatan</th>
-                                                    <th>Tunjangan Lainnya</th>
-                                                    <th>Total Gaji</th>
+                                                    <th>Tanggal Resign</th>
+                                                    <th>Tanggal Approval Resign</th>
+                                                    <th>Alasan Resign</th>
                                                     <th>Status Aktif</th>
                                                     <th>Tanggal Mulai</th>
-                                                    {{-- <th>Tanggal Resign</th>
-                                                    <th>Alasan Resign</th> --}}
                                                     <th>Created at</th>
                                                     <th>Created by</th>
                                                     <th>Updated at</th>
@@ -305,25 +301,11 @@
                                                         <td>{{ $emp_rsn->job_position }}</td>
                                                         <td>{{ $emp_rsn->department_name }}</td>
                                                         <td>{{ $emp_rsn->location_name }}</td>
-                                                        <td>{{ 'Rp ' . number_format($emp_rsn->salary) }}</td>
-                                                        <td>{{ 'Rp ' . number_format($emp_rsn->tunjangan_transport) }}
-                                                        </td>
-                                                        <td>{{ 'Rp ' . number_format($emp_rsn->tunjangan_kesehatan) }}
-                                                        </td>
-                                                        <td>{{ 'Rp ' . number_format($emp_rsn->tunjangan_lainnya) }}
-                                                        </td>
-                                                        <td>{{ 'Rp ' . number_format($emp_rsn->salary_total) }}</td>
+                                                        <td>{{ $emp_rsn->resign_date }}</td>
+                                                        <td>{{ $emp_rsn->approval_resign_date }}</td>
+                                                        <td>{{ $emp_rsn->resign_reasons }}</td>
                                                         <td>{{ $emp_rsn->is_active }}</td>
                                                         <td>{{ old('start_date', $emp_rsn->start_date ? \Carbon\Carbon::parse($emp_rsn->start_date)->format('d-m-Y') : '') }}
-                                                        </td>
-                                                        {{-- <td>
-                                                    @if ($emp_rsn->resign_date == null)
-                                                    <a style="text-decoration: underline;" href="{{route('resign_employee', $emp_rsn->id)}}">Ajukan Resign</a>
-                                                    @else
-                                                    {{ old('resign_date', $emp_rsn->resign_date ? \Carbon\Carbon::parse($emp_rsn->resign_date)->format('d-m-Y'): '') }}</td>
-                                                
-                                                    @endif
-                                                    <td>{{$emp_rsn->resign_reasons}}</td> --}}
                                                         <td>{{ $emp_rsn->created_at }}</td>
                                                         <td>{{ $emp_rsn->created_by }}</td>
                                                         <td>{{ $emp_rsn->updated_at }}</td>

@@ -6,7 +6,7 @@
 <!-- Custom styles for this template-->
 <link href="{{ asset('assets/css/sb-admin-2.min.css') }}" rel="stylesheet">
 <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-<title>Edit data Karyawan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
+<title>SUrat Pernyataan Resign - SAHABAT GROUP AUTO ADMINISTRATOR</title>
 
 <body>
     <div id="wrapper">

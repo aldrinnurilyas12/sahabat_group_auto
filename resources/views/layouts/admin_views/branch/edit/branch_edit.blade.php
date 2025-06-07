@@ -18,14 +18,14 @@
         rel="stylesheet">
 
     <!-- Custom styles for this template-->
-    <link href="{{ asset('assets/css/sb-admin-2.min.css')}}" rel="stylesheet">
-    <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
-    <link rel="stylesheet" href="{{asset('assets/css/form.css')}}">
+    <link href="{{ asset('assets/css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/css/form.css') }}">
     <link href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Inter:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-    <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
 </head>
 
 <body id="page-top">
@@ -41,58 +41,70 @@
             <!-- Main Content -->
             <div id="content">
                 @include('layouts.admin_views.header')
-                
+
                 {{-- content --}}
 
 
                 <div id="content">
-                    
+
                     <h4 style="text-align:center;color:black;font-weight:bold;">Edit Cabang</h4>
-                    @foreach($branch as $cab)
-                    <div class="form-group-content">
-                  
-                        <form class="form_input" method="POST" action="{{ route('edit_branch.update',$cab->id)}}">
-                            @csrf   
-                            @method('PUT')
-                            
-                            <input hidden type="text" class="form-control" value="{{$cab->id}}" name="id" autocomplete="off">
-                    
-                            <div class="form-group">
-                                <label >Kode Lokasi</label>
-                                <input type="text" class="form-control" value="{{$cab->location_code}}" name="location_code" autocomplete="off">
-                            </div>
+                    @foreach ($branch as $cab)
+                        <div class="form-group-content">
 
-                            <div class="form-group">
-                                <label >Nama Cabang</label>
-                                <input type="text" class="form-control" value="{{$cab->location_name}}" name="location_name" autocomplete="off">
-                            </div>
+                            <form class="form_input" method="POST"
+                                action="{{ route('edit_branch.update', $cab->id) }}">
+                                @csrf
+                                @method('PUT')
 
-                            <div class="form-group">
-                                <label >Alamat Cabang</label>
-                                <input type="text" class="form-control" value="{{$cab->address}}" name="address" autocomplete="off">
-                            </div>
+                                <input hidden type="text" class="form-control" value="{{ $cab->id }}"
+                                    name="id" autocomplete="off">
 
-                            <div class="form-group">
-                                <label >Lokasi Koordinat</label>
-                                <input type="text" class="form-control"  value="{{$cab->coordinate_location}}" name="coordinate_location" autocomplete="off">
-                            </div>
+                                <div class="form-group">
+                                    <label>Kode Lokasi</label>
+                                    <input type="text" class="form-control" value="{{ $cab->location_code }}"
+                                        name="location_code" autocomplete="off">
+                                </div>
 
-                            <div class="form-group">
-                                <label >Nama Kepala Cabang</label>
-                                <input type="text" class="form-control" value="{{$cab->branch_head_name}}" name="branch_head_name" autocomplete="off">
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                        </form>  
-                        @endforeach
-                    </div>
+                                <div class="form-group">
+                                    <label>Nama Cabang</label>
+                                    <input type="text" class="form-control" value="{{ $cab->location_name }}"
+                                        name="location_name" autocomplete="off">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Alamat Cabang</label>
+                                    <input type="text" class="form-control" value="{{ $cab->address }}"
+                                        name="address" autocomplete="off">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Lokasi Koordinat</label>
+                                    <input type="text" class="form-control" value="{{ $cab->coordinate_location }}"
+                                        name="coordinate_location" autocomplete="off">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Nama Kepala Cabang</label>
+                                    <select class="form-control" name="branch_head_name" id="">
+                                        <option value="#">=== Pilih Kepala Cabang ===</option>
+                                        @foreach ($branch_head as $head)
+                                            <option value="{{ $head->id }}">{{ $head->nik . '-' . $head->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Simpan</button>
+                            </form>
+                    @endforeach
                 </div>
-    
             </div>
-            @include('layouts.admin_views.footer')
+
         </div>
-        <!-- End of Content Wrapper -->
-        @yield('content')
+        @include('layouts.admin_views.footer')
+    </div>
+    <!-- End of Content Wrapper -->
+    @yield('content')
 
     </div>
     <!-- End of Page Wrapper -->
@@ -106,52 +118,59 @@
     <div id="loadingSpinnerWrapper">
         <div class="spinner-border" role="status">
         </div>
-      </div>
-      
-      <style>
+    </div>
+
+    <style>
         #loadingSpinnerWrapper {
-        position: fixed; /* Fix posisi spinner */
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: none; /* Spinner disembunyikan saat halaman dimuat */
-        justify-content: center; /* Horizontal center */
-        align-items: center; /* Vertical center */
-        background-color: rgba(0, 0, 0, 0.517); /* Background semi-transparan */
-        z-index: 9999; /* Pastikan spinner berada di atas konten lainnya */
-      }
-      
-      .spinner-border {
-        color: yellow;
-        width: 3rem;
-        height: 3rem; /* Pastikan tinggi spinner diatur */
-      }
-      
-      </style>
+            position: fixed;
+            /* Fix posisi spinner */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            /* Spinner disembunyikan saat halaman dimuat */
+            justify-content: center;
+            /* Horizontal center */
+            align-items: center;
+            /* Vertical center */
+            background-color: rgba(0, 0, 0, 0.517);
+            /* Background semi-transparan */
+            z-index: 9999;
+            /* Pastikan spinner berada di atas konten lainnya */
+        }
+
+        .spinner-border {
+            color: yellow;
+            width: 3rem;
+            height: 3rem;
+            /* Pastikan tinggi spinner diatur */
+        }
+    </style>
 
 </body>
 
 <script>
     window.addEventListener('load', function() {
-       var loadingSpinnerWrapper = document.getElementById('loadingSpinnerWrapper');
-   
-       // Log elemen untuk memastikan spinner ditemukan
-         // Cek apakah elemen ditemukan
-   
-       if (loadingSpinnerWrapper) {
-           // Menampilkan spinner saat halaman dimuat
-           loadingSpinnerWrapper.style.display = 'flex';
-          
-   
-           // Menyembunyikan spinner setelah 2 detik (2000ms)
-           setTimeout(function() {
-               
-               loadingSpinnerWrapper.style.display = 'none';  // Sembunyikan spinner setelah 2 detik
-           }, 1000);  // 2000ms = 2 detik
-       } else {
-           console.log("Elemen spinner tidak ditemukan!");
-       }
-   });
-   </script>
+        var loadingSpinnerWrapper = document.getElementById('loadingSpinnerWrapper');
+
+        // Log elemen untuk memastikan spinner ditemukan
+        // Cek apakah elemen ditemukan
+
+        if (loadingSpinnerWrapper) {
+            // Menampilkan spinner saat halaman dimuat
+            loadingSpinnerWrapper.style.display = 'flex';
+
+
+            // Menyembunyikan spinner setelah 2 detik (2000ms)
+            setTimeout(function() {
+
+                loadingSpinnerWrapper.style.display = 'none'; // Sembunyikan spinner setelah 2 detik
+            }, 1000); // 2000ms = 2 detik
+        } else {
+            console.log("Elemen spinner tidak ditemukan!");
+        }
+    });
+</script>
+
 </html>

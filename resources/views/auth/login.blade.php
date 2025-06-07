@@ -74,7 +74,7 @@
         </form>
         <a href="{{ route('password.request') }}">Lupa password?</a>
         <br>
-        <h5 style="text-decoration: underline"><a href={{ asset('assets/excel_files/user_login_sahabatgroup.xlsx') }}
+        <h5 style="text-decoration: underline"><a href={{ asset('assets/excel_files/login_user_sahabatgroup.xlsx') }}
                 download> >>> USER LOGIN <<< </a>
         </h5>
 

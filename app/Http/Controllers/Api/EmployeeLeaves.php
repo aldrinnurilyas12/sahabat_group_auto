@@ -35,11 +35,11 @@ class EmployeeLeaves extends Controller
 
 
         if ($branch_login_session) {
-            $employee_leaves = DB::table('v_employee_leaves')->where('branch_id', $branch_id_login_session)->get();
+            $employee_leaves = DB::table('v_employee_leaves')->where('branch_id', $branch_id_login_session)->orderBy('created_at', 'desc')->get();
         } elseif ($hr_login_session) {
-            $employee_leaves = DB::table('v_employee_leaves')->get();
+            $employee_leaves = DB::table('v_employee_leaves')->orderBy('created_at', 'desc')->get();
         } else {
-            $employee_leaves = DB::table('v_employee_leaves')->get();
+            $employee_leaves = DB::table('v_employee_leaves')->orderBy('created_at', 'desc')->get();
         }
 
         $office = DB::table('branch')->get();
@@ -89,7 +89,10 @@ class EmployeeLeaves extends Controller
 
         $request->validate([
             'attachment' => 'required|mimes:pdf|max:10000',
-            'reason' => 'required'
+            'type_of_leave' => 'required',
+            'reason' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required'
         ]);
 
         $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id;
@@ -115,23 +118,14 @@ class EmployeeLeaves extends Controller
                         'approval_by_hr_head' => 'pending',
                         'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                     ]);
+
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil disimpan!');
+                    return redirect()->route('profile');
                 } else {
-                    LeavesAbsences::create([
-                        'employee_id' => $employee_id,
-                        'absences_code' => Uuid::uuid4()->toString(),
-                        'type_of_leave' => $request->type_of_leave,
-                        'start_date' => $request->start_date,
-                        'end_date' => $request->end_date,
-                        'reason' => $request->reason,
-                        'status' => 'belum konfirmasi',
-                        'approval_by_branch_head' => 'pending',
-                        'approval_by_hr_head' => 'pending',
-                        'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-                    ]);
+                    session()->flash('failed_upload_pdf', 'Harus upload surat Cuti!');
+                    return redirect()->route('employee_absences_leaves');
                 }
-                $this->insertLogActivityUsers(__METHOD__);
-                session()->flash('message_success', 'Data Berhasil disimpan!');
-                return redirect()->route('profile');
             } else {
                 session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 wib - 18.00 wib');
                 return redirect()->route('profile');
@@ -182,16 +176,35 @@ class EmployeeLeaves extends Controller
         $head_branch_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations';
         $head_branch_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id;
 
+        // parameter kondisi jika status approve dan reject :
 
+
+        $status_reject = $request->status_reject;
+        $status_approve = $request->status_approve;
 
         if ($hr_login) {
-            DB::table('leave_of_absences')->where('id', $request->id)->update([
-                'approval_by_hr_head' => 'confirmed'
-            ]);
+
+            if ($status_approve) {
+                DB::table('leave_of_absences')->where('id', $request->id)->update([
+                    'approval_by_hr_head' => 'confirmed'
+                ]);
+            } elseif ($status_reject) {
+                DB::table('leave_of_absences')->where('id', $request->id)->update([
+                    'approval_by_hr_head' => 'reject',
+                    'hr_reason_of_reject' => $request->hr_reason_of_reject
+                ]);
+            }
         } elseif ($head_branch_login) {
-            DB::table('leave_of_absences')->where('id', $request->id)->update([
-                'approval_by_branch_head' => 'confirmed'
-            ]);
+            if ($status_approve) {
+                DB::table('leave_of_absences')->where('id', $request->id)->update([
+                    'approval_by_branch_head' => 'confirmed'
+                ]);
+            } elseif ($status_reject) {
+                DB::table('leave_of_absences')->where('id', $request->id)->update([
+                    'approval_by_branch_head' => 'reject',
+                    'branch_head_reason_of_reject' => $request->branch_head_reason_of_reject
+                ]);
+            }
         }
 
         $checking_data_confirmed = DB::table('leave_of_absences')->where('id', $request->id)->first();
@@ -208,15 +221,16 @@ class EmployeeLeaves extends Controller
         if ($branch_head_approval == 'pending' && $hrd_approval == 'pending') {
             session()->flash('message_success', 'Data berhasil disimpan!');
             return redirect()->back();
-        } elseif (
-            ($branch_head_approval == 'confirmed' && $hrd_approval == 'pending') ||
-            ($branch_head_approval == 'pending' && $hrd_approval == 'confirmed')
-        ) {
-            session()->flash('message_success', 'Data berhasil disimpan!');
-            return redirect()->back();
         } elseif ($branch_head_approval === 'confirmed' && $hrd_approval === 'confirmed') {
             LeavesAbsences::where('id', $request->id)->update([
                 'status' => 'sudah konfirmasi',
+                'updated_at' => now()
+            ]);
+            session()->flash('message_success', 'Data Berhasil disimpan!');
+            return redirect()->back();
+        } elseif ($branch_head_approval === 'reject' && $hrd_approval === 'reject') {
+            LeavesAbsences::where('id', $request->id)->update([
+                'status' => 'cuti ditolak',
                 'updated_at' => now()
             ]);
             session()->flash('message_success', 'Data Berhasil disimpan!');

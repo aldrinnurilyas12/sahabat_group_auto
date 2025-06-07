@@ -74,11 +74,17 @@
                                     <option value="pendidikan">Keperluan Pendidikan</option>
                                     <option value="force_majeure">Keadaan Darurat / Force Majeure</option>
                                 </select>
+                                @if ($errors->has('type_of_leave'))
+                                    <span class="text-danger">{{ $errors->first('type_of_leave') }}</span>
+                                @endif
                             </div>
 
                             <div class="form-group">
                                 <label>Alasan Cuti </label>
                                 <textarea class="form-control" name="reason" id="" cols="30" rows="3"></textarea>
+                                @if ($errors->has('reason'))
+                                    <span class="text-danger">{{ $errors->first('reason') }}</span>
+                                @endif
                             </div>
 
                             <div class="form-group">
@@ -102,6 +108,7 @@
                             <div class="form-group">
                                 <label for="">Upload Surat Cuti (Format Surat : PDF) <span
                                         style="color: red">*</span></label>
+                                <span>Contoh Penulisan nama surat : SuratCutiKaryawan-NamaKaryawan.pdf</span>
                                 <input class="form-control" type="file" name="attachment">
                                 @if ($errors->has('attachment'))
                                     <span class="text-danger">{{ $errors->first('attachment') }}</span>

@@ -17,7 +17,10 @@
         "apexcharts": "^4.1.0",
         "bootstrap": "^5.3.3",
         "flowbite": "^2.5.2",
+        "laravel-echo": "^2.1.5",
         "pagedone": "^1.2.2",
+        "pusher-js": "^8.4.0",
+        "star-rating.js": "^4.3.1",
         "sweetalert": "^2.1.2",
         "sweetalert2": "^11.14.3",
         "vite": "^5.4.10"

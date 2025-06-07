@@ -6,7 +6,8 @@
 <!-- Custom styles for this template-->
 <link href="{{ asset('assets/css/sb-admin-2.min.css') }}" rel="stylesheet">
 <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-<title>Resign Karyawan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<title>Pengajuan Resign Karyawan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
 
 <body>
     <div id="wrapper">
@@ -105,6 +106,7 @@
                             <div class="form-group">
                                 <label for="">Upload Surat Resign (Format Surat : PDF) <span
                                         style="color: red">*</span></label>
+                                <span>Contoh Penulisan nama surat : SuratResignKaryawan-NamaKaryawan.pdf</span>
                                 <input class="form-control" type="file" name="resign_attachment">
                                 @if ($errors->has('resign_attachment'))
                                     <span class="text-danger">{{ $errors->first('resign_attachment') }}</span>
@@ -167,12 +169,18 @@
 </style>
 
 
-@if (session('alert'))
-    <script type="text/javascript">
-        alert('{{ session('alert') }}');
+
+@if (Session::has('failed_upload_pdf'))
+    <script>
+        Swal.fire({
+            title: 'Gagal',
+            text: "{{ Session::get('failed_upload_pdf') }}",
+            icon: "error",
+            timer: 3000,
+            confirmButtonText: 'OK'
+        });
     </script>
 @endif
-
 
 <script>
     window.addEventListener('load', function() {

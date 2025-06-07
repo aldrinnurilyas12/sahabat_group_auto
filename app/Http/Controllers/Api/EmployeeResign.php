@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\EmployeeResignResocuce;
 use App\Models\EmployeeModel;
 use App\Models\EmployeeResignModel;
 use App\Models\User;
@@ -13,6 +14,7 @@ use Illuminate\Support\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
+
 
 
 class EmployeeResign extends Controller
@@ -46,11 +48,11 @@ class EmployeeResign extends Controller
         $branch_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id;
 
         if ($hr_head_login) {
-            $employee_resign = DB::table('v_employee_resign')->get();
+            $employee_resign = DB::table('v_employee_resign')->orderBy('created_at', 'desc')->get();
         } elseif ($branch_head_login) {
-            $employee_resign = DB::table('v_employee_resign')->where('branch_emp_id', $branch_id)->get();
+            $employee_resign = DB::table('v_employee_resign')->where('branch_emp_id', $branch_id)->orderBy('created_at', 'desc')->get();
         } else {
-            $employee_resign = DB::table('v_employee_resign')->get();
+            $employee_resign = DB::table('v_employee_resign')->orderBy('created_at', 'desc')->get();
         }
 
 
@@ -63,6 +65,17 @@ class EmployeeResign extends Controller
     public function create()
     {
         //
+    }
+
+
+    // CONTOH GET API EMPLOYEE RESIGN
+    public function get_resign($id)
+    {
+        $data = DB::table('v_employee_resign')
+            ->where('id', $id)
+            ->get();
+
+        return new EmployeeResignResocuce(true, 'Data Resign', $data);
     }
 
     /**
@@ -230,8 +243,12 @@ class EmployeeResign extends Controller
             session()->flash('message_success', 'Data berhasil disimpan!');
             return redirect()->back();
         } elseif ($branch_head_approval === 'confirmed' && $hrd_approval === 'confirmed') {
+
+            // buat logika untuk mengatur jika employee sudah resign maka set employee is_active = N setelah itu buat jeda lebih dari 1 jam maka update table users is_active = N
+
             EmployeeResignModel::where('id', $request->id)->update([
                 'resign_status' => 'sudah konfirmasi',
+                'approval_resign_date' => now(),
                 'updated_at' => now()
             ]);
 
@@ -239,9 +256,6 @@ class EmployeeResign extends Controller
                 'is_active' => 'N'
             ]);
 
-            // User::where('employee_id', $request->id)->update([
-            //     'is_active' => 'N'
-            // ]);
             session()->flash('message_success', 'Data Berhasil disimpan!');
             return redirect()->back();
         }

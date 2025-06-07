@@ -123,7 +123,9 @@ class BranchController extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
         $branch = DB::table('branch')->where('id', $request->id)->get();
-        return view('layouts.admin_views.branch.edit.branch_edit', compact('branch', 'grouped_sub_menu', 'sidebar_menu'));
+
+        $branch_head = DB::table('v_employee')->where('job_position', 'Head of Branch Operations')->get();
+        return view('layouts.admin_views.branch.edit.branch_edit', compact('branch', 'branch_head', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     /**

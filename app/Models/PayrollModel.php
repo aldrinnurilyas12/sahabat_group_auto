@@ -15,6 +15,7 @@ class PayrollModel extends Model
         'payroll_code',
         'status',
         'payroll_file',
+        'payroll_approval_date',
         'created_by',
         'updated_by'
     ];

@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\MasterMainMenuController;
+use App\Models\TestimonialModel;
 use Carbon\Month;
 use FontLib\Table\Type\loca;
+use Predis\Command\Container\FUNCTIONS;
 
 class Analytics extends Controller
 {
@@ -296,5 +298,15 @@ class Analytics extends Controller
 
         // dd($revenue);
         return view('layouts.admin_views.analytics.analytics', compact('revenue', 'employee', 'grouped_sub_menu', 'sidebar_menu', 'appointment_total', 'unit_request', 'sale_unit_request', 'vehicle_ads', 'vehicle_total_clicked', 'vehicle_total', 'vehicle_brand', 'years', 'months', 'bulan', 'tahun', 'location_unit'));
+    }
+
+    public function show_testimonial_data()
+    {
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+        $testimonial = DB::table('customers_testimonial')->orderBy('created_at', 'desc')->get();
+
+        return view('layouts.admin_views.testimonial.testimonial', compact('testimonial', 'grouped_sub_menu', 'sidebar_menu',));
     }
 }

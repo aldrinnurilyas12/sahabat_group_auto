@@ -58,7 +58,8 @@
                                         <th>Payroll Attachment</th>
                                         <th>NIK</th>
                                         <th>Nama Karyawan</th>
-                                        <th>Tanggal</th>
+                                        <th>Tanggal Bayar</th>
+                                        <th>Tanggal Approved</th>
 
                                     </tr>
                                 </thead>
@@ -84,6 +85,13 @@
                                             <td>
                                                 @if ($payroll->created_at)
                                                     {{ \Carbon\Carbon::parse($payroll->created_at)->format('d F Y') }}
+                                                @else
+                                                    <p>-</p>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($payroll->payroll_approval_date)
+                                                    {{ \Carbon\Carbon::parse($payroll->payroll_approval_date)->format('d F Y') }}
                                                 @else
                                                     <p>-</p>
                                                 @endif

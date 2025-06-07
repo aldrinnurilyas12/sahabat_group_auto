@@ -776,7 +776,7 @@ class MasterVehicleData extends Controller
     {
         $request->validate([
             'vehicle_id' => 'required',
-            'media_files' => 'required|file|mimetypes:video/mp4,audio/mpeg|max:10240000',
+            'media_files' => 'required|file|mimetypes:video/mp4,audio/mpeg|max:102400',
             'media_type' => 'required'
         ]);
 
