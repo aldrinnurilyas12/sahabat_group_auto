@@ -173,8 +173,8 @@
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                                 {{ $testimonial_total }}
                                             </div>
-                                            <a href="{{ route('master_vehicle_advertisement.index') }}"><i
-                                                    class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                                            <a href="{{ route('show_testimonial') }}"><i class="fa fa-arrow-right"
+                                                    aria-hidden="true"></i></a>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fab fa-adversal fa-2x text-gray-300"></i>

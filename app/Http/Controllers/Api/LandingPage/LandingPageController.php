@@ -13,6 +13,7 @@ use App\Models\AppointmentModel;
 use App\Models\MasterVehicleAdvertisementModel;
 use App\Mail\RequestVehicleMail;
 use App\Mail\SendEmailAppointment;
+use App\Models\BannerModel;
 use App\Models\TestimonialModel;
 use App\Models\WebVisitor;
 use Illuminate\Support\Facades\Mail;
@@ -45,6 +46,8 @@ class LandingPageController extends Controller
         $rating_total = TestimonialModel::count('id');
         $ip = $request->ip();
 
+        $banner_data = BannerModel::where('is_active', 'Y')->get();
+
         $check_available_ipaddress = WebVisitor::where('ip_address', $ip)->exists();
 
         if (!$check_available_ipaddress) {
@@ -54,7 +57,7 @@ class LandingPageController extends Controller
         }
 
 
-        return view('layouts.landing_page.main_page.home_page', compact('vehicle_ads', 'blog_data', 'brand', 'branch', 'vehicle_request', 'testimonial_data', 'avg_rating', 'rating_total'));
+        return view('layouts.landing_page.main_page.home_page', compact('vehicle_ads', 'blog_data', 'brand', 'branch', 'vehicle_request', 'testimonial_data', 'avg_rating', 'rating_total', 'banner_data'));
     }
 
 

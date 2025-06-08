@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\LoginAdminController;
 use App\Http\Controllers\Api\AuthenticatedSessionController;
 use App\Http\Controllers\Api\Blog;
+use App\Http\Controllers\Api\MasterBanner;
 use App\Http\Controllers\Api\BranchController;
 use App\Http\Controllers\Api\ConfirmablePasswordController;
 use App\Http\Controllers\Api\CustomerRequestVehicleSale;
@@ -176,10 +177,10 @@ Route::middleware('auth')->group(function () {
     Route::get('resign_employee', [EmployeeResign::class, 'employee_resign_layout'])->name('resign_employee');
 
     // EMPLOYEE RESIGN
-
     Route::apiResource('employee_resign', App\Http\Controllers\Api\EmployeeResign::class);
     Route::put('confirm_employee_resign/{id}', [EmployeeResign::class, 'confirm_employee_resign'])->name('confirm_employee_resign');
     Route::get('get_resignation_letter/{resign_code}', [EmployeeResign::class, 'download_resignation_letter'])->name('get_resignation_letter');
+    Route::get('get_employee_resign/{id}', [EmployeeResign::class, 'get_resign'])->name('get_employee_resign');
 
     // EMPLOYEE LEAVES
     Route::apiResource('employee_leaves', App\Http\Controllers\Api\EmployeeLeaves::class);
@@ -187,9 +188,8 @@ Route::middleware('auth')->group(function () {
     Route::put('confirm_employee_leaves/{id}', [EmployeeLeaves::class, 'confirm_employee_leaves'])->name('confirm_employee_leaves');
     Route::get('get_absences_letter/{absences_code}', [EmployeeLeaves::class, 'download_absences_letter'])->name('get_absences_letter');
 
-
     // ROUTE FOR API employee
-    Route::get('get_employee', [EmployeeController::class, 'getEmployee'])->name('get_employee');
+    // Route::get('get_employee', [EmployeeController::class, 'getEmployee'])->name('get_employee');
     Route::get('get_employee/{id}', [EmployeeController::class, 'getEmployee'])->name('get_employee');
 
     // EMPLOYEE SALARY ROUTES
@@ -359,7 +359,12 @@ Route::middleware('auth')->group(function () {
         return 'Akun Anda tidak aktif. Hubungi HRD atau admin.';
     })->name('inactive-info');
 
-    Route::get('get_employee_resign/{id}', [EmployeeResign::class, 'get_resign'])->name('get_employee_resign');
+    // ROUTES BANNER ADMIN
+    Route::apiResource('master_banner', App\Http\Controllers\Api\MasterBanner::class);
+    Route::get('banner_create', [MasterBanner::class, 'create_banner_layout'])->name('banner_create');
+    Route::get('banner_edit/{id}', [MasterBanner::class, 'edit_banner_layout'])->name('banner_edit');
+    Route::delete('banner_delete/', [MasterBanner::class, 'destroy'])->name('banner_delete');
 
+    // SHOWTESTIMONIAL
     Route::get('show_testimonial', [Analytics::class, 'show_testimonial_data'])->name('show_testimonial');
 });

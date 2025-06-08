@@ -50,8 +50,68 @@
     @include('layouts.landing_page.navbar.header_new')
 
     {{-- section awal --}}
-    <section style="background-image: linear-gradient(to bottom, #f8f000 10%, #fff30984 80%);">
-        <div class="max-w-screen-xl px-4 py-8 mx-auto space-y-12 lg:space-y-20 lg:py-24 lg:px-6">
+    <section class="banner-main">
+
+        {{-- NEW BANNER 08/06/2025 --}}
+        <div class="max-w-screen-xl px-4 py-4 mx-auto space-y-12 lg:space-y-20 lg:py-24 lg:px-6">
+
+            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    @foreach ($banner_data as $key => $img)
+                        <li data-target="#carouselExampleIndicators" data-slide-to="{{ $key }}"
+                            class="{{ $key === 0 ? 'active' : '' }}"></li>
+                    @endforeach
+                </ol>
+                <div style="margin-bottom: 20px;" class="carousel-inner">
+                    @foreach ($banner_data as $key => $img)
+                        <div class="carousel-item {{ $key === 0 ? 'active' : '' }}">
+                            {{-- buat  kondisi jika card pakai agak gelap agar tulisan kebaca --}}
+                            <div style="display:flex; justify-content:center;" class="dflex-content">
+                                <div class="content-banner">
+                                    <h5>{{ $img->banner_title }}</h5>
+                                    <p>{{ $img->text_content }}</p>
+
+                                    <br>
+
+
+                                    @if ($img->button_1)
+                                        <div style="display:flex; gap:10px;" class="button-flex">
+                                            <a style="background: black; color:white;" class="btn btn-dark"
+                                                href="{{ url($img->link_1) }}">{{ $img->button_1 }}</a>
+                                            <a style="color: black; border:2px solid black; border-radius:4px;padding:4px;"
+                                                href="{{ url($img->link_2) }}">{{ $img->button_2 }}</a>
+                                        </div>
+                                    @elseif($img->button_2)
+                                        <a class="btn btn-outline-dark"
+                                            href="{{ url($img->link_2) }}">{{ $img->button_2 }}</a>
+                                    @else
+                                    @endif
+                                </div>
+
+                            </div>
+                            <img style="width:400px; height:400px;" class="d-block w-100"
+                                src="{{ asset('storage/' . $img->banner_file) }}" alt="Slide {{ $key + 1 }}">
+                        </div>
+                    @endforeach
+                </div>
+
+                <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+
+        {{-- END --}}
+
+
+        {{-- OLD BANNER --}}
+
+        {{-- <div class="max-w-screen-xl px-4 py-8 mx-auto space-y-12 lg:space-y-20 lg:py-24 lg:px-6">
             <!-- Row -->
             <div style="display: flex; justify-content:center;"
                 class="items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16">
@@ -72,7 +132,7 @@
             </div>
             <!-- Row -->
 
-        </div>
+        </div> --}}
     </section>
 
     {{-- section why us --}}
@@ -101,19 +161,20 @@
                         </li>
                         <li class="flex space-x-3">
                             <!-- Icon -->
-                            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor"
-                                viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400"
+                                fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd"
                                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                                     clip-rule="evenodd"></path>
                             </svg>
-                            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Bekerja sama
+                            <span class="text-base font-medium leading-tight text-gray-900 dark:text-white">Bekerja
+                                sama
                                 dengan Multifinance terkemuka</span>
                         </li>
                         <li class="flex space-x-3">
                             <!-- Icon -->
-                            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400" fill="currentColor"
-                                viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400"
+                                fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd"
                                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                                     clip-rule="evenodd"></path>
@@ -621,17 +682,54 @@
             height: max-content
         }
 
+        .content-banner {
+            padding: 10px;
+            position: absolute;
+            margin-top: 10%;
 
-        @media only screen and (max-width: 390px) {
+
+        }
+
+        .content-banner p {
+            color: white;
+            width: 500px;
+        }
+
+        .content-banner h5 {
+            font-size: 30px;
+            color: white;
+        }
+
+
+        @media only screen and (max-width: 550px) {
             .card {
                 width: 100%;
                 color: rgb(0, 0, 0);
             }
 
-            ,
+
             .form_input {
                 width: 100%;
                 padding: 50px;
+            }
+
+
+            .content-banner {
+                width: 350px;
+                padding: 10px;
+                position: absolute;
+                margin-top: 25%;
+            }
+
+            .content-banner p {
+                color: white;
+                width: 300px;
+            }
+
+
+            .content-banner h5 {
+                font-size: 20px;
+                color: white;
             }
         }
     </style>
