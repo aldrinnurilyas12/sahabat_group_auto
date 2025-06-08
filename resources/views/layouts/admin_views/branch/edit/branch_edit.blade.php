@@ -84,15 +84,38 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Nama Kepala Cabang</label>
-                                    <select class="form-control" name="branch_head_name" id="">
-                                        <option value="#">=== Pilih Kepala Cabang ===</option>
-                                        @foreach ($branch_head as $head)
-                                            <option value="{{ $head->id }}">{{ $head->nik . '-' . $head->name }}
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <label>Kepala Cabang saat ini</label>
+                                    <input readonly type="text" class="form-control"
+                                        value="{{ $cab->branch_head ? $cab->branch_head : 'Tidak ada kepala cabang yang dipilih' }}"
+                                        autocomplete="off">
                                 </div>
+
+
+                                @if ($cab->branch_head)
+                                    <div class="form-group">
+                                        <label>Ubah jika ingin mengganti Kepala Cabang</label>
+                                        <select class="form-control" name="branch_head_id" id="">
+                                            <option value="#">=== Pilih Kepala Cabang ===</option>
+                                            @foreach ($branch_head as $head)
+                                                <option value="{{ $head->id }}">
+                                                    {{ $head->nik . '-' . $head->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @else
+                                    <div class="form-group">
+                                        <label>Pilh Kepala Cabang</label>
+                                        <select class="form-control" name="branch_head_id" id="">
+                                            <option value="#">=== Pilih Kepala Cabang ===</option>
+                                            @foreach ($branch_head as $head)
+                                                <option value="{{ $head->id }}">
+                                                    {{ $head->nik . '-' . $head->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endif
 
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                             </form>

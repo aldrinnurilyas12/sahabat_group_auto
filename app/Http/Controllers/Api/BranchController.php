@@ -52,7 +52,9 @@ class BranchController extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        $branch_head = DB::table('v_employee')->where('job_position', 'Head of Branch Operations')->get();
+        $branch_head = DB::table('employee as e')->select(DB::raw("CONCAT(e.nik, '-', e.name) as branch_head"), 'e.id', 'e.nik', 'e.name')
+            ->leftJoin('branch as b', 'e.id', '=', 'b.branch_head_id')
+            ->where('e.job_position', '10')->where('branch_head_id', null)->get();
         $branch = BranchModel::all();
         return view('layouts.admin_views.branch.create.branch_create', compact('branch', 'grouped_sub_menu', 'sidebar_menu', 'branch_head'));
     }
@@ -77,7 +79,7 @@ class BranchController extends Controller
                     'location_name' => $request->location_name,
                     'address'       => $request->address,
                     'coordinate_location' => $request->coordinate_location,
-                    'branch_head_name'   => $request->branch_head_name,
+                    'branch_head_id'   => $request->branch_head_id,
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
 
@@ -95,7 +97,7 @@ class BranchController extends Controller
                 'location_name' => $request->location_name,
                 'address'       => $request->address,
                 'coordinate_location' => $request->coordinate_location,
-                'branch_head_name'   => $request->branch_head_name,
+                'branch_head_id'   => $request->branch_head_id,
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                 'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
             ]);
@@ -122,9 +124,11 @@ class BranchController extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        $branch = DB::table('branch')->where('id', $request->id)->get();
+        $branch = DB::table('v_branch')->where('id', $request->id)->get();
 
-        $branch_head = DB::table('v_employee')->where('job_position', 'Head of Branch Operations')->get();
+        $branch_head = DB::table('employee as e')->select(DB::raw("CONCAT(e.nik, '-', e.name) as branch_head"), 'e.id', 'e.nik', 'e.name')
+            ->leftJoin('branch as b', 'e.id', '=', 'b.branch_head_id')
+            ->where('e.job_position', '10')->where('branch_head_id', null)->get();
         return view('layouts.admin_views.branch.edit.branch_edit', compact('branch', 'branch_head', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -144,7 +148,7 @@ class BranchController extends Controller
                     'location_name' => $request->location_name,
                     'address'       => $request->address,
                     'coordinate_location' => $request->coordinate_location,
-                    'branch_head_name'   => $request->branch_head_name,
+                    'branch_head_id'   => $request->branch_head_id,
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'updated_at' => now()
                 ]);
@@ -161,7 +165,7 @@ class BranchController extends Controller
                 'location_name' => $request->location_name,
                 'address'       => $request->address,
                 'coordinate_location' => $request->coordinate_location,
-                'branch_head_name'   => $request->branch_head_name,
+                'branch_head_id'   => $request->branch_head_id,
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                 'updated_at' => now()
             ]);

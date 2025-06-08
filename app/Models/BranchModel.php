@@ -16,7 +16,7 @@ class BranchModel extends Model
         'location_name',
         'address',
         'coordinate_location',
-        'branch_head_name',
+        'branch_head_id',
         'created_by',
         'updated_by'
     ];
