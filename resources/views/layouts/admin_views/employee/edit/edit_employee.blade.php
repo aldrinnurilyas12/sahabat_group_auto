@@ -41,6 +41,14 @@
                                     <span class="text-danger">{{ $errors->first('name') }}</span>
                                 @endif
                             </div>
+
+                            <div class="form-group">
+                                <label>Tanggal Lahir</label>
+                                <input type="date" class="form-control" name="birth_date"
+                                    value="{{ old('birth_date', $emp->birth_date ? $birth_date->format('Y-m-d') : null) }}"
+                                    autocomplete="off">
+                            </div>
+
                             <div class="form-group">
                                 <label>Alamat <span style="color: red">*</span> </label>
                                 <input type="text" class="form-control" name="address" value="{{ $emp->address }}"
@@ -93,6 +101,27 @@
                             </div>
 
                             <div class="form-group">
+                                <label for="">Jenis pekerjaan Karyawan saat ini</label>
+                                <input type="text"
+                                    value="{{ $emp->type_of_employee ?: 'Anda belum memilih tipe perkejaan karyawan' }}"
+                                    class="form-control" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="">Jenis Pekerjaan Karyawan<span style="color: red">*</span></label>
+
+                                <select class="form-control" name="type_of_employee" id="">
+                                    <option value="">=== Pilih Tipe Karyawan ===</option>
+                                    <option value="permanent">Karyawan Tetap</option>
+                                    <option value="contract">Karyawan Kontrak</option>
+                                    <option value="freelance">Karwayan Freelance</option>
+                                    <option value="internship">Karyawan Magang</option>
+                                </select>
+                            </div>
+
+                            <hr>
+
+                            <div class="form-group">
                                 <label for="">Bank</label>
 
                                 <select class="form-control" name="bank_id" id="">
@@ -113,22 +142,23 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Tanggal Lahir</label>
-                                <input type="date" class="form-control" name="birth_date"
-                                    value="{{ old('birth_date', $emp->birth_date ? $birth_date->format('Y-m-d') : null) }}"
-                                    autocomplete="off">
-                            </div>
-                            <div class="form-group">
                                 <label>Tanggal Mulai Bekerja</label>
                                 <input type="date" class="form-control" id="start_date" name="start_date"
                                     value="{{ old('start_date', $emp->start_date ? $start_date->format('Y-m-d') : null) }}"
                                     autocomplete="off">
+                            </div>
 
+                            <div class="form-group">
+                                <label>Tanggal Akhir Bekerja (Hanya untuk Karyawan Kontrak & Internship) <span
+                                        style="color: red">*</span></label>
+                                <input type="date" class="form-control" name="end_date"
+                                    value="{{ old('end_date', $emp->end_date ? $end_date->format('Y-m-d') : null) }}"
+                                    autocomplete="off">
                             </div>
 
 
                             <div class="form-group">
-                                <label>Aktif?</label>
+                                <label>Status Aktif?</label>
                                 <select class="form-control" name="is_active" id="">
                                     <option value="Y">Ya</option>
                                     <option value="N">Tidak</option>

@@ -1,4 +1,3 @@
-<link rel="stylesheet" href="{{ asset('assets/css/form.css') }}">
 <link href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
 <link href="https://fonts.googleapis.com/css?family=Inter:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
     rel="stylesheet">
@@ -9,6 +8,7 @@
 <title>Edit data Karyawan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 <body>
     <div id="wrapper">
@@ -36,9 +36,26 @@
                                 @if ($user_picture->isNotEmpty())
                                     <img style="border-radius:50%;"
                                         src="{{ asset('storage/' . $user_picture->first()->users_foto) }}"
-                                        width="200" height="200" alt="">
+                                        width="200" height="200" title="Foto Profil">
                                 @else
                                     <strong class="text-danger">*Belum Upload Foto</strong>
+                                @endif
+                            </div>
+                            <br>
+                            <div style="display:flex;justify-content:center;" class="qr-code">
+                                @if ($qr_code_employee->first()->qr_code_path == null)
+                                    <form method="POST"
+                                        action="{{ route('generate_qr_code', $employee->first()->nik) }}">
+                                        @csrf
+                                        @method('PUT')
+
+                                        <button type="submit" id="generateqr" class="btn btn-primary"><i
+                                                class="fa fa-qrcode" style="font-size:15px"></i> Generate Kode
+                                            QR</button>
+                                    </form>
+                                @else
+                                    <img src="{{ asset('storage/' . $qr_code_employee->first()->qr_code_path) }}"
+                                        width="80" height="80" title="Kode QR">
                                 @endif
                             </div>
                             <br>
@@ -51,6 +68,16 @@
                             <h4 style="font-size: 14px;color:rgb(0, 0, 0);text-align:center;font-style:italic;">
                                 {{ app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name }}
                             </h4>
+                            <hr>
+
+                            @if ($qr_code_employee->first()->qr_code_path == null)
+                            @else
+                                <div style="display: flex; justify-content:center;" class="id-card">
+                                    <a class="btn btn-primary" href="#" id="openIdCardBtn">
+                                        <i class='fas fa-id-card-alt'></i> ID Card
+                                    </a>
+                                </div>
+                            @endif
                             <hr>
                             @if ($user_picture->isNotEmpty())
                                 <div style="display: block; gap:10px;" class="button-component">
@@ -355,7 +382,10 @@
                                         <div class="form-group">
                                             <label>NIK <span style="color: red">*</span></label>
                                             <input type="text" class="form-control" name="nik"
-                                                value="{{ $emp->nik }}" readonly autocomplete="off">
+                                                value="{{ $emp->nik }}" autocomplete="off">
+                                            @if ($errors->has('nik'))
+                                                <span class="text-danger">{{ $errors->first('nik') }}</span>
+                                            @endif
 
                                         </div>
                                         <div class="form-group">
@@ -412,6 +442,13 @@
                                         </div>
 
                                         <div class="form-group">
+                                            <label>Tipe Pekerjaan Karyawan</label>
+                                            <input type="text" class="form-control" id="start_date"
+                                                value="{{ $emp->is_active == 'contract' ? 'Karyawan Kontrak' : ($emp->is_active == 'permanent' ? 'Karyawan Tetap' : ($emp->is_active == 'internship' ? 'Karyawan Magang' : 'belum pilih tipe perkejaan')) }}"
+                                                autocomplete="off" readonly>
+                                        </div>
+
+                                        <div class="form-group">
                                             <label>Status Karyawan</label>
                                             <input type="text" class="form-control" id="start_date"
                                                 value="{{ $emp->is_active == 'Ya' ? 'Aktif' : 'Tidak Aktif' }}"
@@ -434,6 +471,13 @@
                                             <label>Tanggal Mulai Bekerja</label>
                                             <input type="text" class="form-control" id="start_date"
                                                 value="{{ old('start_date', $emp->start_date ? $start_date->format('Y-m-d') : null) }}"
+                                                autocomplete="off" readonly>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Tanggal Akhir Bekerja</label>
+                                            <input type="text" class="form-control" id="start_date"
+                                                value="{{ old('end_date', $emp->end_date ? $end_date->format('Y-m-d') : null) }}"
                                                 autocomplete="off" readonly>
                                         </div>
 
@@ -462,6 +506,7 @@
                             </div>
                         </div>
 
+                        {{-- UPDATE PASSWORD --}}
                         <div class="container-content">
                             <div style="padding:8px;width:100%;" class="card shadow mb-4">
                                 <div class="card-header py-3">
@@ -518,30 +563,78 @@
                 </div>
             </div>
 
-            {{-- modal hapus foto --}}
+            {{-- Modal Show ID CARD --}}
 
-            <div id="myModal" class="modal-new">
-                <!-- Tambahkan style display: none untuk menyembunyikan modal saat pertama kali dimuat -->
-                <div class="modal-content-new">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteSignatures">Hapus foto profile?</h5>
-                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                            <span class="close" id="closeModalBtn">&times;</span>
+            <div class="modal-id-card" id="showIdCard">
+                <div class="modal-dialog-content" role="idcard">
+
+                    <div style="text-align: center;" class="modal-header">
+                        <h5 style="color:black;font-size:15px;font-weight:bold;" class="modal-title"
+                            id="showIdCardTitle">
+                            Kartu Karyawan PT Sahabat Group Auto
+                        </h5>
+                        <button class="close close-modal" type="button" aria-label="Close">
+                            <span aria-hidden="true">×</span>
                         </button>
                     </div>
+                    <div class="card-body">
+                        <div style="display: flex; justify-content:center; gap:20px;align-items:center;"
+                            class="profile-image-content">
+                            <img style="border-radius:10px;"
+                                src="{{ asset('storage/' . $user_picture->first()->users_foto) }}" width="150"
+                                height="150" title="Foto Profil">
 
-                    <br>
-                    <form method="POST" action="{{ route('delete_foto', $employee->first()->id) }}">
-                        @csrf
-                        @method('DELETE')
+                            <div style="display:flex;justify-content:center;" class="qr-code">
+                                <img src="{{ asset('storage/' . $qr_code_employee->first()->qr_code_path) }}"
+                                    width="130" height="130" title="Kode QR">
+                            </div>
+                        </div>
+
                         <br>
-                        <button type="submit" class="btn btn-danger">Hapus</button>
-                    </form>
-                </div>
+                        <hr>
+                        <h4 style="font-size: 14px;color:rgb(1, 1, 1);text-align:center;">
+                            <strong>{{ app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->nik . ' - ' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name }}</strong>
+                        </h4>
+                        <h4 style="font-size: 14px;color:rgb(11, 11, 11);text-align:center;font-style:italic;">
+                            {{ $employee->first()->job_position }}
+                        </h4>
+                        <div class="dept-name">
+                            <h4 style="font-size: 14px;color:rgb(255, 255, 255);text-align:center;margin:0;">
+                                {{ $employee->first()->department_name }}
+                            </h4>
+                        </div>
+                    </div>
 
+                </div>
             </div>
+
+            {{-- END MODAL ID CARD --}}
             @include('layouts.admin_views.footer')
         </div>
+
+        {{-- MOdal delete user picture --}}
+
+        <div id="myModal" class="modal-new">
+            <!-- Tambahkan style display: none untuk menyembunyikan modal saat pertama kali dimuat -->
+            <div class="modal-content-new">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteSignatures">Hapus foto profile?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span class="close" id="closeModalBtn">&times;</span>
+                    </button>
+                </div>
+
+                <br>
+                <form method="POST" action="{{ route('delete_foto', $employee->first()->id) }}">
+                    @csrf
+                    @method('DELETE')
+                    <br>
+                    <button type="submit" class="btn btn-danger">Hapus</button>
+                </form>
+            </div>
+
+        </div>
+        {{-- end --}}
 
         {{-- modal delete signature --}}
         <div class="modal fade" id="deleteSignature" tabindex="-1" role="dialog"
@@ -564,7 +657,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     {{-- spinner --}}
@@ -672,5 +764,33 @@
             }
         }
 
+    });
+
+
+
+
+    // scricpt for open modal id card
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const openBtn = document.getElementById('openIdCardBtn');
+        const modal = document.getElementById('showIdCard');
+        const closeBtn = modal.querySelector('.close-modal');
+
+        // Buka modal saat tombol diklik
+        openBtn.addEventListener('click', function(e) {
+            modal.style.display = 'block'; // pastikan pakai flex (sesuai CSS)
+        });
+
+        // Tutup modal saat klik tombol "×"
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+
+        // Tutup modal saat klik area luar konten modal
+        window.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
     });
 </script>

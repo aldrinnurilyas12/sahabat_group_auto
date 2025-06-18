@@ -106,7 +106,7 @@
                                         </div>
 
                                         <button style="height: 40px; align-self:end;" type="submit"
-                                            class="btn btn-dark">Pilih</button>
+                                            class="btn btn-primary">Pilih</button>
                                         <a href="{{ route('master_employee.index') }}"
                                             style="height: 40px; align-self:end;" class="btn btn-secondary">Reset</a>
                                     </div>
@@ -121,8 +121,8 @@
                                         <br>
                                         <!-- Memastikan bahwa $month adalah objek dan mengakses propertinya, misalnya 'name' -->
                                         <div class="alert alert-warning">
-                                            Kantor :{{ $departments }} <br>
-                                            Department :{{ $offices }}
+                                            Kantor :{{ $offices }} <br>
+                                            Department :{{ $departments }}
                                             <!-- Menampilkan tahun yang dipilih dari array $year -->
                                         </div>
                                     @elseif($employee->isEmpty())
@@ -139,13 +139,14 @@
                         </div>
 
                         <ul class="nav nav-tabs mb-3" id="ex1" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <a data-mdb-tab-init class="nav-link active" id="ex1-tab-1" href="#ex1-tabs-1"
+                            <li style="padding: 15px;background:whitesmoke;" class="nav-item" role="presentation">
+                                <a data-mdb-tab-init class="nav-link-employee active" id="ex1-tab-1" href="#ex1-tabs-1"
                                     role="tab" aria-controls="ex1-tabs-1" aria-selected="true">Data Karyawan</a>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <a data-mdb-tab-init class="nav-link" id="ex1-tab-2" href="#ex1-tabs-2" role="tab"
-                                    aria-controls="ex1-tabs-2" aria-selected="false">Data Karyawan Resign</a>
+                            <li style="padding: 15px;" class="nav-item" role="presentation">
+                                <a data-mdb-tab-init class="nav-link-employee" id="ex1-tab-2" href="#ex1-tabs-2"
+                                    role="tab" aria-controls="ex1-tabs-2" aria-selected="false">Data Karyawan
+                                    Resign</a>
                             </li>
                         </ul>
 
@@ -161,6 +162,7 @@
                                                 <tr>
                                                     <th>No</th>
                                                     <th>Aksi</th>
+                                                    <th>Kode QR</th>
                                                     <th>NIK</th>
                                                     <th>Nama</th>
                                                     <th>Alamat</th>
@@ -169,6 +171,7 @@
                                                     <th>Email</th>
                                                     <th>Posisi</th>
                                                     <th>Department</th>
+                                                    <th>Tipe Pekerjaan</th>
                                                     <th>Kantor</th>
                                                     <th>Gaji Pokok</th>
                                                     <th>Tunjangan Transport</th>
@@ -177,7 +180,7 @@
                                                     <th>Total Gaji</th>
                                                     <th>Status Aktif</th>
                                                     <th>Tanggal Mulai</th>
-                                                    {{-- <th>Tanggal Resign</th> --}}
+                                                    <th>Tanggal Akhir</th>
                                                     <th>Created at</th>
                                                     <th>Created by</th>
                                                     <th>Updated at</th>
@@ -200,6 +203,15 @@
                                                                     data-target="#deleteEmployee{{ $emp->id }}"><i
                                                                         class="fas fa-trash"></i></a>
                                                         </td>
+
+                                                        @if ($emp->qr_code_path == null)
+                                                            <td><a class="btn btn-primary" href="">Generate QR
+                                                                    Code</a></td>
+                                                        @else
+                                                            <td><img style="width: 100px; height:100px;"
+                                                                    src="{{ asset('storage/' . $emp->qr_code_path) }}"
+                                                                    alt=""></td>
+                                                        @endif
                                                         <td>{{ $emp->nik }}</td>
                                                         <td>{{ Str::upper($emp->name) }}</td>
                                                         <td>{{ $emp->address }}</td>
@@ -208,6 +220,7 @@
                                                         <td>{{ $emp->email }}</td>
                                                         <td>{{ $emp->job_position }}</td>
                                                         <td>{{ $emp->department_name }}</td>
+                                                        <td>{{ $emp->type_of_employee }}</td>
                                                         <td>{{ $emp->location_name }}</td>
                                                         <td>{{ 'Rp ' . number_format($emp->salary) }}</td>
                                                         <td>{{ 'Rp ' . number_format($emp->tunjangan_transport) }}</td>
@@ -217,15 +230,8 @@
                                                         <td>{{ $emp->is_active }}</td>
                                                         <td>{{ old('start_date', $emp->start_date ? \Carbon\Carbon::parse($emp->start_date)->format('d-m-Y') : '') }}
                                                         </td>
-                                                        {{-- <td>
-                                                            @if ($emp->resign_date == null)
-                                                                <a style="text-decoration: underline;"
-                                                                    href="{{ route('resign_employee', $emp->id) }}">Ajukan
-                                                                    Resign</a>
-                                                            @else
-                                                                {{ old('resign_date', $emp->resign_date ? \Carbon\Carbon::parse($emp->resign_date)->format('d-m-Y') : '') }}
-                                                        </td> --}}
-                                                        {{-- @endif --}}
+                                                        <td>{{ old('end_date', $emp->end_date ? \Carbon\Carbon::parse($emp->end_date)->format('d-m-Y') : '') }}
+                                                        </td>
                                                         <td>{{ $emp->created_at }}</td>
                                                         <td>{{ $emp->created_by }}</td>
                                                         <td>{{ $emp->updated_at }}</td>
@@ -240,7 +246,9 @@
                                 </div>
 
                             </div>
-                            {{-- credit simulation --}}
+
+
+                            {{-- SEGMENT RESIGN KARYAWAN --}}
                             <div class="tab-pane fade" id="ex1-tabs-2" role="tabpanel" aria-labelledby="ex1-tab-2">
                                 <div class="card-body">
                                     <div class="table-responsive">
@@ -249,26 +257,17 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
-                                                    <th>Aksi</th>
-                                                    <th>Status</th>
+                                                    <th>Status Approval</th>
                                                     <th>NIK</th>
                                                     <th>Nama</th>
-                                                    <th>Alamat</th>
-                                                    <th>Usia</th>
-                                                    <th>Telepon</th>
-                                                    <th>Email</th>
                                                     <th>Posisi</th>
                                                     <th>Department</th>
                                                     <th>Kantor</th>
-                                                    <th>Tanggal Resign</th>
                                                     <th>Tanggal Approval Resign</th>
                                                     <th>Alasan Resign</th>
-                                                    <th>Status Aktif</th>
-                                                    <th>Tanggal Mulai</th>
+                                                    <th>Tanggal Resign</th>
+                                                    <th>Properti perusahaan yang dikembalikan</th>
                                                     <th>Created at</th>
-                                                    <th>Created by</th>
-                                                    <th>Updated at</th>
-                                                    <th>Updated by</th>
                                                 </tr>
                                             </thead>
 
@@ -277,40 +276,17 @@
                                                 @foreach ($employee_resign as $emp_rsn)
                                                     <tr>
                                                         <td><?php echo $no++; ?></td>
-                                                        <td>
-                                                            <div style="display:flex; justify-content:center;gap:8px; "
-                                                                class="action">
-                                                                <a href="{{ route('edit_employee', $emp_rsn->id) }}"><i
-                                                                        class="fas fa-edit"></i></a>
-                                                                <a style="size: 12px;" href="#"
-                                                                    data-toggle="modal"
-                                                                    data-target="#deleteEmployee{{ $emp_rsn->id }}"><i
-                                                                        class="fas fa-trash"></i></a>
-                                                        </td>
-                                                        <td>
-                                                            @if ($emp_rsn->is_active == 'Tidak')
-                                                                <p class="text-danger">Resign</p>
-                                                            @else
-                                                            @endif
+                                                        <td class="text-success">{{ $emp_rsn->resign_status }}</td>
                                                         <td>{{ $emp_rsn->nik }}</td>
                                                         <td>{{ Str::upper($emp_rsn->name) }}</td>
-                                                        <td>{{ $emp_rsn->address }}</td>
-                                                        <td>{{ $emp_rsn->age }}</td>
-                                                        <td>{{ $emp_rsn->phone_number }}</td>
-                                                        <td>{{ $emp_rsn->email }}</td>
-                                                        <td>{{ $emp_rsn->job_position }}</td>
+                                                        <td>{{ $emp_rsn->position_name }}</td>
                                                         <td>{{ $emp_rsn->department_name }}</td>
                                                         <td>{{ $emp_rsn->location_name }}</td>
-                                                        <td>{{ $emp_rsn->resign_date }}</td>
                                                         <td>{{ $emp_rsn->approval_resign_date }}</td>
                                                         <td>{{ $emp_rsn->resign_reasons }}</td>
-                                                        <td>{{ $emp_rsn->is_active }}</td>
-                                                        <td>{{ old('start_date', $emp_rsn->start_date ? \Carbon\Carbon::parse($emp_rsn->start_date)->format('d-m-Y') : '') }}
+                                                        <td>{{ old('resign_date', $emp_rsn->resign_date ? \Carbon\Carbon::parse($emp_rsn->resign_date)->format('d-m-Y') : '') }}
+                                                        <td>{{ $emp_rsn->return_company_property }}</td>
                                                         <td>{{ $emp_rsn->created_at }}</td>
-                                                        <td>{{ $emp_rsn->created_by }}</td>
-                                                        <td>{{ $emp_rsn->updated_at }}</td>
-                                                        <td>{{ $emp_rsn->updated_by }}</td>
-
                                                     </tr>
                                                 @endforeach
 
@@ -498,7 +474,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         // Select all tab links
-        const tabLinks = document.querySelectorAll('.nav-link');
+        const tabLinks = document.querySelectorAll('.nav-link-employee');
 
         // Add click event to each tab link
         tabLinks.forEach(link => {

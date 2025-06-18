@@ -14,6 +14,8 @@ use Illuminate\Support\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
+use App\Exports\EmployeeResignExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 
 
@@ -339,6 +341,42 @@ class EmployeeResign extends Controller
 
         return $resignation_letter->download($filename);
     }
+
+
+    public function employee_export_resign(Request $request)
+    {
+        // $departments = $request->department; // Full month name (e.g., January)
+        $offices = $request->office; // Current year (e.g., 2024)
+
+        $fileName = 'Data_Resign_Karyawan' . '_' . $offices . '-' . date('Y') . '.xlsx';
+
+        return Excel::download(new EmployeeResignExport($offices), $fileName);
+    }
+
+    public function filter_employee_resign(Request $request)
+    {
+        $employee = DB::table('v_employee_resign')->get();
+        $office = DB::table('branch')->get();
+        $offices = $request->office;
+        $departments = $request->department;
+
+
+        if ($offices) {
+            $employee_resign = DB::table('v_employee_resign')->where('location_name', $offices)->get();
+        }
+        if ($offices === 'alldata') {
+            $employee = DB::table('v_employee_resign')->get();
+            $employee_resign = DB::table('v_employee_resign')->get();
+        }
+
+
+
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+        return view('layouts.admin_views.employee_resign.employee_resign_main', compact('employee_resign', 'employee', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices'));
+    }
+
 
     /**
      * Update the specified resource in storage.

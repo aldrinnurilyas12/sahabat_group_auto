@@ -17,6 +17,7 @@ use App\Models\UsersPicture;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 use function Laravel\Prompts\table;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\Cast\Array_;
@@ -24,6 +25,15 @@ use App\Http\Resources\EmployeeResource;
 use App\Models\EmployeeBankAccount;
 use App\Models\EmployeeResignModel;
 use App\Models\EmployeeSignature;
+use App\Models\EmployeeTypePosition;
+use BaconQrCode\Writer;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\Image\EpsImageBackEnd;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+
+
+// use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class EmployeeController extends Controller
 {
@@ -43,7 +53,7 @@ class EmployeeController extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $employee = DB::table('v_employee')->where('is_active', 'Ya')->get();
-        $employee_resign = DB::table('v_employee')->where('is_active', 'Tidak')->get();
+        $employee_resign = DB::table('v_employee_resign')->where('resign_status', 'sudah konfirmasi')->get();
         $office = DB::table('branch')->get();
         $department = DB::table('department')->get();
         $offices = $request->office;
@@ -115,6 +125,10 @@ class EmployeeController extends Controller
         $job_position = JobPositionModel::all();
         $branch = DB::table('branch')->get();
         $banks = DB::table('bank')->get();
+
+
+
+
         return view('layouts.admin_views.employee.create.add_employee', compact('employee', 'banks', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -126,7 +140,7 @@ class EmployeeController extends Controller
         $insertTime = (int) date('H');
 
         $request->validate([
-            'nik' => 'required|max:6|unique:employee',
+            'nik' => 'required|max:16|unique:employee',
             'name'  => 'required',
             'address' => 'required',
             'phone_number' => 'required|unique:employee',
@@ -136,9 +150,44 @@ class EmployeeController extends Controller
         ]);
         $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
+        $checking_email_available = DB::table('employee')->where('email', $request->email)->first();
+        $cheking_phone_number_available = DB::table('employee')->where('phone_number', "+62 " . $request->phone_number)->first();
+
+        // code for QR CODE Employee
+
+        $location_name = DB::table('branch')->select('location_name')->where('id', $request->branch_id)->first();
+        $position = DB::table('job_position')->select('position_name')->where('id', $request->job_position)->first();
+
+        $employee_data_qr_code  = [
+            'nik' => $request->nik,
+            'name' => $request->name,
+            'job_position' => $position->position_name,
+            'branch' => $location_name->location_name
+        ];
+
+        // dd($employee_data_qr_code);
+
+        $folderPath = public_path('employee_qrcode');
+        if (!File::exists($folderPath)) {
+            File::makeDirectory($folderPath, 0755, true);
+        }
+
+        $qrCodePath = 'employee_qrcode/' . $request->nik . '.svg';
+        $renderer = new ImageRenderer(
+            new RendererStyle(400),
+            new SvgImageBackEnd()
+        );
+
+        $writer = new Writer($renderer);
+        $svgOutput = $writer->writeString(json_encode($employee_data_qr_code));
+
+        Storage::disk('public')->put('employee_qrcode/' . $request->nik . '.svg', $svgOutput);
+
+
+
         if ($SETTING_TIME->open_schedule_time == 'on') {
             if ($insertTime >= 7 && $insertTime <= 18) {
-                EmployeeModel::create([
+                $employee = EmployeeModel::create([
                     'nik' => $request->nik,
                     'name' => $request->name,
                     'address' => $request->address,
@@ -146,12 +195,19 @@ class EmployeeController extends Controller
                     'email' => $request->email,
                     'job_position' => $request->job_position,
                     'branch_id' => $request->branch_id,
-                    'is_active' => $request->is_active,
+                    'is_active' => 'Y',
                     'birth_date' => $request->birth_date,
                     'start_date' => $request->start_date,
-                    'resign_date' => $request->resign_date,
+                    'qr_code_path' => $qrCodePath,
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                ]);
+
+                EmployeeTypePosition::create([
+                    'employee_id' => $employee->latest()->first()->id,
+                    'type_of_employee' => $request->type_of_employee,
+                    'start_date' => $request->start_date,
+                    'end_date' => $request->end_date
                 ]);
 
                 EmployeeBankAccount::create([
@@ -162,6 +218,12 @@ class EmployeeController extends Controller
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
 
                 ]);
+
+                if ($checking_email_available && $cheking_phone_number_available) {
+                    session()->flash('failed_insert', 'Email sudah terdaftar, silahkan gunakan email lain!');
+                    return redirect()->back();
+                }
+
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Berhasil disimpan!');
                 return redirect()->route('master_employee.index');
@@ -170,7 +232,7 @@ class EmployeeController extends Controller
                 return redirect()->route('master_employee.index');
             }
         } else {
-            EmployeeModel::create([
+            $employee =  EmployeeModel::create([
                 'nik' => $request->nik,
                 'name' => $request->name,
                 'address' => $request->address,
@@ -178,12 +240,19 @@ class EmployeeController extends Controller
                 'email' => $request->email,
                 'job_position' => $request->job_position,
                 'branch_id' => $request->branch_id,
-                'is_active' => $request->is_active,
+                'is_active' => 'Y',
                 'birth_date' => $request->birth_date,
                 'start_date' => $request->start_date,
-                'resign_date' => $request->resign_date,
+                'qr_code_path' => $qrCodePath,
                 'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+            ]);
+
+            EmployeeTypePosition::create([
+                'employee_id' => $employee->latest()->first()->id,
+                'type_of_employee' => $request->type_of_employee,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date
             ]);
 
             EmployeeBankAccount::create([
@@ -194,6 +263,12 @@ class EmployeeController extends Controller
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
 
             ]);
+
+            if ($checking_email_available && $cheking_phone_number_available) {
+                session()->flash('failed_insert', 'Email sudah terdaftar, silahkan gunakan email lain!');
+                return redirect()->back();
+            }
+
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
             return redirect()->route('master_employee.index');
@@ -227,21 +302,21 @@ class EmployeeController extends Controller
 
         if ($offices && $departments) {
             $employee = DB::table('v_employee')->where('is_active', 'Ya')->where('department_name', $departments)->where('location_name', $offices)->get();
-            $employee_resign = DB::table('v_employee')->where('is_active', 'Tidak')->where('department_name', $departments)->where('location_name', $offices)->get();
+            $employee_resign = DB::table('v_employee_resign')->where('resign_status', 'sudah konfirmasi')->where('department_name', $departments)->where('location_name', $offices)->get();
         }
 
         if ($offices === 'alldata') {
             $employee = DB::table('v_employee')->where('is_active', 'Ya')->where('department_name', $departments)->get();
-            $employee_resign = DB::table('v_employee')->where('is_active', 'Tidak')->where('department_name', $departments)->get();
+            $employee_resign = DB::table('v_employee_resign')->where('resign_status', 'sudah konfirmasi')->where('department_name', $departments)->get();
         }
 
         if ($departments === 'alldata') {
             $employee = DB::table('v_employee')->where('is_active', 'Ya')->where('location_name', $offices)->get();
-            $employee_resign = DB::table('v_employee')->where('is_active', 'Tidak')->where('location_name', $offices)->get();
+            $employee_resign = DB::table('v_employee_resign')->where('resign_status', 'sudah konfirmasi')->where('location_name', $offices)->get();
         }
         if ($offices === 'alldata' && $departments === 'alldata') {
             $employee = DB::table('v_employee')->where('is_active', 'Ya')->get();
-            $employee_resign = DB::table('v_employee')->where('is_active', 'Tidak')->get();
+            $employee_resign = DB::table('v_employee_resign')->where('resign_status', 'sudah konfirmasi')->get();
         }
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
@@ -276,6 +351,7 @@ class EmployeeController extends Controller
         $start_date = Carbon::parse($emp->start_date);
         $resign_date = Carbon::parse($emp->resign_date);
         $birth_date  = Carbon::parse($emp->birth_date);
+        $end_date = Carbon::parse($emp->end_date);
 
         $employee = DB::table('v_employee')->where('id', $request->id)->get();
         $main_menu = DB::table('v_main_menu')->get();
@@ -283,7 +359,7 @@ class EmployeeController extends Controller
         $branch = DB::table('branch')->get();
         $banks = DB::table('bank')->get();
 
-        return view('layouts.admin_views.employee.edit.edit_employee', compact('employee', 'banks', 'start_date', 'birth_date', 'resign_date', 'branch', 'job_position', 'main_menu', 'grouped_sub_menu', 'sidebar_menu'));
+        return view('layouts.admin_views.employee.edit.edit_employee', compact('employee', 'banks', 'start_date', 'end_date', 'birth_date', 'resign_date', 'branch', 'job_position', 'main_menu', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
 
@@ -291,7 +367,7 @@ class EmployeeController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'nik' => 'max:6'
+            'nik' => 'max:16'
         ]);
 
         date_default_timezone_set('Asia/Jakarta');
@@ -312,9 +388,16 @@ class EmployeeController extends Controller
                     'is_active' => $request->is_active,
                     'birth_date' => $request->birth_date,
                     'start_date' => $request->start_date,
-                    'resign_date' => $request->resign_date,
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'updated_at' => now()
+                ]);
+
+
+                EmployeeTypePosition::where('employee_id', $request->id)->update([
+                    'employee_id' => $request->id,
+                    'type_of_employee' => $request->type_of_employee,
+                    'start_date' => $request->start_date,
+                    'end_date' => $request->end_date
                 ]);
 
                 if ($checkingBankAccount === null) {
@@ -358,6 +441,14 @@ class EmployeeController extends Controller
                 'updated_at' => now()
             ]);
 
+
+            EmployeeTypePosition::where('employee_id', $request->id)->update([
+                'employee_id' => $request->id,
+                'type_of_employee' => $request->type_of_employee,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date
+            ]);
+
             if ($checkingBankAccount === null) {
                 EmployeeBankAccount::create([
                     'nik' => $request->nik,
@@ -388,9 +479,15 @@ class EmployeeController extends Controller
         $insertTime = (int) date('H');
         $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
+        $request->validate([
+            'nik' => 'max:16'
+        ]);
+
+        $employee_id = $request->id;
+
         if ($SETTING_TIME->open_schedule_time == 'on') {
             if ($insertTime >= 5 && $insertTime <= 18) {
-                DB::table('employee')->where('nik', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->nik)->update([
+                DB::table('employee')->where('id', $employee_id)->update([
                     'nik' => $request->nik,
                     'name' => $request->name,
                     'address' => $request->address,
@@ -408,7 +505,7 @@ class EmployeeController extends Controller
                 return redirect()->route('profile', ['nik' => auth()->user()->nik]);
             }
         } else {
-            DB::table('employee')->where('nik', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->nik)->update([
+            DB::table('employee')->where('id', $employee_id)->update([
                 'nik' => $request->nik,
                 'name' => $request->name,
                 'address' => $request->address,
@@ -647,7 +744,54 @@ class EmployeeController extends Controller
         $checking_employee_resign_status = DB::table('v_employee_resign')->where('employee_id', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id)->get();
         $checking_absences_status = DB::table('v_employee_leaves')->where('employee_id', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id)->latest()->first();
 
-        return view('layouts.admin_views.employee_profile.edit.edit_profile', compact('employee', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu', 'user', 'start_date', 'birth_date', 'user_picture', 'signature_employee', 'checking_employee_resign_status', 'checking_absences_status'));
+        $qr_code_employee = DB::table('employee')->select('qr_code_path')->where('nik', auth()->user()->nik)->get();
+
+        return view('layouts.admin_views.employee_profile.edit.edit_profile', compact('employee', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu', 'user', 'start_date', 'birth_date', 'user_picture', 'signature_employee', 'checking_employee_resign_status', 'checking_absences_status', 'qr_code_employee'));
+    }
+
+
+    public function generate_qr_code(Request $request)
+    {
+
+        $employee_branch_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id;
+        $employee_job_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position;
+        $nik =  app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->nik;
+        $name =  app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name;
+
+        $location_name = DB::table('branch')->select('location_name')->where('id', $employee_branch_id)->first();
+        $position = DB::table('job_position')->select('position_name')->where('id', $employee_job_id)->first();
+
+        $employee_data_qr_code  = [
+            'nik' => $nik,
+            'name' => $name,
+            'job_position' => $position->position_name,
+            'branch' => $location_name->location_name
+        ];
+
+        // dd($employee_data_qr_code);
+
+        $folderPath = public_path('employee_qrcode');
+        if (!File::exists($folderPath)) {
+            File::makeDirectory($folderPath, 0755, true);
+        }
+
+        $qrCodePath = 'employee_qrcode/' . $request->nik . '.svg';
+        $renderer = new ImageRenderer(
+            new RendererStyle(400),
+            new SvgImageBackEnd()
+        );
+
+        $writer = new Writer($renderer);
+        $svgOutput = $writer->writeString(json_encode($employee_data_qr_code));
+
+        Storage::disk('public')->put('employee_qrcode/' . $request->nik . '.svg', $svgOutput);
+
+
+        EmployeeModel::where('nik', $nik)->update([
+            'qr_code_path' => $qrCodePath
+        ]);
+
+        return redirect()->back()->with('message_success', 'QR Code berhasil dibuat!');
     }
 
 

@@ -72,6 +72,12 @@ class LandingPageController extends Controller
         return view('layouts.landing_page.main_page.all_vehicle', compact('vehicle_ads', 'brand', 'lowerprice', 'highprice', 'search'));
     }
 
+    public function all_blog(Request $request): View
+    {
+        $all_blog = DB::table('blog')->orderBy('post_date', 'DESC')->paginate(12);
+        return view('layouts.landing_page.main_page.all_blog', compact('all_blog'));
+    }
+
     // public function filterbyvehiclebrand(Request $request): View
     // {
     //     // Ambil brand yang dipilih dari request
@@ -383,8 +389,9 @@ class LandingPageController extends Controller
     public function showBlog(Request $request, string $id): View
     {
         $blog_data = DB::table('blog')->where('id', $request->id)->get();
+        $editor = DB::table('blog')->select(DB::raw('TRIM(SUBSTRING_INDEX(created_by, "-", -1)) AS editor_name'))->where('id', $request->id)->first();
 
-        return view('layouts.landing_page.main_page.show_blog', compact('blog_data'));
+        return view('layouts.landing_page.main_page.show_blog', compact('blog_data', 'editor'));
     }
 
 

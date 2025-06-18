@@ -52,10 +52,10 @@
                                 <i class="fas fa-plus-circle"></i>&nbsp;Tambah Banner
                             </a>
 
-                            <a class="btn btn-success" href="{{ route('branch_export') }}">
+                            {{-- <a class="btn btn-success" href="{{ route('branch_export') }}">
                                 <i class="fas fa-file-excel"></i>
                                 &nbsp; Download
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
                     <div class="card-body">
@@ -71,10 +71,8 @@
                                         <th>Judul Banner</th>
                                         <th>Konten Text</th>
                                         <th>Aktif</th>
-                                        <th>Button 1</th>
-                                        <th>Button 2</th>
-                                        <th>Link 1</th>
-                                        <th>Link 2</th>
+                                        <th>Button 1 & Link</th>
+                                        <th>Button 2 & Link</th>
                                         <th>Created At</th>
                                         <th>Created By</th>
                                         <th>Updated At</th>
@@ -99,6 +97,11 @@
                                             </td>
                                             <td><img style="width: 100px; height:100px;"
                                                     src="{{ asset('storage/' . $banner->banner_file) }}" alt="">
+                                                <br>
+                                                <br>
+                                                <a class="btn btn-dark" style="font-size: 13px;" href="#"
+                                                    data-toggle="modal"
+                                                    data-target="#showBanner{{ $banner->id }}">Preview</a>
                                             </td>
                                             <td>{{ $banner->banner_name }}</td>
                                             <td>{{ $banner->banner_title }}</td>
@@ -109,10 +112,19 @@
                                             @else
                                                 <td> <span class="text-secondary">Tidak Aktif</span></td>
                                             @endif
-                                            <td>{{ $banner->button_1 }}</td>
-                                            <td>{{ $banner->button_2 }}</td>
-                                            <td>{{ $banner->link_1 }}</td>
-                                            <td>{{ $banner->link_2 }}</td>
+
+                                            @if ($banner->button_1 && $banner->button_2 && $banner->link_1 && $banner->link_2)
+                                                <td>Label : <strong> {{ $banner->button_1 }} </strong> <br> <br> Link :
+                                                    <strong> {{ $banner->link_1 }} </strong>
+                                                </td>
+                                                <td>Label : <strong> {{ $banner->button_2 }} </strong> <br> <br> Link :
+                                                    <strong> {{ $banner->link_2 }} </strong>
+                                                </td>
+                                            @else
+                                                <td class="text-secondary">Tidak ada button dan link untuk banner ini
+                                                </td>
+                                            @endif
+
                                             <td>{{ $banner->created_at }}</td>
                                             <td>{{ $banner->created_by }}</td>
                                             <td>{{ $banner->updated_at }}</td>
@@ -173,6 +185,67 @@
     @endforeach
 
     {{-- end modal --}}
+
+
+    {{-- MODAL FOR PREVIEW BANNER --}}
+
+    @foreach ($banner_data as $banner)
+        <div class="modal fade" id="showBanner{{ $banner->id }}" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalLabel{{ $banner->id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel{{ $banner->id }}">Preview Banner:
+                            {{ $banner->banner_name }}</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+
+                    <div class="max-w-screen-xl px-4 py-4 mx-auto space-y-12 lg:space-y-20 lg:py-24 lg:px-6">
+
+                        <div style="margin-bottom: 20px;">
+
+                            <div>
+                                {{-- buat  kondisi jika card pakai agak gelap agar tulisan kebaca --}}
+                                <div style="display:flex; justify-content:center;" class="dflex-content">
+                                    <div class="content-banner">
+                                        <h5>{{ $banner->banner_title }}</h5>
+                                        <p>{{ $banner->text_content }}</p>
+
+                                        <br>
+
+
+                                        @if ($banner->button_1)
+                                            <div style="display:flex; gap:10px;" class="button-flex">
+                                                <a style="background: black; color:white;" class="btn btn-dark"
+                                                    href="{{ url($banner->link_1) }}">{{ $banner->button_1 }}</a>
+                                                <a style="color: black; border:2px solid black; border-radius:4px;padding:4px;"
+                                                    href="{{ url($banner->link_2) }}">{{ $banner->button_2 }}</a>
+                                            </div>
+                                        @elseif($banner->button_2)
+                                            <a class="btn btn-outline-dark"
+                                                href="{{ url($banner->link_2) }}">{{ $banner->button_2 }}</a>
+                                        @else
+                                        @endif
+                                    </div>
+
+                                </div>
+                                <img style="width:400px; height:400px;" class="d-block w-100"
+                                    src="{{ asset('storage/' . $banner->banner_file) }}">
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+    {{-- END BANNER --}}
+
     <!-- End of Page Wrapper -->
 
     <!-- Scroll to Top Button-->
@@ -216,6 +289,24 @@
             width: 3rem;
             height: 3rem;
             /* Pastikan tinggi spinner diatur */
+        }
+
+        .content-banner {
+            width: 350px;
+            padding: 10px;
+            position: absolute;
+            margin-top: 25%;
+        }
+
+        .content-banner p {
+            color: white;
+            width: 300px;
+        }
+
+
+        .content-banner h5 {
+            font-size: 20px;
+            color: white;
         }
     </style>
 </body>

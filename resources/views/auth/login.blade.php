@@ -19,10 +19,10 @@
                 class="alert alert-warning">
                 <x-input-error :messages="$errors->get('password')" />
             </div>
-        @elseif($errors->get('nik'))
+        @elseif($errors->get('login'))
             <div style="padding: 3px;background:rgba(255, 105, 50, 0.416); color:rgb(255, 94, 0);border-radius:5px;font-weight:bold;display: flex; align-items: center;"
                 class="alert alert-warning">
-                <x-input-error :messages="$errors->get('nik')" />
+                <x-input-error :messages="$errors->get('login')" />
             </div>
         @else
         @endif
@@ -33,9 +33,9 @@
             @csrf
             <!-- nik Address -->
             <div class="form-group">
-                <x-input-label :value="__('NIK')" />
-                <x-text-input id="nik" class="block mt-1 w-full" type="text" name="nik" :value="old('nik')"
-                    required autofocus autocomplete="off" />
+                <x-input-label :value="__('NIK atau Email anda')" />
+                <x-text-input id="nik" class="block mt-1 w-full" type="text" value="{{ old('login') }}"
+                    name="login" required autofocus autocomplete="off" />
 
             </div>
 

@@ -84,6 +84,8 @@ Route::middleware('guest')->group(function () {
     Route::put('ads_clicked/{slug}', [LandingPageController::class, 'clicked_ads'])->name('ads_clicked');
     Route::get('search/', [LandingPageController::class, 'searchControll'])->name('search/');
 
+    Route::get('all_blog', [LandingPageController::class, 'all_blog'])->name('all_blog');
+
 
     Route::get('show_blog/{id}', [LandingPageController::class, 'showBlog'])->name('show_blog');
     // route vehicle sale request
@@ -133,7 +135,7 @@ Route::middleware('auth')->group(function () {
     Route::get('users_create', [RegisteredUserController::class, 'users_create_layout'])->name('users_create');
     Route::get('/get_email_nik/{employeeId}', [RegisteredUserController::class, 'getEmailNik']);
     Route::get('profile', [EmployeeController::class, 'profile'])->name('profile');
-    Route::put('user_update/', [EmployeeController::class, 'user_update'])->name('user_update');
+    Route::put('user_update/{id}', [EmployeeController::class, 'user_update'])->name('user_update');
     Route::post('users_picture', [EmployeeController::class, 'upload_users_picture'])->name('users_picture');
     Route::put('update_picture/{id}', [EmployeeController::class, 'update_user_picture'])->name('update_picture');
     Route::get('users_export', [EmployeeController::class, 'users_export'])->name('users_export');
@@ -175,18 +177,23 @@ Route::middleware('auth')->group(function () {
     Route::delete('delete_signature/{employee_id}', [EmployeeController::class, 'delete_signature'])->name('delete_signature');
     Route::delete('delete_foto/{employee_id}', [EmployeeController::class, 'delete_foto'])->name('delete_foto');
     Route::get('resign_employee', [EmployeeResign::class, 'employee_resign_layout'])->name('resign_employee');
+    Route::put('generate_qr_code/{nik}', [EmployeeController::class, 'generate_qr_code'])->name('generate_qr_code');
 
     // EMPLOYEE RESIGN
     Route::apiResource('employee_resign', App\Http\Controllers\Api\EmployeeResign::class);
     Route::put('confirm_employee_resign/{id}', [EmployeeResign::class, 'confirm_employee_resign'])->name('confirm_employee_resign');
     Route::get('get_resignation_letter/{resign_code}', [EmployeeResign::class, 'download_resignation_letter'])->name('get_resignation_letter');
     Route::get('get_employee_resign/{id}', [EmployeeResign::class, 'get_resign'])->name('get_employee_resign');
+    Route::get('filter_employee_resign', [EmployeeResign::class, 'filter_employee_resign'])->name('filter_employee_resign');
+    Route::post('/export_employee_resign', [EmployeeResign::class, 'employee_export_resign'])->name('export_employee_resign');
 
     // EMPLOYEE LEAVES
     Route::apiResource('employee_leaves', App\Http\Controllers\Api\EmployeeLeaves::class);
     Route::get('employee_absences_leaves', [EmployeeLeaves::class, 'employee_absences_leaves'])->name('employee_absences_leaves');
     Route::put('confirm_employee_leaves/{id}', [EmployeeLeaves::class, 'confirm_employee_leaves'])->name('confirm_employee_leaves');
     Route::get('get_absences_letter/{absences_code}', [EmployeeLeaves::class, 'download_absences_letter'])->name('get_absences_letter');
+    Route::get('filter_employee_leaves', [EmployeeLeaves::class, 'filter_employee_leaves'])->name('filter_employee_leaves');
+    Route::post('/export_employee_leaves', [EmployeeLeaves::class, 'employee_export_leaves'])->name('export_employee_leaves');
 
     // ROUTE FOR API employee
     // Route::get('get_employee', [EmployeeController::class, 'getEmployee'])->name('get_employee');
@@ -367,4 +374,10 @@ Route::middleware('auth')->group(function () {
 
     // SHOWTESTIMONIAL
     Route::get('show_testimonial', [Analytics::class, 'show_testimonial_data'])->name('show_testimonial');
+
+
+
+    // IT ONLY ACCESS
+
+    Route::apiResource('settings_role_permission', App\Http\Controllers\Api\SettingsApp::class);
 });

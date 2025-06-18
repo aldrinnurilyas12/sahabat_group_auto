@@ -47,10 +47,10 @@
                             <div style="display: flex; gap:10px; font-family:inter,sans-serif;" class="btn-content">
 
                                 @if ($employee_resign->isNotEmpty())
-                                    <form action="{{ route('export_employee') }}" method="POST">
+                                    <form action="{{ route('export_employee_resign') }}" method="POST">
                                         @csrf
                                         <input type="text" name="office" value="{{ $offices }}" hidden>
-                                        <input type="text" value="{{ $departments }}" name="department" hidden>
+                                        {{-- <input type="text" value="{{ $departments }}" name="department" hidden> --}}
                                         <button type="submit" class="btn btn-success">
                                             <i class="fas fa-file-excel"></i>
                                             &nbsp; Download Excel
@@ -66,8 +66,8 @@
 
                             </div>
                             <br>
-                            {{-- <div style="color: black;" class="form-group">
-                                <form action="{{ route('filter_employee') }}" method="GET">
+                            <div style="color: black;" class="form-group">
+                                <form action="{{ route('filter_employee_resign') }}" method="GET">
 
                                     <div style="display: flex;gap:10px;" class="grouped-container">
                                         <div style="display: block" class="select-group">
@@ -86,7 +86,7 @@
                                             @endif
                                         </div>
 
-                                        <div style="display: block" class="select-group">
+                                        {{-- <div style="display: block" class="select-group">
                                             <label for="">Department</label>
                                             <select class="form-control" name="department" id="status">
                                                 <option value="">--- Pilih Department ---</option>
@@ -100,10 +100,10 @@
                                             @if ($errors->has('year'))
                                                 <span class="text-danger">{{ $errors->first('year') }}</span>
                                             @endif
-                                        </div>
+                                        </div> --}}
 
                                         <button style="height: 40px; align-self:end;" type="submit"
-                                            class="btn btn-dark">Pilih</button>
+                                            class="btn btn-primary">Pilih</button>
                                         <a href="{{ route('master_employee.index') }}"
                                             style="height: 40px; align-self:end;" class="btn btn-secondary">Reset</a>
                                     </div>
@@ -118,8 +118,7 @@
                                         <br>
                                         <!-- Memastikan bahwa $month adalah objek dan mengakses propertinya, misalnya 'name' -->
                                         <div class="alert alert-warning">
-                                            Kantor :{{ $departments }} <br>
-                                            Department :{{ $offices }}
+                                            Kantor :{{ $offices }} <br>
                                             <!-- Menampilkan tahun yang dipilih dari array $year -->
                                         </div>
                                     @elseif($employee_resign->isEmpty())
@@ -132,7 +131,7 @@
 
 
 
-                            </div> --}}
+                            </div>
                         </div>
 
 

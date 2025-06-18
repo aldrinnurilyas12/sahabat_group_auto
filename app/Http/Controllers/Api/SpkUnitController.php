@@ -48,41 +48,48 @@ class SpkUnitController extends Controller
         $kurnia_abadi_motor = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name == 'KURNIA ABADI MOTOR';
         $mega_abadi_motor = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name == 'MEGA ABADI MOTOR';
 
-        if ($plaza_auto) {
-            if ($branch_role || $sales_manager_role) {
-                $spk_data = DB::table('v_spk')->where('location_unit', 'PLAZA AUTO')->orderBy('created_at', 'DESC')->get();
-                $all_spk_data = DB::table('v_spk')->where('location_unit', 'PLAZA AUTO')->where('approval_by_head_branch', 'Y')->where('approval_by_sales_manager', 'Y')->orderBy('created_at', 'DESC')->get();
-                return view('layouts.admin_views.spk_unit.spk_branch', compact('spk_data', 'all_spk_data', 'grouped_sub_menu', 'sidebar_menu'));
-            } else {
-                $spk_data = DB::table('v_spk')->where('location_unit', 'PLAZA AUTO')->orderBy('created_at', 'DESC')->get();
-                return view('layouts.admin_views.spk_unit.spk', compact('spk_data', 'grouped_sub_menu', 'sidebar_menu'));
-            }
-        } elseif ($permata_abadi_motor) {
-            if ($branch_role || $sales_manager_role) {
-                $spk_data = DB::table('v_spk')->where('location_unit', 'PERMATA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
-                $all_spk_data = DB::table('v_spk')->where('location_unit', 'PERMATA ABADI MOTOR')->where('approval_by_head_branch', 'Y')->where('approval_by_sales_manager', 'Y')->orderBy('created_at', 'DESC')->get();
-                return view('layouts.admin_views.spk_unit.spk_branch', compact('spk_data', 'all_spk_data', 'grouped_sub_menu', 'sidebar_menu'));
-            } else {
-                $spk_data = DB::table('v_spk')->where('location_unit', 'PERMATA ABADI ')->orderBy('created_at', 'DESC')->get();
-            }
-        } elseif ($kurnia_abadi_motor) {
-            if ($branch_role || $sales_manager_role) {
-                $spk_data = DB::table('v_spk')->where('location_unit', 'KURNIA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
-                $all_spk_data = DB::table('v_spk')->where('location_unit', 'KURNIA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
-                return view('layouts.admin_views.spk_unit.spk_branch', compact('spk_data', 'all_spk_data', 'grouped_sub_menu', 'sidebar_menu'));
-            } else {
-                $spk_data = DB::table('v_spk')->where('location_unit', 'KURNIA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
-            }
-        } else {
-            if ($branch_role || $sales_manager_role) {
-                $spk_data = DB::table('v_spk')->where('location_unit', 'MEGA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
-                $all_spk_data = DB::table('v_spk')->where('location_unit', 'MEGA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
-                return view('layouts.admin_views.spk_unit.spk_branch', compact('spk_data', 'all_spk_data', 'grouped_sub_menu', 'sidebar_menu'));
-            } else {
-                $spk_data = DB::table('v_spk')->where('location_unit', 'MEGA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
-            }
-        }
-        return view('layouts.admin_views.spk_unit.spk', compact('spk_data', 'grouped_sub_menu', 'sidebar_menu'));
+        $spk_data = DB::table('v_spk')->orderBy('created_at', 'DESC')->get();
+        $all_spk_data = DB::table('v_spk')->where('approval_by_head_branch', 'Y')->where('approval_by_sales_manager', 'Y')->orderBy('created_at', 'DESC')->get();
+
+
+        // CODE UNTUK FILTER SPK BERDASARKAN BRANCH
+
+
+        // if ($plaza_auto) {
+        //     if ($branch_role || $sales_manager_role) {
+        //         $spk_data = DB::table('v_spk')->where('location_unit', 'PLAZA AUTO')->orderBy('created_at', 'DESC')->get();
+        //         $all_spk_data = DB::table('v_spk')->where('location_unit', 'PLAZA AUTO')->where('approval_by_head_branch', 'Y')->where('approval_by_sales_manager', 'Y')->orderBy('created_at', 'DESC')->get();
+        //         return view('layouts.admin_views.spk_unit.spk_branch', compact('spk_data', 'all_spk_data', 'grouped_sub_menu', 'sidebar_menu'));
+        //     } else {
+        //         $spk_data = DB::table('v_spk')->where('location_unit', 'PLAZA AUTO')->orderBy('created_at', 'DESC')->get();
+        //         return view('layouts.admin_views.spk_unit.spk', compact('spk_data', 'grouped_sub_menu', 'sidebar_menu'));
+        //     }
+        // } elseif ($permata_abadi_motor) {
+        //     if ($branch_role || $sales_manager_role) {
+        //         $spk_data = DB::table('v_spk')->where('location_unit', 'PERMATA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
+        //         $all_spk_data = DB::table('v_spk')->where('location_unit', 'PERMATA ABADI MOTOR')->where('approval_by_head_branch', 'Y')->where('approval_by_sales_manager', 'Y')->orderBy('created_at', 'DESC')->get();
+        //         return view('layouts.admin_views.spk_unit.spk_branch', compact('spk_data', 'all_spk_data', 'grouped_sub_menu', 'sidebar_menu'));
+        //     } else {
+        //         $spk_data = DB::table('v_spk')->where('location_unit', 'PERMATA ABADI ')->orderBy('created_at', 'DESC')->get();
+        //     }
+        // } elseif ($kurnia_abadi_motor) {
+        //     if ($branch_role || $sales_manager_role) {
+        //         $spk_data = DB::table('v_spk')->where('location_unit', 'KURNIA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
+        //         $all_spk_data = DB::table('v_spk')->where('location_unit', 'KURNIA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
+        //         return view('layouts.admin_views.spk_unit.spk_branch', compact('spk_data', 'all_spk_data', 'grouped_sub_menu', 'sidebar_menu'));
+        //     } else {
+        //         $spk_data = DB::table('v_spk')->where('location_unit', 'KURNIA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
+        //     }
+        // } else {
+        //     if ($branch_role || $sales_manager_role) {
+        //         $spk_data = DB::table('v_spk')->where('location_unit', 'MEGA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
+        //         $all_spk_data = DB::table('v_spk')->where('location_unit', 'MEGA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
+        //         return view('layouts.admin_views.spk_unit.spk_branch', compact('spk_data', 'all_spk_data', 'grouped_sub_menu', 'sidebar_menu'));
+        //     } else {
+        //         $spk_data = DB::table('v_spk')->where('location_unit', 'MEGA ABADI MOTOR')->orderBy('created_at', 'DESC')->get();
+        //     }
+        // }
+        return view('layouts.admin_views.spk_unit.spk', compact('all_spk_data', 'spk_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     /**

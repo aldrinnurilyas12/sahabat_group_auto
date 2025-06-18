@@ -32,7 +32,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nik' => ['required', 'string'],
+            'login' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
@@ -42,49 +42,49 @@ class LoginRequest extends FormRequest
      *
      * @throws \Illuminate\Validation\ValidationException
      */
+
     public function authenticate(): RedirectResponse
     {
         $this->ensureIsNotRateLimited();
-        $nik = $this->input('nik');
-        $password = $this->input('password');
-        $user = User::where('nik', $nik)->first();
 
-        if (!$user) {
+        $login_access = $this->only('login')['login'];
+        $field_login = filter_var($login_access, FILTER_VALIDATE_EMAIL) ? 'email' : 'nik';
+
+        $user_available = User::where($field_login, $login_access)->first();
+
+        if (!$user_available) {
             RateLimiter::hit($this->throttleKey());
-
             throw ValidationException::withMessages([
-                'nik' => 'Nik tidak sesuai'
+                'login' => 'NIK atau Email anda tidak sesuai'
             ]);
-        } elseif (!Hash::check($password, $user->password)) {
-            RateLimiter::hit($this->throttleKey());
+        }
 
+
+        if ($user_available->is_active === 'N') {
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'login' => ' Akun anda sudah tidak aktif'
+            ]);
+
+            // return redirect()->intended('login');
+        }
+
+
+        if (!Auth::attempt([$field_login => $login_access, 'password' => $this->input('password')], $this->boolean('remember'))) {
+            RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'password' => 'Password salah, coba lagi.'
             ]);
-        } elseif ($user->is_active === 'Y') {
-            Auth::login($user);
-
-            RateLimiter::clear($this->throttleKey());
-
-            $this->session()->regenerate();
-            session()->flash('message_success', 'Berhasil login!');
-            return redirect()->intended('dashboard');
-        } else {
-
-            RateLimiter::hit($this->throttleKey());
-
-            if ($user->is_active === 'N') {
-                throw ValidationException::withMessages([
-                    'nik' => 'User ' . $user->nik . ' Akun anda sudah tidak aktif'
-                ]);
-            }
-
-            throw ValidationException::withMessages([
-                'nik' => 'User ' . $user->nik . ' tidak dapat digunakan'
-            ]);
-            return redirect()->intended('login');
         }
+
+        // Jika semua cek berhasil, login pengguna
+        Auth::login($user_available);
+        RateLimiter::clear($this->throttleKey());
+        $this->session()->regenerate();
+        session()->flash('message_success', 'Berhasil login!');
+        return redirect()->intended('dashboard');
     }
+
 
     /**
      * Ensure the login request is not rate limited.
@@ -102,7 +102,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'nik' => trans('auth.throttle', [
+            'email' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -114,6 +114,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('nik')) . '|' . $this->ip());
+        return Str::transliterate(Str::lower($this->string('email')) . '|' . $this->ip());
     }
 }

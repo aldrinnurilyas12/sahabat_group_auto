@@ -1,7 +1,7 @@
 <nav style="padding: 30px;background-color:white;box-shadow: rgba(95, 95, 95, 0.3) 0px 1px 2px 0px, rgba(64, 64, 65, 0.15) 0px 2px 6px 2px; "
     class="navbar navbar-expand-lg">
     <div class="container-fluid">
-        <a style="font-weight: bold;" class="navbar-brand" href="#">PT Sahabat Group Auto</a>
+        <a style="font-weight: bold;" class="navbar-brand" href="#">Sahabat Group Auto</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -51,7 +51,7 @@
                         class="form-inline my-2 my-lg-0">
                         <input class="form-control mr-sm-2" name="search" type="search"
                             placeholder="Cari mobil disini...." value="{{ old('search') }}" aria-label="Search">
-                        <button class="btn btn-primary" type="submit">Search</button>
+                        <button class="btn btn-dark" type="submit">Search</button>
                     </form>
                 </div>
 

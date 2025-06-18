@@ -119,6 +119,8 @@ class MasterBanner extends Controller
             'banner_file' => 'image|mimes:jpg,jpeg,png|max:5048'
         ]);
 
+        $picture_id = DB::table('banner_landingpage')->where('id', $request->id)->first();
+
         if ($request->hasFile('banner_file')) {
             $file = $request->file('banner_file');
             $bannerFile = $file->storeAs('banner_file', uniqid() . '.' . $file->getClientOriginalExtension(), 'public');
@@ -134,6 +136,13 @@ class MasterBanner extends Controller
                 'link_2' => $request->link_2,
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
             ]);
+
+            if ($picture_id->banner_file) {
+                $oldPicture = public_path('storage/' . $picture_id->banner_file);
+                if (file_exists($oldPicture)) {
+                    unlink($oldPicture);
+                }
+            }
         } else {
             BannerModel::where('id', $request->id)->update([
                 'banner_name' => $request->banner_name,

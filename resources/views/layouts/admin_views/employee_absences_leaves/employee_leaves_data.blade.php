@@ -48,10 +48,9 @@
 
 
                                 @if ($employee_leaves->isNotEmpty())
-                                    <form action="{{ route('export_employee') }}" method="POST">
+                                    <form action="{{ route('export_employee_leaves') }}" method="POST">
                                         @csrf
                                         <input type="text" name="office" value="{{ $offices }}" hidden>
-                                        <input type="text" value="{{ $departments }}" name="department" hidden>
                                         <button type="submit" class="btn btn-success">
                                             <i class="fas fa-file-excel"></i>
                                             &nbsp; Download Excel
@@ -68,7 +67,7 @@
                             </div>
                             <br>
                             <div style="color: black;" class="form-group">
-                                <form action="{{ route('filter_employee') }}" method="GET">
+                                <form action="{{ route('filter_employee_leaves') }}" method="GET">
 
                                     <div style="display: flex;gap:10px;" class="grouped-container">
                                         <div style="display: block" class="select-group">
@@ -87,25 +86,21 @@
                                             @endif
                                         </div>
 
-                                        <div style="display: block" class="select-group">
-                                            <label for="">Department</label>
+                                        {{-- <div style="display: block" class="select-group">
+                                            <label for="">Status Cuti</label>
                                             <select class="form-control" name="department" id="status">
                                                 <option value="">--- Pilih Department ---</option>
-                                                <option value="alldata">Semua Department</option>
-                                                @foreach ($department as $dept)
-                                                    <option value="{{ $dept->department_name }}">
-                                                        {{ $dept->department_name }}</option>
-                                                @endforeach
+                                               
 
                                             </select>
                                             @if ($errors->has('year'))
                                                 <span class="text-danger">{{ $errors->first('year') }}</span>
                                             @endif
-                                        </div>
+                                        </div> --}}
 
                                         <button style="height: 40px; align-self:end;" type="submit"
-                                            class="btn btn-dark">Pilih</button>
-                                        <a href="{{ route('master_employee.index') }}"
+                                            class="btn btn-primary">Pilih</button>
+                                        <a href="{{ route('employee_leaves.index') }}"
                                             style="height: 40px; align-self:end;" class="btn btn-secondary">Reset</a>
                                     </div>
                                     &nbsp;
@@ -119,8 +114,7 @@
                                         <br>
                                         <!-- Memastikan bahwa $month adalah objek dan mengakses propertinya, misalnya 'name' -->
                                         <div class="alert alert-warning">
-                                            Kantor :{{ $departments }} <br>
-                                            Department :{{ $offices }}
+                                            Kantor :{{ $offices }} <br>
                                             <!-- Menampilkan tahun yang dipilih dari array $year -->
                                         </div>
                                     @elseif($employee_leaves->isEmpty())
@@ -156,6 +150,7 @@
                                             <th>NIK</th>
                                             <th>Nama</th>
                                             <th>Posisi</th>
+                                            <th>Cabang</th>
                                             <th>Department</th>
                                             <th>Tanggal Mulai Cuti</th>
                                             <th>Tanggal Akhir Cuti</th>
@@ -204,8 +199,8 @@
                                                 @endif
                                                 <td>
                                                     @if ($emp->attachment)
-                                                        <a style="color: black;" class="btn btn-warning"
-                                                            href="#" data-toggle="modal"
+                                                        <a style="color: black;" class="btn btn-warning" href="#"
+                                                            data-toggle="modal"
                                                             data-target="#showAttachment{{ $emp->id }}"><i
                                                                 class="fa fa-eye" aria-hidden="true"></i>
                                                             lihat</a>
@@ -216,6 +211,7 @@
                                                 <td>{{ $emp->nik }}</td>
                                                 <td>{{ Str::upper($emp->name) }}</td>
                                                 <td>{{ $emp->position_name }}</td>
+                                                <td>{{ $emp->location_name }}</td>
                                                 <td>{{ $emp->department_name }}</td>
                                                 <td>{{ old('start_date', $emp->start_date ? \Carbon\Carbon::parse($emp->start_date)->format('d-m-Y') : '') }}
                                                 </td>

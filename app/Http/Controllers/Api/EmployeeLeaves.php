@@ -12,6 +12,8 @@ use PhpParser\Node\Stmt\Return_;
 use Ramsey\Uuid\Uuid;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
+use App\Exports\EmployeeLeavesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EmployeeLeaves extends Controller
 {
@@ -306,6 +308,41 @@ class EmployeeLeaves extends Controller
     }
 
 
+    public function filter_employee_leaves(Request $request)
+    {
+        $employee = DB::table('v_employee_leaves')->get();
+        $office = DB::table('branch')->get();
+        $department = DB::table('department')->get();
+        $offices = $request->office;
+        $departments = $request->department;
+
+
+        if ($offices) {
+            $employee_leaves = DB::table('v_employee_leaves')->where('location_name', $offices)->get();
+        }
+        if ($offices === 'alldata') {
+            $employee = DB::table('v_employee_leaves')->get();
+            $employee_leaves = DB::table('v_employee_leaves')->get();
+        }
+
+
+
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+        return view('layouts.admin_views.employee_absences_leaves.employee_leaves_data', compact('employee_leaves', 'employee', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices'));
+    }
+
+
+    public function employee_export_leaves(Request $request)
+    {
+        // $departments = $request->department; // Full month name (e.g., January)
+        $offices = $request->office; // Current year (e.g., 2024)
+
+        $fileName = 'Data_Cuti_Karyawan' . '_' . $offices . '-' . date('Y') . '.xlsx';
+
+        return Excel::download(new EmployeeLeavesExport($offices), $fileName);
+    }
 
     /**
      * Display the specified resource.

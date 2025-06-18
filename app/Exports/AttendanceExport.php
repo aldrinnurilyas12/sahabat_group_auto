@@ -115,6 +115,22 @@ class AttendanceExport implements FromCollection, WithHeadings, WithTitle, WithE
                 $event->sheet->getStyle('A2:AF2')->getFont()->setBold(true);
                 $event->sheet->getStyle('A3')->getFont()->setBold(true);
                 $event->sheet->getStyle('A4:E4')->getFont()->setBold(true); // Bold headers
+
+                // CODE UNTUK AUTO-SIZE COLUMN
+                $sheet = $event->sheet->getDelegate();
+                // Auto-size all used columns
+                foreach (range('A', 'Z') as $col) {
+                    $sheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                // Jika Anda tahu ada kolom lebih dari Z, Anda bisa extend dengan:
+                foreach (range('A', 'Z') as $first) {
+                    $sheet->getColumnDimension($first)->setAutoSize(true);
+                }
+                foreach (range('A', 'F') as $second) { // Untuk kolom AA hingga AF
+                    $col = 'A' . $second;
+                    $sheet->getColumnDimension($col)->setAutoSize(true);
+                }
             },
         ];
     }

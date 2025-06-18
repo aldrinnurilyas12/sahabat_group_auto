@@ -53,10 +53,10 @@
                                 <i class="fas fa-plus-circle"></i>&nbsp;Buat Agenda
                             </a>
 
-                            <a class="btn btn-success" href="{{ route('branch_export') }}">
+                            {{-- <a class="btn btn-success" href="{{ route('branch_export') }}">
                                 <i class="fas fa-file-excel"></i>
                                 &nbsp; Download
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
                     <div class="card-body">

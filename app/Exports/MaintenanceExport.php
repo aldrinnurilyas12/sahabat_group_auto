@@ -118,6 +118,21 @@ class MaintenanceExport implements FromCollection, WithHeadings, WithTitle, With
             // You can also customize formatting for other parts of the sheet (e.g., bold headers)
             AfterSheet::class => function (AfterSheet $event) {
                 $event->sheet->getStyle('A4:N4')->getFont()->setBold(true);
+
+                $sheet = $event->sheet->getDelegate();
+                // Auto-size all used columns
+                foreach (range('A', 'Z') as $col) {
+                    $sheet->getColumnDimension($col)->setAutoSize(true);
+                }
+
+                // Jika Anda tahu ada kolom lebih dari Z, Anda bisa extend dengan:
+                foreach (range('A', 'Z') as $first) {
+                    $sheet->getColumnDimension($first)->setAutoSize(true);
+                }
+                foreach (range('A', 'F') as $second) { // Untuk kolom AA hingga AF
+                    $col = 'A' . $second;
+                    $sheet->getColumnDimension($col)->setAutoSize(true);
+                }
             },
         ];
     }

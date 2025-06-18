@@ -34,42 +34,36 @@ class LoginAdminController extends Controller
 
     public function store(LoginRequest $request)
     {
-        $request->validate([
-            'nik' => 'required|max:6'
-        ]);
+        // $request->validate([
+        //     'nik' => 'required|max:16'
+        // ]);
 
         date_default_timezone_set('Asia/Jakarta');
-        $insertTime = (int) date('H');
 
-        // if ($insertTime >= 0 && $insertTime <= 0) {
         $request->authenticate();
 
         $request->session()->regenerate();
 
-        $credentials = $request->only('nik', 'password');
+        $credentials = $request->only('login', 'password');
+        $field = filter_var($credentials['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'nik';
 
-        if (!$token = auth()->guard('api')->attempt($credentials)) {
+        if (!$token = auth()->guard('api')->attempt([$field => $credentials['login'], 'password' => $credentials['password']])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Nik atau password salah'
-            ]);
+                'message' => 'NIK atau password salah'
+            ], 401);
         }
 
-        // $dataResponseToken =  response()->json([
-        //     'success' => true,
-        //     'user'    => auth()->guard('api')->user(),
-        //     'token'   => $token
-        // ], 200);
-
-        // return $dataResponseToken;
 
         $this->insertLogActivityUsers(__METHOD__);
         User::where('nik', Auth::user()->nik)->update(['last_seen' => now()]);
         return redirect()->intended(route('dashboard', absolute: false));
-        // } else {
-        //     session()->flash('failed_login', 'Maaf saat ini anda tidak bisa login, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib ');
-        //     return redirect()->route('login');
-        // }
+
+        return response()->json([
+            'success' => true,
+            'token' => $token,
+            'user' => auth()->guard('api')->user(),
+        ]);
     }
 
     public function getUsers()

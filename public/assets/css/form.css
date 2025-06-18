@@ -104,6 +104,37 @@
     background-size: 16px;
 }
 
+
+    .modal-id-card {
+            display: none;
+            position: fixed;
+            z-index: 1; /* PASTIKAN ADA */
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.86); 
+            justify-content: center;
+            align-items: center;
+    }
+
+    .modal-dialog {
+        margin: 10% auto;
+        background: white;
+        border-radius: 8px;
+        max-width: 500px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        float: right;
+        cursor: pointer;
+    }
+
 /* Remove default border for select on focus */
 .form-control:focus {
     border-color: #007bff;
@@ -140,16 +171,16 @@
 
 
   .modal-new {
-display: none; /* Sembunyikan modal secara default */
-position: fixed; /* Tetap di tempat */
-z-index: 1; /* Di atas elemen lain */
-left: 0;
-top: 0;
-width: 100%; /* Lebar penuh */
-height: 100%; /* Tinggi penuh */
-overflow: auto; /* Aktifkan scroll jika diperlukan */
-background-color: rgb(0,0,0); /* Warna latar belakang */
-background-color: rgba(0,0,0,0.4); /* Latar belakang transparan */
+    display: none; /* Sembunyikan modal secara default */
+    position: fixed; /* Tetap di tempat */
+    z-index: 1; /* Di atas elemen lain */
+    left: 0;
+    top: 0;
+    width: 100%; /* Lebar penuh */
+    height: 100%; /* Tinggi penuh */
+    overflow: auto; /* Aktifkan scroll jika diperlukan */
+    background-color: rgb(0,0,0); /* Warna latar belakang */
+    background-color: rgba(0,0,0,0.4); /* Latar belakang transparan */
 }
 
 
@@ -157,14 +188,49 @@ background-color: rgba(0,0,0,0.4); /* Latar belakang transparan */
 
         /* Konten Modal */
 .modal-content-new {
-background-color: #fff;
-margin: 15% auto;
-padding: 20px;
-border: 1px solid #888;
-width: 80%;
-max-width: 500px;
-border-radius: 10px;
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 10px;
   }
+
+
+
+
+    .modal-qr {
+      /* Sembunyikan modal secara default */
+        position: fixed; /* Tetap di tempat */
+        z-index: 1; /* Di atas elemen lain */
+        left: 0;
+        top: 0;
+        width: 100%; /* Lebar penuh */
+        height: 100%; /* Tinggi penuh */
+        overflow: auto; /* Aktifkan scroll jika diperlukan */
+        background-color: rgb(0,0,0); /* Warna latar belakang */
+        background-color: rgba(0,0,0,0.4); /* Latar belakang transparan */
+    }
+
+
+    .dept-name {
+        background-color: #007bff;
+        width: 100%;
+        padding: 6px;;
+    }
+
+        /* Konten Modal */
+    .modal-dialog-content{
+       background-color: rgb(255, 255, 255);
+        margin: 5% auto;
+        height: max-content;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 10px;
+    }
 
   /* Tombol Tutup */
   .close {

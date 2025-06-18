@@ -28,21 +28,20 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="{{ url('bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
-        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    {{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous"> --}}
     <link rel="stylesheet" href="{{ asset('assets/css/star-rating.css') }}">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    {{-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
-    </script>
+    </script> --}}
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js"
         integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous">
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"
         integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous">
     </script>
-
+    <script src="{{ url('bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url('assets/js/star-rating.js') }}"></script>
 </head>
 
@@ -284,8 +283,6 @@
         </div>
     </section>
 
-
-
     {{-- section testimonial customers --}}
 
     <section id="testimonial-customers">
@@ -307,9 +304,9 @@
                         <div class="card-body">
 
                             @if ($testi->hidden_name == 'y')
-                                <h5 class="card-title">{{ $testi->customer_name }}</h5>
-                            @else
                                 <h5 style="color: gray;" class="card-title">anonymous</h5>
+                            @else
+                                <h5 class="card-title">{{ $testi->customer_name }}</h5>
                             @endif
                             <p style="font-style: italic; color:black; font-weight:400;" class="card-text"><span
                                     style="font-size: 15px; font-family:cambria;">"</span>
@@ -343,8 +340,6 @@
 
 
     </section>
-
-
 
     {{-- end section --}}
 
@@ -544,7 +539,7 @@
 
 
             <div style="text-align: center" class="button-more-vehicle">
-                <a style="background-color:#212529;" class="btn btn-dark" href="{{ route('all_vehicle') }}">Lihat
+                <a style="background-color:#212529;" class="btn btn-dark" href="{{ route('all_blog') }}">Lihat
                     semua <i class="fas fa-arrow-right"></i></a>
             </div>
         </div>
@@ -583,6 +578,13 @@
                                                     class="fa fa-map-pin" aria-hidden="true"></i>
                                                 {{ $office->address }}</small>
                                         </div>
+
+                                        <a href="{{ url('https://www.google.com/maps/place/' . $office->coordinate_location) }}"
+                                            style="margin-top:10px;display: flex; align-items:center;gap:10px; color:rgb(255, 255, 255); background:rgb(58, 58, 58); padding:5px; width:max-content; border-radius:5px;"
+                                            class="maps">
+                                            <i class="fas fa-map-marked-alt"></i>
+                                            <span style="font-size: 14px; color:rgb(255, 255, 255);">Buka Maps</span>
+                                        </a>
                                     </div>
 
                                 </li>
@@ -605,6 +607,12 @@
                                                     class="fa fa-map-pin" aria-hidden="true"></i>
                                                 {{ $office->address }}</small>
                                         </div>
+                                        <a href="{{ url('https://www.google.com/maps/place/' . $office->coordinate_location) }}"
+                                            style="margin-top:10px;display: flex; align-items:center;gap:10px; color:rgb(255, 255, 255); background:rgb(58, 58, 58); padding:5px; width:max-content; border-radius:5px;"
+                                            class="maps">
+                                            <i class="fas fa-map-marked-alt"></i>
+                                            <span style="font-size: 14px; color:rgb(255, 255, 255);">Buka Maps</span>
+                                        </a>
                                     </div>
                                 </li>
                             @endif
@@ -626,6 +634,80 @@
     {{-- spinner --}}
     <div id="loadingSpinnerWrapper">
         <div class="spinner-border" role="status">
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" id="showForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Sampaikan Testimonial dan
+                        kritik & saran kepada kami</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+
+                <form method="POST" action="{{ route('customer_testimonial.store') }}">
+                    @csrf
+
+                    <div style="color: black;" class="modal-body">
+
+                        <div class="form-group">
+                            <label for="">Nama Anda</label>
+                            <input class="form-control" name="customer_name" type="text"
+                                placeholder="Masukan nama anda">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="">Email Anda (optional)</label>
+                            <input class="form-control" name="email" type="email"
+                                placeholder="Masukan email anda">
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="">Testimonial Anda</label>
+                            <textarea class="form-control" name="testimonial" id=""></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="">Rating kepuasan anda</label>
+                            <select name="rating" class="star-rating">
+                                <option value="5">Bagus Sekali</option>
+                                <option value="4">Bagus </option>
+                                <option value="3">Normal</option>
+                                <option value="2">Buruk</option>
+                                <option value="1">Sangat Buruk</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="">Kritik & Saran</label>
+                            <textarea class="form-control" name="criticsm_and_suggestion" id=""></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="">Sembunyikan nama Anda </label>
+                            <div class="hidden-name-option">
+                                <input value="y" name="hidden_name" type="radio"> Sembunyikan
+                                <br>
+                                <input value="n" name="hidden_name" type="radio"> Jangan Sembunyikan
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <button class="btn btn-dark" type="submit">Kirim <i class="fa fa-paper-plane"
+                                aria-hidden="true"></i></button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -734,86 +816,8 @@
         }
     </style>
 
-    <div class="modal fade" id="showForm" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Sampaikan Testimonial dan
-                        kritik & saran kepada kami</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-
-                <form method="POST" action="{{ route('customer_testimonial.store') }}">
-                    @csrf
-
-                    <div style="color: black;" class="modal-body">
-
-                        <div class="form-group">
-                            <label for="">Nama Anda</label>
-                            <input class="form-control" name="customer_name" type="text"
-                                placeholder="Masukan nama anda">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="">Email Anda (optional)</label>
-                            <input class="form-control" name="email" type="email"
-                                placeholder="Masukan email anda">
-                        </div>
-
-
-                        <div class="form-group">
-                            <label for="">Testimonial Anda</label>
-                            <textarea class="form-control" name="testimonial" id=""></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="">Rating kepuasan anda</label>
-                            <select name="rating" class="star-rating">
-                                <option value="5">Bagus Sekali</option>
-                                <option value="4">Bagus </option>
-                                <option value="3">Normal</option>
-                                <option value="2">Buruk</option>
-                                <option value="1">Sangat Buruk</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="">Kritik & Saran</label>
-                            <textarea class="form-control" name="criticsm_and_suggestion" id=""></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="">Sembunyikan nama Anda </label>
-                            <div class="hidden-name-option">
-                                <input value="y" name="hidden_name" type="radio"> Sembunyikan
-                                <br>
-                                <input value="n" name="hidden_name" type="radio"> Jangan Sembunyikan
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                        <button class="btn btn-dark" type="submit">Kirim <i class="fa fa-paper-plane"
-                                aria-hidden="true"></i></button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
 </body>
 
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous">
-</script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.min.js"
-    integrity="sha384-RuyvpeZCxMJCqVUGFI0Do1mQrods/hhxYlcVfGPOfQtPJh0JCw12tUAZ/Mv10S7D" crossorigin="anonymous">
-</script>
 
 @if (Session::has('message_success'))
     <script>
@@ -913,6 +917,7 @@
 </script>
 
 
+{{-- SCRIPT FOR DISPLAY MAPS --}}
 
 <script>
     // Inisialisasi peta dan set view ke koordinat tengah
@@ -924,11 +929,15 @@
     }).addTo(map);
 
     // Daftar koordinat (tiga titik)
-    var coordinates = [
-        [-6.209602928047727, 106.68867164152863], // Titik 1
-        [-6.212175153365249, 106.698178050714], // Titik 2
-        [-6.235612379406214, 106.80735566195257] // Titik 3
-    ];
+
+    var getDataCoordinates = @json($branch->pluck('coordinate_location'));
+
+    var coordinates = getDataCoordinates
+        .filter(coord => coord && coord.includes(','))
+        .map(function(coord) {
+            var parts = coord.split(',');
+            return [parseFloat(parts[0]), parseFloat(parts[1])];
+        });
 
     // Menambahkan marker untuk setiap titik koordinat
     coordinates.forEach(function(coord, index) {
