@@ -14,35 +14,50 @@ This project start build at september 10,2024 until now for development, Using L
 ## Feature in this Information System
 
 # ADMIN PANEL :
-  - **>>> MASTER DATA <<<**
-    
+
+
+  
+- **>>> MASTER DATA <<<**
+  
 - Login and Register User Account (Admin & Superadmin)
 - Analytics Dashboard
 - Vehicle Master Data
-- Advertisement Master Data
+- Advertisement Vehicle Master Data
 - Branch Master Data
 - Employee Master Data
 - Department Master Data
 - Job Position Master Data
-- Payroll System **(Under Development)*
+- Payroll System
 - Employee Resignation 
 - Employee Attendance Master Data 
+- Employee Leave of Absence
 - Agenda Master Data
 - Blog Master Data 
 - Maintenence Unit Master Data 
 - User Information Profile
+- Banner of Web Landing Page Master Data
+
 
 - **>>> TRANSACTION <<<**
+
 - Appointment
 - Customer Vehicle Request
 - Customer Vehicle Sale Request
 - SPK Unit
+
+- **>>> SETTINGS <<<**
+
+- Web admin operating hours
+- Admin Menu and Submenu
+- Role Permission **(Under Development)
+
   
 # CUSTOMER WEB 
 - Appointment
 - Customer Vehicle Request
 - Customer Vehicle Sale Request
 - Show Vehicle Catalog
+- Testimonial Customers
 
 
 ## LIBRARY 
