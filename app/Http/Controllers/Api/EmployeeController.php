@@ -373,7 +373,10 @@ class EmployeeController extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
         $checkingBankAccount = DB::table('employee_bank_account')->where('nik', $request->nik)->first();
+        $checkingAvailableEmployeeJobPosition = DB::table('employee_type_position')->select('type_of_employee')->where('employee_id', $request->id)->first();
         $SETTING_TIME = DB::table('settings_schedule_time')->first();
+
+        // dd($checkingAvailableEmployeeJobPosition);
 
         if ($SETTING_TIME->open_schedule_time == 'on') {
             if ($insertTime >= 7 && $insertTime <= 18) {
@@ -392,13 +395,22 @@ class EmployeeController extends Controller
                     'updated_at' => now()
                 ]);
 
+                if ($checkingAvailableEmployeeJobPosition === null) {
+                    EmployeeTypePosition::create([
+                        'employee_id' => $request->id,
+                        'type_of_employee' => $request->type_of_employee,
+                        'start_date' => $request->start_date,
+                        'end_date' => $request->end_date
+                    ]);
+                } else {
+                    EmployeeTypePosition::where('employee_id', $request->id)->update([
+                        'employee_id' => $request->id,
+                        'type_of_employee' => $request->type_of_employee,
+                        'start_date' => $request->start_date,
+                        'end_date' => $request->end_date
+                    ]);
+                }
 
-                EmployeeTypePosition::where('employee_id', $request->id)->update([
-                    'employee_id' => $request->id,
-                    'type_of_employee' => $request->type_of_employee,
-                    'start_date' => $request->start_date,
-                    'end_date' => $request->end_date
-                ]);
 
                 if ($checkingBankAccount === null) {
                     EmployeeBankAccount::create([
@@ -441,13 +453,21 @@ class EmployeeController extends Controller
                 'updated_at' => now()
             ]);
 
-
-            EmployeeTypePosition::where('employee_id', $request->id)->update([
-                'employee_id' => $request->id,
-                'type_of_employee' => $request->type_of_employee,
-                'start_date' => $request->start_date,
-                'end_date' => $request->end_date
-            ]);
+            if ($checkingAvailableEmployeeJobPosition === null) {
+                EmployeeTypePosition::create([
+                    'employee_id' => $request->id,
+                    'type_of_employee' => $request->type_of_employee,
+                    'start_date' => $request->start_date,
+                    'end_date' => $request->end_date
+                ]);
+            } else {
+                EmployeeTypePosition::where('employee_id', $request->id)->update([
+                    'employee_id' => $request->id,
+                    'type_of_employee' => $request->type_of_employee,
+                    'start_date' => $request->start_date,
+                    'end_date' => $request->end_date
+                ]);
+            }
 
             if ($checkingBankAccount === null) {
                 EmployeeBankAccount::create([
@@ -705,23 +725,24 @@ class EmployeeController extends Controller
     }
 
 
-
-    // BUG FIX
     public function profile(Request $request): View
     {
 
+        $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id;
 
         if (auth()->user()->nik  !== auth()->user()->nik) {
             abort(403, 'Ooops unauthorized nik');
         }
 
         $employee = DB::table('v_employee')->where('nik', auth()->user()->nik)->get();
+        $employee_type_position = DB::table('employee_type_position')->where('employee_id', $employee_id)->get();
         if ($employee->isEmpty()) {
             abort(403, 'Ooops unauthorized nik');
         }
 
 
         $start_date = Carbon::parse($employee->first()->start_date);
+        $end_date = Carbon::parse($employee->first()->end_date);
         $birth_date  = Carbon::parse($employee->first()->birth_date);
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
@@ -746,7 +767,7 @@ class EmployeeController extends Controller
 
         $qr_code_employee = DB::table('employee')->select('qr_code_path')->where('nik', auth()->user()->nik)->get();
 
-        return view('layouts.admin_views.employee_profile.edit.edit_profile', compact('employee', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu', 'user', 'start_date', 'birth_date', 'user_picture', 'signature_employee', 'checking_employee_resign_status', 'checking_absences_status', 'qr_code_employee'));
+        return view('layouts.admin_views.employee_profile.edit.edit_profile', compact('employee', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu', 'user', 'start_date', 'end_date', 'birth_date', 'user_picture', 'signature_employee', 'checking_employee_resign_status', 'checking_absences_status', 'qr_code_employee'));
     }
 
 

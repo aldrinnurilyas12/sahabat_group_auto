@@ -56,6 +56,33 @@ class UserControl extends Controller
     }
 
 
+    // CONTROLLLER UNTUK VERIFIKASI EMAIL USER ADMIN
+    public function useremailverification(Request $request)
+    {
+
+        DB::table('users')->where('nik', $request->nik)->update([
+            'is_active' => 'Y',
+            'email_verified_at' => now()
+        ]);
+        // return response()->json([
+        //     'status' => 'success',
+        //     'message' => 'User verification status updated successfully.'
+        // ]);
+
+        session()->flash('message_success', 'Verifikasi Email Anda Berhasil!');
+        return redirect()->route('login');
+    }
+
+
+    public function user_verification_page(Request $request, $nik): View
+    {
+
+        return view('layouts.landing_page.main_page.users_verification_page', ['nik' => $nik]);
+    }
+
+
+
+
     /**
      * Display the specified resource.
      */

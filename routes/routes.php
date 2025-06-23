@@ -98,6 +98,10 @@ Route::middleware('guest')->group(function () {
 
     Route::apiResource('customer_testimonial', App\Http\Controllers\Api\TestimonialCustomers::class);
     Route::get('all_testimonial', [TestimonialCustomers::class, 'all_testimonial_show'])->name('all_testimonial');
+
+    // USERS VERIFICATION EMAIL
+    Route::put('user_verification/{nik}',  [UserControl::class, 'useremailverification'])->name('user_verification');
+    Route::get('users_verification_page/{nik}', [UserControl::class, 'user_verification_page'])->name('users_verification_page');
 });
 
 

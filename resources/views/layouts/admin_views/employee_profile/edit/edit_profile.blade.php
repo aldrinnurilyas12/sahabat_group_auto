@@ -443,14 +443,22 @@
 
                                         <div class="form-group">
                                             <label>Tipe Pekerjaan Karyawan</label>
-                                            <input type="text" class="form-control" id="start_date"
-                                                value="{{ $emp->is_active == 'contract' ? 'Karyawan Kontrak' : ($emp->is_active == 'permanent' ? 'Karyawan Tetap' : ($emp->is_active == 'internship' ? 'Karyawan Magang' : 'belum pilih tipe perkejaan')) }}"
+                                            <input type="text" class="form-control"
+                                                value="{{ $emp->type_of_employee == 'contract'
+                                                    ? 'Karyawan Kontrak'
+                                                    : ($emp->type_of_employee == 'permanent'
+                                                        ? 'Karyawan Tetap'
+                                                        : ($emp->type_of_employee == 'freelance'
+                                                            ? 'Pekerja Lepas'
+                                                            : ($emp->type_of_employee == 'internship'
+                                                                ? 'Karyawan Magang'
+                                                                : 'belum pilih tipe perkejaan'))) }}"
                                                 autocomplete="off" readonly>
                                         </div>
 
                                         <div class="form-group">
                                             <label>Status Karyawan</label>
-                                            <input type="text" class="form-control" id="start_date"
+                                            <input type="text" class="form-control"
                                                 value="{{ $emp->is_active == 'Ya' ? 'Aktif' : 'Tidak Aktif' }}"
                                                 autocomplete="off" readonly>
                                         </div>
@@ -474,12 +482,18 @@
                                                 autocomplete="off" readonly>
                                         </div>
 
-                                        <div class="form-group">
-                                            <label>Tanggal Akhir Bekerja</label>
-                                            <input type="text" class="form-control" id="start_date"
-                                                value="{{ old('end_date', $emp->end_date ? $end_date->format('Y-m-d') : null) }}"
-                                                autocomplete="off" readonly>
-                                        </div>
+                                        @if ($emp->type_of_employee == 'permanent')
+                                        @else
+                                            <div class="form-group">
+                                                <label>Tanggal Akhir Bekerja <span
+                                                        style="font-size: 13px; color:rgb(21, 21, 21);">*(Hanya Untuk
+                                                        Karyawan Kontrak,Freelance, dan Internship)</span>
+                                                </label>
+                                                <input type="text" class="form-control" id="start_date"
+                                                    value="{{ old('end_date', $emp->end_date ? $end_date->format('Y-m-d') : null) }}"
+                                                    autocomplete="off" readonly>
+                                            </div>
+                                        @endif
 
                                         <div class="form-group">
                                             <label>Status Akun</label>
@@ -495,7 +509,7 @@
                                                     Karyawan</a></span>
                                             <br>
                                             <br>
-                                            <button type="submit" class="btn btn-primary">Ubah</button>
+                                            <button type="submit" class="btn btn-primary">Ubah Data</button>
                                         @else
                                             <span class="text-secondary">*Saat ini anda tidak bisa merubah informasi
                                                 data diri anda karena akun anda sudah tidak aktif</span>
@@ -580,14 +594,22 @@
                     <div class="card-body">
                         <div style="display: flex; justify-content:center; gap:20px;align-items:center;"
                             class="profile-image-content">
-                            <img style="border-radius:10px;"
-                                src="{{ asset('storage/' . $user_picture->first()->users_foto) }}" width="150"
-                                height="150" title="Foto Profil">
+                            @if ($user_picture->isNotEmpty())
+                                <img style="border-radius:10px;"
+                                    src="{{ asset('storage/' . $user_picture->first()->users_foto) }}" width="150"
+                                    height="150" title="Foto Profil">
+                            @else
+                                <h5>Anda belum upload foto</h5>
+                            @endif
 
-                            <div style="display:flex;justify-content:center;" class="qr-code">
-                                <img src="{{ asset('storage/' . $qr_code_employee->first()->qr_code_path) }}"
-                                    width="130" height="130" title="Kode QR">
-                            </div>
+                            @if ($qr_code_employee->isNotEmpty())
+                                <div style="display:flex;justify-content:center;" class="qr-code">
+                                    <img src="{{ asset('storage/' . $qr_code_employee->first()->qr_code_path) }}"
+                                        width="130" height="130" title="Kode QR">
+                                </div>
+                            @else
+                                <h5>Anda belum Generate Kode QR</h5>
+                            @endif
                         </div>
 
                         <br>

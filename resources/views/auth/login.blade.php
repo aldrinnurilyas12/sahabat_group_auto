@@ -82,6 +82,20 @@
 
 </body>
 
+
+@if (Session::has('message_success'))
+    <script>
+        Swal.fire({
+            title: 'Berhasil',
+            text: "{{ Session::get('message_success') }}",
+            icon: 'success',
+            timer: 2000,
+            confirmButtonText: 'OK'
+        });
+    </script>
+@endif
+
+
 @if (Session::has('failed_login'))
     <script>
         Swal.fire({

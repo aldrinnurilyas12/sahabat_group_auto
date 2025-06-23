@@ -109,7 +109,6 @@
 
                             <div class="form-group">
                                 <label for="">Jenis Pekerjaan Karyawan<span style="color: red">*</span></label>
-
                                 <select class="form-control" name="type_of_employee" id="">
                                     <option value="">=== Pilih Tipe Karyawan ===</option>
                                     <option value="permanent">Karyawan Tetap</option>

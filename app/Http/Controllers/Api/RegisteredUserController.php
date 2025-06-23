@@ -18,6 +18,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\RateLimiter;
 use App\Http\Controllers\Api\MasterMainMenuController;
+use App\Mail\UsersAdminVerification;
+use Illuminate\Support\Facades\Mail;
+use Ramsey\Uuid\Uuid;
 
 class RegisteredUserController extends Controller
 {
@@ -58,12 +61,6 @@ class RegisteredUserController extends Controller
         return view('layouts.admin_views.users_admin.create.users_create', compact('roles', 'employees', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
-    /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-
 
     public function insertLogActivityUsers($log_activity)
     {
@@ -82,25 +79,25 @@ class RegisteredUserController extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
         $validate = $request->validate([
-            'nik' => 'required|max:6|unique:users',
-            'employee_id' => 'unique:users'
+            'nik' => 'required|max:16|unique:users',
+            'employee_id' => 'unique:users',
+            'email' => 'unique:users'
         ]);
         $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
         if ($SETTING_TIME->open_schedule_time == 'on') {
             if ($insertTime >= 7 && $insertTime <= 22) {
-                User::create([
+                $User = User::create([
                     'employee_id' => $request->employee_id,
                     'nik' => $validate['nik'],
                     'email' => $request->email,
-                    'email_verified_at' => now(),
-                    'is_active' => $request->is_active,
+                    'is_active' => 'X',
                     'password' => Hash::make($request->password),
                     'role' => $request->role,
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
-                $this->insertLogActivityUsers(__METHOD__);
+                $this->SentEmailVerification($User);
                 session()->flash('message_success', 'Data Berhasil disimpan!');
                 return redirect()->route('master_users.index');
             } else {
@@ -108,20 +105,32 @@ class RegisteredUserController extends Controller
                 return redirect()->route('master_users.index');
             }
         } else {
-            User::create([
+            $User = User::create([
                 'employee_id' => $request->employee_id,
                 'nik' => $validate['nik'],
                 'email' => $request->email,
-                'email_verified_at' => now(),
-                'is_active' => $request->is_active,
+                'is_active' => 'X',
                 'password' => Hash::make($request->password),
                 'role' => $request->role,
                 'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
             ]);
-            $this->insertLogActivityUsers(__METHOD__);
+            $this->SentEmailVerification($User);
             session()->flash('message_success', 'Data Berhasil disimpan!');
             return redirect()->route('master_users.index');
+        }
+    }
+
+
+    public function SentEmailVerification(User $User)
+    {
+
+        try {
+            Mail::to($User->email)->send(new UsersAdminVerification($User));
+            return response()->json(['message' => 'Email berhasil dikirim'], 200);
+        } catch (\Exception $e) {
+            \Log::error('Email sending failed : ' .  $e->getMessage());
+            return response()->json(['error' => 'failed to send email'], 500);
         }
     }
 
@@ -137,8 +146,8 @@ class RegisteredUserController extends Controller
             $roles = RoleModel::all();
             $employees = EmployeeModel::all();
             $user =  DB::table('v_users')->where('id', $id)->get();
-            return view('layouts.admin_views.users_admin.edit.users_edit', compact('roles', 'employees', 'user', 'grouped_sub_menu', 'sidebar_menu'));
         }
+        return view('layouts.admin_views.users_admin.edit.users_edit', compact('roles', 'employees', 'user', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     public function update(Request $request)
@@ -184,7 +193,8 @@ class RegisteredUserController extends Controller
         $employeeData = EmployeeModel::find($employeeId);
         return response()->json([
             'email' => $employeeData->email,
-            'nik' => $employeeData->nik
+            'nik' => $employeeData->nik,
+            'birth_date' => $employeeData->birth_date
         ]);
     }
 

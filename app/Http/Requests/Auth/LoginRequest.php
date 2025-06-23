@@ -65,8 +65,13 @@ class LoginRequest extends FormRequest
             throw ValidationException::withMessages([
                 'login' => ' Akun anda sudah tidak aktif'
             ]);
+        }
 
-            // return redirect()->intended('login');
+        if ($user_available->is_active === 'X') {
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'login' => 'Anda Belum melakukan verifikasi email, silahkan cek email anda untuk melakukan verifikasi.'
+            ]);
         }
 
 

@@ -25,6 +25,8 @@ class SpkUnitModel extends Model
         'email',
         'approval_by_head_branch',
         'approval_by_sales_manager',
+        'spk_status',
+        'spk_confirmation_date',
         'created_by',
         'updated_by'
     ];

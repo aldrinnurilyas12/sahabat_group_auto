@@ -10,6 +10,8 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 use function Laravel\Prompts\error;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendEmailSpkNotification;
 
 class SpkUnitController extends Controller
 {
@@ -49,7 +51,7 @@ class SpkUnitController extends Controller
         $mega_abadi_motor = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name == 'MEGA ABADI MOTOR';
 
         $spk_data = DB::table('v_spk')->orderBy('created_at', 'DESC')->get();
-        $all_spk_data = DB::table('v_spk')->where('approval_by_head_branch', 'Y')->where('approval_by_sales_manager', 'Y')->orderBy('created_at', 'DESC')->get();
+        $all_spk_data = DB::table('v_spk')->where('approval_by_head_branch', 'Sudah Konfirmasi')->where('approval_by_sales_manager', 'Sudah Konfirmasi')->orderBy('created_at', 'DESC')->get();
 
 
         // CODE UNTUK FILTER SPK BERDASARKAN BRANCH
@@ -146,8 +148,9 @@ class SpkUnitController extends Controller
                     'address' => $request->address,
                     'phone_number' => $request->phone_number,
                     'email' => $request->email,
-                    'approval_by_head_branch' => "N",
-                    'approval_by_sales_manager' => "N",
+                    'approval_by_head_branch' => "Belum Konfirmasi",
+                    'approval_by_sales_manager' => "Belum Konfirmasi",
+                    'spk_status' => "Belum Konfirmasi",
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
@@ -170,8 +173,9 @@ class SpkUnitController extends Controller
                 'address' => $request->address,
                 'phone_number' => $request->phone_number,
                 'email' => $request->email,
-                'approval_by_head_branch' => "N",
-                'approval_by_sales_manager' => "N",
+                'approval_by_head_branch' => "Belum Konfirmasi",
+                'approval_by_sales_manager' => "Belum Konfirmasi",
+                'spk_status' => "Belum Konfirmasi",
                 'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
             ]);
@@ -199,7 +203,7 @@ class SpkUnitController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function confirmedSpkUnit(Request $request)
+    public function confirmedSpkUnit(Request $request, $id)
     {
 
         date_default_timezone_set('Asia/Jakarta');
@@ -210,40 +214,24 @@ class SpkUnitController extends Controller
             if ($insertTime >= 7 && $insertTime <= 22) {
 
                 if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations') {
-                    $updateDataHeadBranch = DB::table('spk_unit')->where('id', $request->id)->update([
-                        'approval_by_head_branch' => $request->approval_by_head_branch,
+                    DB::table('spk_unit')->where('id', $request->id)->update([
+                        'approval_by_head_branch' => "Sudah Konfirmasi",
                         'updated_at' => now(),
                         'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                     ]);
                 } elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Sales Manager') {
-                    $updateDataSalesManager =  DB::table('spk_unit')->where('id', $request->id)->update([
-                        'approval_by_sales_manager' => $request->approval_by_sales_manager,
+                    DB::table('spk_unit')->where('id', $request->id)->update([
+                        'approval_by_sales_manager' => "Sudah Konfirmasi",
                         'updated_at' => now(),
                         'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                     ]);
                 }
 
+                $checking_status_spk = SpkUnitModel::find($request->id);
 
-                $checking_data_confirmed = DB::table('spk_unit')->first();
-
-
-                if ($checking_data_confirmed->approval_by_head_branch == 'N' && $checking_data_confirmed->approval_by_sales_manager == 'N') {
-                    session()->flash('message_success', 'Data Berhasil disimpan!');
-                    return redirect()->route('transaksi_spk_unit.index');
-                } elseif ($checking_data_confirmed->approval_by_head_branch == 'N' && $checking_data_confirmed->approval_by_sales_manager == 'Y') {
-                    session()->flash('message_success', 'Data Berhasil disimpan!');
-                    return redirect()->route('transaksi_spk_unit.index');
-                } elseif ($checking_data_confirmed->approval_by_sales_manager == 'N' && $checking_data_confirmed->approval_by_head_branch == 'Y') {
-                    session()->flash('message_success', 'Data Berhasil disimpan!');
-                    return redirect()->route('transaksi_spk_unit.index');
-                } elseif ($checking_data_confirmed->approval_by_head_branch == 'Y' && $checking_data_confirmed->approval_by_sales_manager == 'Y') {
-                    VehicleModel::where('id', $request->vehicle_id)->update([
-                        'status_vehicle_id' => 2,
-                        'updated_at' => now(),
-                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-                    ]);
+                if ($checking_status_spk && $checking_status_spk->spk_status == 'Sudah Konfirmasi') {
+                    return $this->SendEmailNotificationSpk($checking_status_spk);
                 }
-
 
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Berhasil disimpan!');
@@ -254,40 +242,55 @@ class SpkUnitController extends Controller
             }
         } else {
             if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations') {
-                $updateDataHeadBranch = DB::table('spk_unit')->where('id', $request->id)->update([
-                    'approval_by_head_branch' => $request->approval_by_head_branch,
+                DB::table('spk_unit')->where('id', $request->id)->update([
+                    'approval_by_head_branch' => "Sudah Konfirmasi",
                     'updated_at' => now(),
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
             } elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Sales Manager') {
-                $updateDataSalesManager =  DB::table('spk_unit')->where('id', $request->id)->update([
-                    'approval_by_sales_manager' => $request->approval_by_sales_manager,
+                DB::table('spk_unit')->where('id', $request->id)->update([
+                    'approval_by_sales_manager' => "Sudah Konfirmasi",
                     'updated_at' => now(),
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
             }
 
+            // code for send email notification
+            $checking_status_spk = SpkUnitModel::find($request->id);
 
-            $checking_data_confirmed = DB::table('spk_unit')->first();
 
-
-            if ($checking_data_confirmed->approval_by_head_branch == 'N' && $checking_data_confirmed->approval_by_sales_manager == 'N') {
-                session()->flash('message_success', 'Data Berhasil disimpan!');
-                return redirect()->route('transaksi_spk_unit.index');
-            } elseif ($checking_data_confirmed->approval_by_head_branch == 'N' && $checking_data_confirmed->approval_by_sales_manager == 'Y') {
-                session()->flash('message_success', 'Data Berhasil disimpan!');
-                return redirect()->route('transaksi_spk_unit.index');
-            } elseif ($checking_data_confirmed->approval_by_sales_manager == 'N' && $checking_data_confirmed->approval_by_head_branch == 'Y') {
-                session()->flash('message_success', 'Data Berhasil disimpan!');
-                return redirect()->route('transaksi_spk_unit.index');
-            } elseif ($checking_data_confirmed->approval_by_head_branch == 'Y' && $checking_data_confirmed->approval_by_sales_manager == 'Y') {
-                VehicleModel::where('id', $request->vehicle_id)->update([
-                    'status_vehicle_id' => 2,
-                    'updated_at' => now(),
-                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-                ]);
+            if ($checking_status_spk && $checking_status_spk->spk_status == 'Sudah Konfirmasi') {
+                return $this->SendEmailNotificationSpk($checking_status_spk);
             }
+
             $this->insertLogActivityUsers(__METHOD__);
+            session()->flash('message_success', 'Data Berhasil disimpan!');
+            return redirect()->route('transaksi_spk_unit.index');
+        }
+    }
+
+
+    public function SendEmailNotificationSpk(SpkUnitModel $spk)
+    {
+        // code for send notification to Finance, Branch and marketing, sales manager:
+        //  $ALL_EMAIL = DB::table('employee')->select('email')
+        // ->whereIn('job_position', ['1', '2', '4', '6', '9', '10'])->get();
+
+        $ALL_EMAIL = DB::table('employee')->select('email')
+            ->whereIn('job_position', ['9', '10'])->get();
+
+        if ($ALL_EMAIL->isEmpty()) {
+            return response()->json(['error' => 'No Email found'], 404);
+        }
+
+        try {
+            foreach ($ALL_EMAIL as $stackholder_email) {
+                Mail::to($stackholder_email->email)->send(new SendEmailSpkNotification($spk));
+            }
+            return response()->json(['message' => 'Email success delivered'], 200);
+        } catch (\Exception $e) {
+            \Log::error('Sending email failed : ' . $e->getMessage());
+            // return response()->json(['error' => 'Failed sending email']);
             session()->flash('message_success', 'Data Berhasil disimpan!');
             return redirect()->route('transaksi_spk_unit.index');
         }

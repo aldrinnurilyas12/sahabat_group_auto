@@ -45,9 +45,12 @@
                             <h5 style="color: black;"><strong>Data Karyawan PT Sahabat Group Auto</strong></h5>
                             <br>
                             <div style="display: flex; gap:10px; font-family:inter,sans-serif;" class="btn-content">
-                                <a href="{{ route('add_employee') }}" class="btn btn-primary">
-                                    <i class="fas fa-plus-circle"></i>&nbsp;Tambah Karyawan
-                                </a>
+                                @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '5')
+                                    <a href="{{ route('add_employee') }}" class="btn btn-primary">
+                                        <i class="fas fa-plus-circle"></i>&nbsp;Tambah Karyawan
+                                    </a>
+                                @else
+                                @endif
 
                                 @if ($employee->isNotEmpty())
                                     <form action="{{ route('export_employee') }}" method="POST">
@@ -161,7 +164,16 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
-                                                    <th>Aksi</th>
+                                                    @if (in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, [
+                                                            '12',
+                                                            '13',
+                                                            '5',
+                                                            '7',
+                                                            '15',
+                                                        ]))
+                                                        <th>Aksi</th>
+                                                    @else
+                                                    @endif
                                                     <th>Kode QR</th>
                                                     <th>NIK</th>
                                                     <th>Nama</th>
@@ -193,20 +205,29 @@
                                                 @foreach ($employee as $emp)
                                                     <tr>
                                                         <td><?php echo $no++; ?></td>
-                                                        <td>
-                                                            <div style="display:flex; justify-content:center;gap:8px; "
-                                                                class="action">
-                                                                <a href="{{ route('edit_employee', $emp->id) }}"><i
-                                                                        class="fas fa-edit"></i></a>
-                                                                <a style="size: 12px;" href="#"
-                                                                    data-toggle="modal"
-                                                                    data-target="#deleteEmployee{{ $emp->id }}"><i
-                                                                        class="fas fa-trash"></i></a>
-                                                        </td>
+
+                                                        @if (in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, [
+                                                                '12',
+                                                                '13',
+                                                                '5',
+                                                                '7',
+                                                                '15',
+                                                            ]))
+                                                            <td>
+                                                                <div style="display:flex; justify-content:center;gap:8px; "
+                                                                    class="action">
+                                                                    <a href="{{ route('edit_employee', $emp->id) }}"><i
+                                                                            class="fas fa-edit"></i></a>
+                                                                    <a style="size: 12px;" href="#"
+                                                                        data-toggle="modal"
+                                                                        data-target="#deleteEmployee{{ $emp->id }}"><i
+                                                                            class="fas fa-trash"></i></a>
+                                                            </td>
+                                                        @else
+                                                        @endif
 
                                                         @if ($emp->qr_code_path == null)
-                                                            <td><a class="btn btn-primary" href="">Generate QR
-                                                                    Code</a></td>
+                                                            <td>-</td>
                                                         @else
                                                             <td><img style="width: 100px; height:100px;"
                                                                     src="{{ asset('storage/' . $emp->qr_code_path) }}"

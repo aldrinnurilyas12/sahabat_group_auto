@@ -87,7 +87,22 @@
                                         <thead>
                                             <tr>
                                                 <th>No</th>
+                                                @if (in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, [
+                                                        '1',
+                                                        '2',
+                                                        '4',
+                                                        '6',
+                                                        '9',
+                                                        '10',
+                                                    ]))
+                                                    <th>
+
+                                                        Aksi
+                                                    </th>
+                                                @else
+                                                @endif
                                                 <th>PDF</th>
+                                                <th>SPK Status</th>
                                                 <th>Unit</th>
                                                 <th>Lokasi Unit</th>
                                                 <th>Metode Bayar</th>
@@ -113,16 +128,53 @@
                                             @foreach ($spk_data as $spk)
                                                 <tr style="width: 200px;">
                                                     <td><?php echo $no++; ?></td>
+
+                                                    @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Sales Manager' ||
+                                                            app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations')
+                                                        <td>
+                                                            <div style="display:flex; justify-content:center;gap:8px; "
+                                                                class="action">
+                                                                @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations')
+                                                                    @if ($spk->approval_by_head_branch == 'Belum Konfirmasi')
+                                                                        <a class="btn btn-primary" href="#"
+                                                                            data-toggle="modal"
+                                                                            data-target="#confirmSpk{{ $spk->id }}">Konfirmasi</a>
+                                                                    @else
+                                                                        <a class="btn btn-secondary"
+                                                                            href="####">Sudah
+                                                                            Konfirmasi</a>
+                                                                    @endif
+                                                                @elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Sales Manager')
+                                                                    @if ($spk->approval_by_sales_manager == 'Belum Konfirmasi')
+                                                                        <a class="btn btn-primary" href="#"
+                                                                            data-toggle="modal"
+                                                                            data-target="#confirmSpk{{ $spk->id }}">Konfirmasi</a>
+                                                                    @else
+                                                                        <a class="btn btn-secondary"
+                                                                            href="####">Sudah
+                                                                            Konfirmasi</a>
+                                                                    @endif
+                                                                @else
+                                                                @endif
+
+                                                        </td>
+                                                    @else
+                                                    @endif
                                                     <td>
                                                         <div style="display:flex; justify-content:center;gap:8px; "
                                                             class="action">
-                                                            @if ($spk->approval_by_head_branch == 'Y' && $spk->approval_by_sales_manager == 'Y')
+                                                            @if ($spk->approval_by_head_branch == 'Sudah Konfirmasi' && $spk->approval_by_sales_manager == 'Sudah Konfirmasi')
                                                                 <a href="{{ route('get_pdf', $spk->id) }}"><i
                                                                         class="fa fa-file"></i></a>
                                                             @else
                                                                 <p class="text-secondary">SPK belum dikonfirmasi</p>
                                                             @endif
                                                     </td>
+                                                    @if ($spk->spk_status == 'Belum Konfirmasi')
+                                                        <td class="text-secondary">{{ $spk->spk_status }}</td>
+                                                    @else
+                                                        <td class="text-success">{{ $spk->spk_status }}</td>
+                                                    @endif
                                                     <td>{{ $spk->unit }}</td>
                                                     <td>{{ $spk->location_unit }}</td>
                                                     <td>{{ $spk->payment_method }}</td>
@@ -134,17 +186,17 @@
                                                     <td>{{ $spk->phone_number }}</td>
                                                     <td>{{ $spk->email }}</td>
                                                     <td>
-                                                        @if ($spk->approval_by_head_branch == 'N')
+                                                        @if ($spk->approval_by_head_branch == 'Belum Konfirmasi')
                                                             <p class="text-danger">Belum Konfirmasi</p>
-                                                        @elseif($spk->approval_by_head_branch == 'Y')
+                                                        @elseif($spk->approval_by_head_branch == 'Sudah Konfirmasi')
                                                             <p class="text-success">Sudah Konfirmasi</p>
                                                         @else
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        @if ($spk->approval_by_sales_manager == 'N')
+                                                        @if ($spk->approval_by_sales_manager == 'Belum Konfirmasi')
                                                             <p class="text-danger">Belum Konfirmasi</p>
-                                                        @elseif($spk->approval_by_sales_manager == 'Y')
+                                                        @elseif($spk->approval_by_sales_manager == 'Sudah Konfirmasi')
                                                             <p class="text-success">Sudah Konfirmasi</p>
                                                         @else
                                                         @endif
@@ -201,7 +253,9 @@
                                                     <td>
                                                         <div style="display:flex; justify-content:center;gap:8px; "
                                                             class="action">
-                                                            @if ($spk_all->approval_by_head_branch == 'Y' && $spk_all->approval_by_sales_manager == 'Y')
+                                                            @if (
+                                                                $spk_all->approval_by_head_branch == 'Sudah Konfirmasi' &&
+                                                                    $spk_all->approval_by_sales_manager == 'Sudah Konfirmasi')
                                                                 <a href="{{ route('get_pdf', $spk_all->id) }}"><i
                                                                         class="fa fa-file"></i></a>
                                                             @else
@@ -219,17 +273,17 @@
                                                     <td>{{ $spk_all->phone_number }}</td>
                                                     <td>{{ $spk_all->email }}</td>
                                                     <td>
-                                                        @if ($spk_all->approval_by_head_branch == 'N')
+                                                        @if ($spk_all->approval_by_head_branch == 'Belum Konfirmasi')
                                                             <p class="text-danger">Belum Konfirmasi</p>
-                                                        @elseif($spk_all->approval_by_head_branch == 'Y')
+                                                        @elseif($spk_all->approval_by_head_branch == 'Sudah Konfirmasi')
                                                             <p class="text-success">Sudah Konfirmasi</p>
                                                         @else
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        @if ($spk_all->approval_by_sales_manager == 'N')
+                                                        @if ($spk_all->approval_by_sales_manager == 'Belum Konfirmasi')
                                                             <p class="text-danger">Belum Konfirmasi</p>
-                                                        @elseif($spk_all->approval_by_sales_manager == 'Y')
+                                                        @elseif($spk_all->approval_by_sales_manager == 'Sudah Konfirmasi')
                                                             <p class="text-success">Sudah Konfirmasi</p>
                                                         @else
                                                         @endif
@@ -261,37 +315,38 @@
     </div>
 
     {{-- modal change status --}}
+    @foreach ($spk_data as $spk)
+        <div class="modal fade" id="confirmSpk{{ $spk->id }}" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalLabel{{ $spk->id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel{{ $spk->id }}">Konfirmasi SPK unit :
+                            {{ $spk->unit }}</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
 
-    {{-- @foreach ($agenda as $agendas) 
-     <div class="modal fade" id="deleteUnit{{$agendas->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{$agendas->id}}" aria-hidden="true">
-         <div class="modal-dialog" role="document">
-             <div class="modal-content">
-                 <div class="modal-header">
-                     <h5 class="modal-title" id="exampleModalLabel{{$agendas->id}}">Hapus data Agenda: {{$agendas->agenda_name}}</h5>
-                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                         <span aria-hidden="true">×</span>
-                     </button>
-                 </div>
-     
-                 <form method="POST" action="{{ route('master_agenda.destroy', $agendas->id) }}">
-                     @csrf
-                     @method('DELETE')
-                     <div style="color: black;" class="modal-body">
-                         Apakah Anda ingin menghapus data Agenda:
-                         {{$agendas->agenda_name}} ?
-                         <br>
-                         <span style="font-style: italic;color:gray;font-size:12px;">*Data akan terhapus permanen.</span>    
-                     </div>
-                     <div class="modal-footer">
-                         <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                         <button class="btn btn-danger" type="submit">Hapus</button>
-                     </div>
-                 </form>
-             </div>
-         </div>
-     </div>
-     
-     @endforeach --}}
+                    <form method="POST" action="{{ route('confirmed_status_spk', $spk->id) }}">
+                        @csrf
+                        @method('PUT')
+                        <div style="color: black;" class="modal-body">
+                            Apakah Anda ingin mengubah status SPK unit:
+                            <br>
+                            {{ $spk->unit }} ?
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                            <button class="btn btn-primary" type="submit">Konfirmasi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+
 
     {{-- end modal --}}
     <!-- End of Page Wrapper -->
