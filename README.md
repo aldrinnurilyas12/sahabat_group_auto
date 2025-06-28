@@ -13,11 +13,11 @@ This project start build at september 10,2024 until now for development, Using L
 
 ## Feature in this Information System
 
-# ADMIN PANEL :
+# ADMIN PANEL MODULES :
 
 
   
-- **>>> MASTER DATA <<<**
+- **>>> MASTER DATA MODULE <<<**
   
 - Login and Register User Account (Admin & Superadmin)
 - Analytics Dashboard
@@ -38,14 +38,20 @@ This project start build at september 10,2024 until now for development, Using L
 - Banner of Web Landing Page Master Data
 
 
-- **>>> TRANSACTION <<<**
+- **>>> TRANSACTION MODULE <<<**
 
 - Appointment
 - Customer Vehicle Request
 - Customer Vehicle Sale Request
 - SPK Unit
 
-- **>>> SETTINGS <<<**
+  - **>>> BUSINESS ANALYTICS MODULE <<<**
+
+- Data Analytics
+- Business Intelligence **(Under Development)
+  
+
+- **>>> SETTINGS MODULE <<<**
 
 - Web admin operating hours
 - Admin Menu and Submenu
@@ -66,6 +72,7 @@ This project start build at september 10,2024 until now for development, Using L
 - Laravel Breeze
 - DomPDF
 - SB Admin
+- Instascan (QR CODE Scanner) for Employee Attendance
 
 ## Contributing
 
