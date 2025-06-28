@@ -21,6 +21,10 @@
     <link href="{{ asset('assets/css/sb-admin-2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    {{-- <script type="text/javascript" src="{{ asset('assets/js/instascan.min.js') }}"></script> --}}
+    <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 </head>
 
 <body id="page-top">
@@ -184,10 +188,12 @@
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
 
-                            <div style="display: flex; flex-wrap:wrap; gap:10px; font-family:inter,sans-serif;justify-content:space-between;align-items:center;"
-                                class="btn-content">
+                            {{-- <div style="display: flex; flex-wrap:wrap; gap:10px; font-family:inter,sans-serif;justify-content:space-between;align-items:center;"
+                                class="btn-content"> --}}
 
-                                <div style="color: black;" class="form-group">
+                            <div style="color: black;display:flex;gap:3em;flex-wrap:wrap;" class="form-group">
+
+                                <div style="display: block;" class="d-block">
                                     <form action="{{ route('filter_attedance') }}" method="GET">
                                         <label for=""><strong>Pilih bulan dan tahun untuk melihat history
                                                 Presensi Anda.</strong></label>
@@ -198,7 +204,8 @@
                                                     <option value="">--- Pilih bulan ---</option>
                                                     <option value="alldata">Semua Data</option>
                                                     @foreach ($months as $month)
-                                                        <option value="{{ $month->id }}">{{ $month->month_list }}
+                                                        <option value="{{ $month->id }}">
+                                                            {{ $month->month_list }}
                                                         </option>
                                                     @endforeach
 
@@ -256,13 +263,30 @@
 
                                         {{-- {{ dd([$month, $year])}} --}}
                                     </div>
+                                </div>
 
+                                {{-- OPEN CAMERA --}}
 
+                                <div style="display: block;" class="open-camera-scanner">
+                                    <label for=""><strong>SCAN KODE QR UNTUK PRESENSI
+                                            KEHADIRAN</strong></label>
+                                    <br>
+                                    <video id="preview" width="300" height="200" autoplay></video>
 
+                                    <div class="alert alert-warning">
+                                        <ul style="font-size: 12px;">
+                                            <li>SCAN KODE QR HANYA UNTUK PRESENSI KEHADIRAN</li>
+                                            <li>BILA SAKIT ATAU IZIN MAKA KLIK BUTTON ("PRESENSI")</li>
+                                            <li>JAM UNTUK PRESENSI HANYA DIBUKA MULAI JAM 8 PAGI s/d JAM 10 PAGI</li>
+                                        </ul>
+                                    </div>
                                 </div>
 
 
                             </div>
+
+
+                            {{-- </div> --}}
 
                         </div>
 
@@ -356,6 +380,8 @@
                                                                     {{ $delayMinutes }} menit</p>
                                                             @elseif(isset($delay) && $emp->created_at <= 8)
                                                             @endif
+                                                        @else
+                                                            <p class="btn-hadir">{{ $emp->attedance_type }}</p>
                                                         @endif
                                                     </td>
                                                     <td>{{ $emp->reasons }}</td>
@@ -377,41 +403,6 @@
 
                 </div>
 
-                {{-- modal change status --}}
-
-                {{-- @foreach ($employee_attedance as $emp) 
-                <div class="modal fade" id="deleteEmployee{{$emp->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel{{$emp->id}}" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel{{$emp->id}}">Hapus Data Karyawan: {{$emp->nik . ' - ' . $emp->name}}</h5>
-                                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
-                                </button>
-                            </div>
-                
-                            <form method="POST" action="{{route('master_employee.destroy', $emp->id)}}">
-                                @csrf
-                                @method('DELETE')
-                                <div style="color: black;" class="modal-body">
-                                    Apakah Anda ingin menghapus data Karyawan:
-                                    <br>
-                                    {{$emp->nik . ' - ' . $emp->name}} ?
-                                    <br>
-                                    <span style="font-style: italic;color:gray;font-size:12px;">*Data akan terhapus permanen.</span>    
-                                </div>
-                                <div class="modal-footer">
-                                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                                    <button class="btn btn-danger" type="submit">Hapus</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                
-                @endforeach --}}
-
-                {{-- end modal --}}
 
             </div>
 
@@ -550,21 +541,21 @@
         background: rgba(255, 13, 0, 0.429);
         color: rgb(206, 1, 1);
     }
+
+    #preview {
+        border-radius: 10px;
+        height: auto;
+        border: 1px solid #ccc;
+    }
 </style>
 
 <script>
     window.addEventListener('load', function() {
         var loadingSpinnerWrapper = document.getElementById('loadingSpinnerWrapper');
 
-        // Log elemen untuk memastikan spinner ditemukan
-        // Cek apakah elemen ditemukan
 
         if (loadingSpinnerWrapper) {
-            // Menampilkan spinner saat halaman dimuat
             loadingSpinnerWrapper.style.display = 'flex';
-
-
-            // Menyembunyikan spinner setelah 2 detik (2000ms)
             setTimeout(function() {
 
                 loadingSpinnerWrapper.style.display = 'none'; // Sembunyikan spinner setelah 2 detik
@@ -572,6 +563,73 @@
         } else {
             console.log("Elemen spinner tidak ditemukan!");
         }
+    });
+
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+
+        let scanner = new Instascan.Scanner({
+            video: document.getElementById('preview'),
+            scanPeriod: 5,
+            mirror: false
+        });
+        scanner.addListener('scan', function(content) {
+            alert('QR Code ditemukan: ' + content);
+
+
+            const data = JSON.parse(content);
+            const employee_id = data.employee_id;
+
+            const today = new Date();
+            const attendanceDate = today.getFullYear() + '-' +
+                String(today.getMonth() + 1).padStart(2, '0') + '-' +
+                String(today.getDate()).padStart(2, '0');
+
+            axios.post('/send_attendance_employee', {
+                    employee_id: employee_id,
+                    attedance_type: 'hadir',
+                    attedance_date: attendanceDate
+                })
+                .then(function(response) {
+                    if (response.data.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: response.data.message,
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'OK'
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: response.data.message,
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(function(error) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Gagal!',
+                        text: response.data.message,
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    });
+                });
+        });
+        Instascan.Camera.getCameras().then(function(cameras) {
+            if (cameras.length > 0) {
+                scanner.start(cameras[0]);
+            } else {
+                console.error('No cameras found.');
+            }
+        }).catch(function(e) {
+            console.error(e);
+        });
     });
 </script>
 

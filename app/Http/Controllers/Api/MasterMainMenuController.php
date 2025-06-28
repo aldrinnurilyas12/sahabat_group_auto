@@ -157,8 +157,8 @@ class MasterMainMenuController extends Controller
             }
         } elseif (!$IT_DEV || $OTHER_DEPT) {
             if ($admin_role || $superadmin_role) {
-                $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->whereNotIn('id', ['2', '3', '4'])->get();
-                $sub_menu = DB::table('submenu')->whereNotIn('id', ['17', '18', '9'])->orderBy('submenu_name', 'asc')->get();
+                $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->whereNotIn('id', ['2', '3', '4', '8'])->get();
+                $sub_menu = DB::table('submenu')->whereNotIn('id', ['17', '18', '9', '36', '37'])->orderBy('submenu_name', 'asc')->get();
                 $grouped_sub_menu = $sub_menu->groupBy('parent_id');
                 return compact('grouped_sub_menu', 'sidebar_menu');
             } elseif ($head_branch) {

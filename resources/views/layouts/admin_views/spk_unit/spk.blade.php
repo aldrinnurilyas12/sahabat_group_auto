@@ -49,9 +49,19 @@
                         <h5 style="color: black;"><strong>Data SPK Unit Kendaraan PT Sahabat Group Auto</strong></h5>
                         <br>
                         <div style="display: flex; flex-wrap:wrap; gap:10px;" class="component">
-                            <a href="{{ route('spk_create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus-circle"></i>&nbsp;Buat SPK Unit
-                            </a>
+
+                            @if (in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, [
+                                    '1',
+                                    '4',
+                                    '6',
+                                    '9',
+                                    '11',
+                                ]))
+                                <a href="{{ route('spk_create') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus-circle"></i>&nbsp;Buat SPK Unit
+                                </a>
+                            @else
+                            @endif
 
                             <a class="btn btn-success" href="{{ route('branch_export') }}">
                                 <i class="fas fa-file-excel"></i>

@@ -16,6 +16,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\UserActivity::class,
             \App\Http\Middleware\CheckUserActive::class,
+            \App\Http\Middleware\PreventBackHistory::class,
         ],
 
         'api' => [
@@ -24,5 +25,9 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\UserActivity::class
         ],
+    ];
+
+    protected $command = [
+        \App\Console\Commands\ClearLog::class,
     ];
 }

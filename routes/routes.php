@@ -67,8 +67,8 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
-    Route::get('login', [LoginAdminController::class, 'login_gateway'])
-        ->name('login');
+    Route::get('login_admin_sahabat_group', [LoginAdminController::class, 'login_gateway'])
+        ->name('login_login_admin_sahabat_group');
     Route::post('login_execute', [LoginAdminController::class, 'store'])->name('login_execute');
     Route::get('sahabatmotor', [LandingPageController::class, 'index'])->name('sahabatmotor');
     // route post request vehicle
@@ -219,7 +219,7 @@ Route::middleware('auth')->group(function () {
     Route::get('filter_attedance', [EmployeeAttedance::class, 'filter_attedance'])->name('filter_attedance');
     Route::post('/attendance_export_data', [EmployeeAttedance::class, 'attendance_export'])->name('attendance_export_data');
     Route::post('/attendance_branch_export_data', [EmployeeAttedance::class, 'branch_attendance_export'])->name('attendance_branch_export_data');
-
+    Route::post('send_attendance_employee', [EmployeeAttedance::class, 'store'])->name('send_attendance');
 
     // VEHICLE ROUTES
     Route::apiResource('master_vehicle_data', App\Http\Controllers\Api\MasterVehicleData::class);
@@ -307,7 +307,7 @@ Route::middleware('auth')->group(function () {
 
 
     // Analytics DashboardController
-    Route::get('master_analytics', [Analytics::class, 'index'])->name('master_analytics');
+    Route::get('data_analytics', [Analytics::class, 'index'])->name('data_analytics');
     Route::get('/get_clicked_data', [Analytics::class, 'get_total_vehicle_ads']);
     Route::get('/get_brand_total', [Analytics::class, 'get_brand_total']);
     Route::get('/get_revenue', [Analytics::class, 'get_revenue']);

@@ -35,7 +35,8 @@
                         <div style="display: flex; gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:2rem;"
                             class="form-group-content">
                             @foreach ($all_testimonial as $testi)
-                                <div style="width:300px; height:max-content;" class="card">
+                                <div style="width:300px; height:max-content;background:#fff; border:1px solid rgb(235, 235, 235);padding:1em;border-radius:10px;"
+                                    class="card-testimonial">
                                     <div class="card-body">
 
                                         @if ($testi->hidden_name == 'y')

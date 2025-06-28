@@ -64,7 +64,7 @@
 
                                 {{-- CONTAINER IMAGES --}}
 
-                                <div class="scroll-images" style="width: 39rem; overflow-x: auto;">
+                                <div class="scroll-images" style="overflow-x: auto;">
                                     <ul style="width: max-content;" class="preview-thumbnail nav nav-tabs">
                                         @foreach ($vehicle_fotos as $key => $vehicles)
                                             <li class="nav-item">
@@ -89,7 +89,7 @@
                                     $whatsapplink = 'https://wa.me/?text=' . $encodeUrl;
                                 @endphp
 
-                                <div style="display: flex; gap:10px;align-items:center;margin-top:10px;"
+                                <div style="display: flex;flex-wrap:wrap; gap:10px;align-items:center;margin-top:10px;"
                                     class="media-player">
 
                                     <div style="display: flex; flex-wrap:wrap; gap:10px;" class="media-playback">

@@ -74,9 +74,22 @@
         </form>
         <a href="{{ route('password.request') }}">Lupa password?</a>
         <br>
-        <h5 style="text-decoration: underline"><a href={{ asset('assets/excel_files/login_user_sahabatgroup.xlsx') }}
-                download> >>> USER LOGIN <<< </a>
-        </h5>
+
+        <div style="display: flex; gap:10px; flex-wrap:wrap;align-items:center;" class="user-guide">
+            <h5 style="font-size: 12px;"><i class="fa fa-user"></i> <a style="text-decoration: underline; color:black;"
+                    class="btn btn-dark"
+                    href={{ asset('assets/user_guide/excel_files/login_user_sahabatgroup_new.xlsx') }} download>
+                    USER LOGIN</a>
+            </h5>
+
+            <span>|</span>
+
+            <h5 style="font-size: 12px;"><i class="fa fa-info"></i> <a style="text-decoration: underline; color:black;"
+                    class="btn btn-dark" href={{ asset('assets/excel_files/login_user_sahabatgroup.xlsx') }} download>
+                    PANDUAN PENGGUNA</a>
+            </h5>
+        </div>
+
 
     </div>
 

@@ -778,13 +778,16 @@ class EmployeeController extends Controller
         $employee_job_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position;
         $nik =  app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->nik;
         $name =  app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name;
-
+        $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id;
         $location_name = DB::table('branch')->select('location_name')->where('id', $employee_branch_id)->first();
         $position = DB::table('job_position')->select('position_name')->where('id', $employee_job_id)->first();
 
         $employee_data_qr_code  = [
             'nik' => $nik,
             'name' => $name,
+            'employee_id' => $employee_id,
+            'attedance_type' => "hadir",
+            'attedance_date' => now()->format('Y-m-d'),
             'job_position' => $position->position_name,
             'branch' => $location_name->location_name
         ];

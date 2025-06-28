@@ -285,20 +285,62 @@
                                 <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">×</span>
                                 </button>
+
+
+                            </div>
+                            <br>
+                            <div style="font-size: 13px;" class="alert alert-warning">
+                                <ul>
+                                    <li>Urutan iklan di Web Utama : Posisi iklan pertama yaitu dari atas kiri ke
+                                        kanan</li>
+                                    <li>Urutan iklan pertama berdasarkan anda ceklis iklan pertama yang menentukan
+                                        posisi iklan teratas</li>
+                                </ul>
                             </div>
 
                             <form method="POST" action="{{ route('updated_ads_position') }}">
                                 @csrf
                                 @method('PUT')
                                 <div style="color: black;" class="modal-body">
-                                    @foreach ($availableAds as $vads)
+
+                                    <div class="table-responsive">
+                                        <table style="font-size: 14px; color:black;" class="table table-bordered"
+                                            id="dataTable" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Posisi Iklan</th>
+                                                    <th>Unit</th>
+                                                    <th>Urutkan Posisi</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <?php $no = 1; ?>
+                                                @foreach ($availableAds as $vads)
+                                                    <tr style="width: 200px;">
+                                                        <td><?php echo $no++; ?></td>
+                                                        <td>{{ $vads->unit }}</td>
+                                                        <td> <input type="checkbox" value="{{ $vads->ads_id }}"
+                                                                name="id[]" multiple></td>
+
+
+                                                    </tr>
+                                                @endforeach
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+
+                                    {{-- @foreach ($availableAds as $vads)
                                         <div style="display: flex;align-items:first baseline;gap:8px;padding:6px;"
                                             class="content-input">
                                             <input type="checkbox" value="{{ $vads->ads_id }}" name="id[]"
                                                 multiple>
                                             <p>{{ $vads->unit }}</p>
                                         </div>
-                                    @endforeach
+                                    @endforeach --}}
                                 </div>
                                 <div class="modal-footer">
                                     <button class="btn btn-secondary" type="button"

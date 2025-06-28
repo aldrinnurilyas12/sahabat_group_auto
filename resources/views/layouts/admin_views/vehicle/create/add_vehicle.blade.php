@@ -21,8 +21,8 @@
                 <h4 style="text-align:center;color:black;font-weight:bold;">Tambah Data Kendaraan</h4>
                 <div style="display: flex; gap:50px;flex-wrap:wrap;" class="form-group-content">
 
-                    <form style="width: 60%;" class="form_input" method="POST"
-                        action="{{ route('master_vehicle_data.store') }}" enctype="multipart/form-data">
+                    <form class="form_input_new" method="POST" action="{{ route('master_vehicle_data.store') }}"
+                        enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
                             <label>VIN/NO.POL Kendaraan <span style="color: red">*</span></label>

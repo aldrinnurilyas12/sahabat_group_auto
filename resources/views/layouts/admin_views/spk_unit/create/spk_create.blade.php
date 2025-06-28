@@ -16,16 +16,15 @@
     <link
         href="https://fonts.googleapis.com/css?family=Inter:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-
     <!-- Custom styles for this template-->
-    <link href="{{ asset('assets/css/sb-admin-2.min.css')}}" rel="stylesheet">
-    <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
-    <link rel="stylesheet" href="{{asset('assets/css/form.css')}}">
+    <link href="{{ asset('assets/css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/css/form.css') }}">
     <link href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Inter:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-    <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
 </head>
 
 <body id="page-top">
@@ -41,34 +40,38 @@
             <!-- Main Content -->
             <div id="content">
                 @include('layouts.admin_views.header')
-    
+
                 <div id="content">
-                    
+
                     <h4 style="text-align:center;color:black;font-weight:bold;">Tambah SPK Unit Kendaraan</h4>
-                    
+
                     <div style="display: flex; gap:50px;flex-wrap:wrap;" class="form-group-content">
-                        <form style="width: 60%;" class="form_input" method="POST" action="{{ route('transaksi_spk_unit.store')}}">
-                            @csrf   
+                        <form class="form_input_new" method="POST" action="{{ route('transaksi_spk_unit.store') }}">
+                            @csrf
 
                             <div class="form-group">
                                 <label>Unit Kendaraan</label>
                                 <select class="form-control" name="vehicle_id" id="vehicleId">
                                     <option value="">==== Pilih Unit Kendaraan ====</option>
                                     @foreach ($vehicle_data as $vehicle)
-                                    <option value="{{$vehicle->id}}">[{{$vehicle->vehicle_registration_number}}] - {{$vehicle->unit}}</option>        
+                                        <option value="{{ $vehicle->id }}">
+                                            [{{ $vehicle->vehicle_registration_number }}] - {{ $vehicle->unit }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label for="">Warna Kendaraan</label>
-                                <input id="showColor" class="form-control" value="{{old('color')}}" type="text" readonly>
+                                <input id="showColor" class="form-control" value="{{ old('color') }}" type="text"
+                                    readonly>
                             </div>
 
 
                             <div class="form-group">
                                 <label for="">Tahun Kendaraan</label>
-                                <input id="showYear" class="form-control" value="{{old('manufacture_year')}}" type="text" readonly>
+                                <input id="showYear" class="form-control" value="{{ old('manufacture_year') }}"
+                                    type="text" readonly>
                             </div>
 
                             <div class="form-group">
@@ -81,67 +84,81 @@
                             </div>
 
 
-                            <div style="display: flex;flex-wrap:wrap;justify-content:start; gap:10px;" class="form-group">
+                            <div style="display: flex;flex-wrap:wrap;justify-content:start; gap:10px;"
+                                class="form-group">
                                 <div class="cash-price">
                                     <label for="">Harga Cash</label>
                                     <div style="display: flex; gap:10px;" class="input-price">
-                                        <input style="font-size: 15px;" id="showPrice" value="{{old('price')}}" class="form-control" type="radio" name="price">
-                                        <input style="border: none;width:100px;" type="text" value="{{old('price')}}" id="showPriceNew" readonly>
+                                        <input style="font-size: 15px;" id="showPrice" value="{{ old('price') }}"
+                                            class="form-control" type="radio" name="price">
+                                        <input style="border: none;width:100px;" type="text"
+                                            value="{{ old('price') }}" id="showPriceNew" readonly>
                                     </div>
                                 </div>
-                                 <br>
-                                 <div class="credit-price">
+                                <br>
+                                <div class="credit-price">
                                     <label for="">Harga Kredit</label>
                                     <div style="display: flex; gap:10px;" class="input-price">
-                                        <input style="font-size: 15px;" id="showCreditPrice" value="{{old('credit_price')}}" class="form-control" type="radio" name="price"> 
-                                        <input style="border: none;width:100px;" type="text" value="{{old('credit_price')}}" id="showCreditPriceNew" readonly>
+                                        <input style="font-size: 15px;" id="showCreditPrice"
+                                            value="{{ old('credit_price') }}" class="form-control" type="radio"
+                                            name="price">
+                                        <input style="border: none;width:100px;" type="text"
+                                            value="{{ old('credit_price') }}" id="showCreditPriceNew" readonly>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label for="">Terbilang</label>
-                                <input class="form-control" type="text" placeholder="Nominal terbilang" name="price_nominal">
+                                <input class="form-control" type="text" placeholder="Nominal terbilang"
+                                    name="price_nominal">
                             </div>
 
                             <div class="form-group">
                                 <label for="">DP Unit</label>
-                                <input class="form-control" type="text" placeholder="Pembayaran DP" name="down_payment">
-                                <p style="font-style: italic;font-size:13px;" class="text-secondary"> *Jika pembayaran metode kredit </p>
+                                <input class="form-control" type="text" placeholder="Pembayaran DP"
+                                    name="down_payment">
+                                <p style="font-style: italic;font-size:13px;" class="text-secondary"> *Jika pembayaran
+                                    metode kredit </p>
                             </div>
 
-                            
-                            
+
+
                             <div class="form-group">
                                 <label for="">Lokasi Unit</label>
-                                <input id="showLocation" class="form-control" type="text" name="location_unit" value="{{old('location_name')}}" readonly>
+                                <input id="showLocation" class="form-control" type="text" name="location_unit"
+                                    value="{{ old('location_name') }}" readonly>
                             </div>
 
                             <hr>
 
                             <div class="form-group">
                                 <label>Nama Customer</label>
-                                <input type="text" class="form-control" name="name" autocomplete="off" placeholder="Masukan Nama Customer">
+                                <input type="text" class="form-control" name="name" autocomplete="off"
+                                    placeholder="Masukan Nama Customer">
                             </div>
 
                             <div class="form-group">
                                 <label>Alamat</label>
-                                <input type="text" class="form-control" name="address" autocomplete="off" placeholder="Masukan Alamat Customer">
+                                <input type="text" class="form-control" name="address" autocomplete="off"
+                                    placeholder="Masukan Alamat Customer">
                             </div>
 
                             <div class="form-group">
                                 <label>No.Telepon/WA</label>
-                                <input type="text" class="form-control" name="phone_number" autocomplete="off" placeholder="Masukan No Telepon">
+                                <input type="text" class="form-control" name="phone_number" autocomplete="off"
+                                    placeholder="Masukan No Telepon">
                             </div>
 
                             <div class="form-group">
                                 <label>Email</label>
-                                <input type="email" class="form-control" name="email" autocomplete="off" placeholder="Masukan Email">
+                                <input type="email" class="form-control" name="email" autocomplete="off"
+                                    placeholder="Masukan Email">
                             </div>
-                            
+
 
                             <button type="submit" class="btn btn-primary">Simpan</button>
-                        </form>  
+                        </form>
 
 
                         <div style="width: 400px; height:max-content; padding:8px;" class="card shadow mb-4">
@@ -156,18 +173,18 @@
                                     <br>
                                     <li>Pembuatan SPK Unit Kendaraan pastikan data yang dinput benar</li>
                                 </ul>
-                                
+
                             </div>
                         </div>
                     </div>
 
-                    
+
                 </div>
 
-                
-    
+
+
             </div>
-           
+
             @include('layouts.admin_views.footer')
 
         </div>
@@ -186,105 +203,111 @@
     <div id="loadingSpinnerWrapper">
         <div class="spinner-border" role="status">
         </div>
-      </div>
-      
-      <style>
+    </div>
+
+    <style>
         #loadingSpinnerWrapper {
-        position: fixed; /* Fix posisi spinner */
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: none; /* Spinner disembunyikan saat halaman dimuat */
-        justify-content: center; /* Horizontal center */
-        align-items: center; /* Vertical center */
-        background-color: rgba(0, 0, 0, 0.517); /* Background semi-transparan */
-        z-index: 9999; /* Pastikan spinner berada di atas konten lainnya */
-      }
-      
-      .spinner-border {
-        color: yellow;
-        width: 3rem;
-        height: 3rem; /* Pastikan tinggi spinner diatur */
-      }
-      
+            position: fixed;
+            /* Fix posisi spinner */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            /* Spinner disembunyikan saat halaman dimuat */
+            justify-content: center;
+            /* Horizontal center */
+            align-items: center;
+            /* Vertical center */
+            background-color: rgba(0, 0, 0, 0.517);
+            /* Background semi-transparan */
+            z-index: 9999;
+            /* Pastikan spinner berada di atas konten lainnya */
+        }
+
+        .spinner-border {
+            color: yellow;
+            width: 3rem;
+            height: 3rem;
+            /* Pastikan tinggi spinner diatur */
+        }
     </style>
-  
+
 
 </body>
 
 <script>
     window.addEventListener('load', function() {
-       var loadingSpinnerWrapper = document.getElementById('loadingSpinnerWrapper');
-   
-       // Log elemen untuk memastikan spinner ditemukan
-         // Cek apakah elemen ditemukan
-   
-       if (loadingSpinnerWrapper) {
-           // Menampilkan spinner saat halaman dimuat
-           loadingSpinnerWrapper.style.display = 'flex';
-          
-   
-           // Menyembunyikan spinner setelah 2 detik (2000ms)
-           setTimeout(function() {
-               
-               loadingSpinnerWrapper.style.display = 'none';  // Sembunyikan spinner setelah 2 detik
-           }, 1000);  // 2000ms = 2 detik
-       } else {
-           console.log("Elemen spinner tidak ditemukan!");
-       }
-   });
-   </script>
+        var loadingSpinnerWrapper = document.getElementById('loadingSpinnerWrapper');
 
-   <script>
-    document.getElementById('vehicleId').addEventListener('change', function(){
+        // Log elemen untuk memastikan spinner ditemukan
+        // Cek apakah elemen ditemukan
+
+        if (loadingSpinnerWrapper) {
+            // Menampilkan spinner saat halaman dimuat
+            loadingSpinnerWrapper.style.display = 'flex';
+
+
+            // Menyembunyikan spinner setelah 2 detik (2000ms)
+            setTimeout(function() {
+
+                loadingSpinnerWrapper.style.display = 'none'; // Sembunyikan spinner setelah 2 detik
+            }, 1000); // 2000ms = 2 detik
+        } else {
+            console.log("Elemen spinner tidak ditemukan!");
+        }
+    });
+</script>
+
+<script>
+    document.getElementById('vehicleId').addEventListener('change', function() {
         var vehicleId = this.value;
 
-        if(!vehicleId) {
+        if (!vehicleId) {
             document.getElementById('showYear').value = '';
             document.getElementById('showColor').value = '';
             document.getElementById('showLocation').value = '';
-            document.getElementById('showPrice').value ='';
-            document.getElementById('showPriceNew').value ='';
+            document.getElementById('showPrice').value = '';
+            document.getElementById('showPriceNew').value = '';
             document.getElementById('showCreditPrice') = '';
             document.getElementById('showCreditPriceNew') = '';
             return;
         }
-        
-        fetch('/get_unit/' + vehicleId).then(response =>{
-            if(!response.ok){
+
+        fetch('/get_unit/' + vehicleId).then(response => {
+            if (!response.ok) {
                 throw new Error('Not have data');
             }
             return response.json();
         }).then(data => {
-            if(data.color){
+            if (data.color) {
                 document.getElementById('showColor').value = data.color;
             }
-            if(data.manufacture_year){
+            if (data.manufacture_year) {
                 document.getElementById('showYear').value = data.manufacture_year;
             }
 
-            if(data.location_name){
+            if (data.location_name) {
                 document.getElementById('showLocation').value = data.location_name;
             }
 
-            if(data.price){
+            if (data.price) {
                 document.getElementById('showPrice').value = data.price;
             }
 
-            if(data.price){
+            if (data.price) {
                 document.getElementById('showPriceNew').value = data.price;
             }
 
-            if(data.credit_price){
+            if (data.credit_price) {
                 document.getElementById('showCreditPrice').value = data.credit_price;
             }
 
-            if(data.credit_price){
+            if (data.credit_price) {
                 document.getElementById('showCreditPriceNew').value = data.credit_price;
             }
         })
     })
-   </script>
+</script>
 
 </html>

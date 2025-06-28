@@ -27,11 +27,11 @@
                     @foreach ($blog_data as $blog)
                         <div style="margin-bottom: 10px;text-align:center;" class="title">
                             <h2 style="font-weight: bold;font-size:20px;">{{ $blog->title }}</h2>
-                            <div style="display:flex; gap:9px;font-size:13px; justify-content:center;margin-bottom:0px;"
-                                class="flex-author">
-                                <p>Editor : {{ $editor->editor_name }}</p>
+                            <div class="flex-author">
+                                <p class="editor">Editor : {{ $editor->editor_name }}</p>
                                 <span> | </span>
-                                <p> Tanggal posting : {{ date('d F Y', strtotime($blog->created_at)) }}</p>
+                                <p class="editor"> Tanggal posting : {{ date('d F Y', strtotime($blog->created_at)) }}
+                                </p>
                             </div>
 
                         </div>
@@ -72,6 +72,19 @@
     body {
         font-family: "Noto Serif", serif;
 
+    }
+
+    p.editor {
+        margin: 0;
+    }
+
+    .flex-author {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        font-size: 13px;
+        justify-content: center;
+        margin-bottom: 0px;
     }
 
     #loadingSpinnerWrapper {

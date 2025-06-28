@@ -171,6 +171,7 @@
                                                             '7',
                                                             '15',
                                                         ]))
+                                                        ;
                                                         <th>Aksi</th>
                                                     @else
                                                     @endif

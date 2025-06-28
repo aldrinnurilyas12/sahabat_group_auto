@@ -285,13 +285,13 @@
 
     {{-- section testimonial customers --}}
 
-    <section id="testimonial-customers">
+    <section style="background-image:linear-gradient(to right, #0d0d0d, #100021)" id="testimonial-customers">
         <div class="max-w-screen-xl px-4 pt-20 pb-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12 ">
-            <h2 style="text-align: center;margin"
-                class="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Apa kata mereka tentang
+            <h2 style="text-align: center;color:white;" class="text-3xl font-extrabold tracking-tight">Apa kata mereka
+                tentang
                 kami?</h2>
             <br>
-            <span style="display:flex; justify-content:center;" class="total-rating">An
+            <span style="display:flex; justify-content:center;color:white;" class="total-rating">An
                 average rating of {{ (float) $avg_rating }} from {{ $rating_total }} reviews</span>
             <br>
 
@@ -320,7 +320,7 @@
                                         src="{{ asset('assets/img/star-icon.svg') }}" alt="">
                                     {{ $testi->rating }}</span>
                                 <span style="color: black;"> | </span>
-                                <span>{{ date('d F Y'), strtotime($testi->created_at) }}</span>
+                                <span>{{ \Carbon\Carbon::parse($testi->created_at)->format('d F Y') }}</span>
                             </div>
                         </div>
                     </div>
@@ -333,7 +333,7 @@
                 <a href="#" data-toggle="modal" data-target="#showForm" style="background-color:#212529;"
                     class="btn btn-dark">Sampaikan Testimonial</a>
 
-                <a class="btn btn-outline-dark" href="{{ route('all_testimonial') }}">Lihat
+                <a class="btn btn-outline-secondary" href="{{ route('all_testimonial') }}">Lihat
                     semua <i class="fas fa-arrow-right"></i></a>
             </div>
         </div>

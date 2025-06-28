@@ -566,27 +566,48 @@ class EmployeeAttedance extends Controller
             'attedance_type' => 'required'
         ]);
 
+        $today = date('Y-m-d');
+
+        $checking_attendance_today = DB::table('employee_attedance')
+            ->where('employee_id', $request->employee_id)
+            ->whereDate('attedance_date', $today)->exists();
+
+
         if ($insertTime >= 8 && $insertTime <= 18) {
             if ($insertTime >= 8  && $insertTime <= 10) {
-                EmployeeAttedanceModel::create([
-                    'employee_id' => $request->employee_id,
-                    'attedance_type' => $request->attedance_type,
-                    'reasons' => $request->reasons,
-                    'attedance_date' => $request->attedance_date,
-                    'fotos' => $request->fotos,
-                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
 
-                ]);
-                session()->flash('message_success', 'Data Berhasil disimpan!');
-                return redirect()->route('master_employee_attedance.index');
+                if (!$checking_attendance_today) {
+                    EmployeeAttedanceModel::create([
+                        'employee_id' => $request->employee_id,
+                        'attedance_type' => $request->attedance_type,
+                        'reasons' => $request->reasons,
+                        'attedance_date' => $request->attedance_date,
+                        'fotos' => $request->fotos,
+                        'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+
+                    ]);
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Berhasil melakukan presensi!'
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Anda sudah melakukan presensi!'
+                    ]);
+                }
             } else {
-                session()->flash('failed_insert', 'Presensi sudah lewat!.');
-                return redirect()->route('master_employee_attedance.index');
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Presensi sudah lewat!, Presensi dilakukan jam 08.00 s/d 10.00 WIB.'
+                ]);
             }
         } else {
-            session()->flash('failed_insert', 'Presensi belum pada jadwalnya!, Presensi dilakukan jam 08.00 Wib.');
-            return redirect()->route('master_employee_attedance.index');
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Presensi belum pada jadwalnya!, Presensi dilakukan jam 08.00 WIB.'
+            ]);
         }
     }
 
