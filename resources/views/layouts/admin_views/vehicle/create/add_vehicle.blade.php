@@ -26,8 +26,10 @@
                         @csrf
                         <div class="form-group">
                             <label>VIN/NO.POL Kendaraan <span style="color: red">*</span></label>
-                            <input type="text" class="form-control" name="vehicle_registration_number"
-                                placeholder="Masukan NO.POL Kendaraan" autocomplete="off">
+                            <input type="text" class="form-control" value="{{ old('vehicle_registration_number') }}"
+                                name="vehicle_registration_number" placeholder="Masukan NO.POL Kendaraan"
+                                autocomplete="off">
+                            <x-input-error :messages="$errors->get('vehicle_registration_number')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label for="">Brand/Merk</label>
@@ -37,11 +39,14 @@
                                     <option value="{{ $merk->id }}">{{ $merk->brand_name }}</option>
                                 @endforeach
                             </select>
+                            <x-input-error :messages="$errors->get('brand')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Tipe Kendaraan</label>
-                            <input type="text" class="form-control" name="vehicle_type"
-                                placeholder="Masukan tipe merk kendaraan, cth:avanza veloz" autocomplete="off">
+                            <input type="text" class="form-control" value="{{ old('vehicle_type') }}"
+                                name="vehicle_type" placeholder="Masukan tipe merk kendaraan, cth:avanza veloz"
+                                autocomplete="off">
+                            <x-input-error :messages="$errors->get('vehicle_type')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Model</label>
@@ -51,6 +56,7 @@
                                     <option value="{{ $type->id }}">{{ $type->vehicle_type }}</option>
                                 @endforeach
                             </select>
+                            <x-input-error :messages="$errors->get('vehicle_category')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Jenis Kendaraan</label>
@@ -62,47 +68,59 @@
                                 <option value="Mobil Listrik">Mobil Listrik</option>
                                 <option value="Kendaraan Modifikasi">Kendaraan Modifikasi</option>
                             </select>
+                            <x-input-error :messages="$errors->get('model')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>KM saat ini</label>
-                            <input type="text" class="form-control" name="current_km"
-                                placeholder="Masukan Kilometer saat ini" autocomplete="off">
+                            <input type="text" class="form-control" value="{{ old('current_km') }}"
+                                name="current_km" placeholder="Masukan Kilometer saat ini" autocomplete="off">
+                            <x-input-error :messages="$errors->get('current_km')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Warna</label>
-                            <input type="text" class="form-control" name="color"
+                            <input type="text" class="form-control" value="{{ old('color') }}" name="color"
                                 placeholder="Masukan warna kendaraan" autocomplete="off">
+                            <x-input-error :messages="$errors->get('color')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Tahun Pembuatan</label>
-                            <input type="number" class="form-control" step="1" name="manufacture_year">
+                            <input type="number" class="form-control" step="1"
+                                value="{{ old('manufacture_year') }}" name="manufacture_year">
+                            <x-input-error :messages="$errors->get('manufacture_year')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Tahun Registrasi</label>
-                            <input type="number" class="form-control" step="1" name="registration_year">
+                            <input type="number" class="form-control" step="1"
+                                value="{{ old('registration_year') }}" name="registration_year">
+                            <x-input-error :messages="$errors->get('registration_year')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Tanggal Pajak</label>
-                            <input type="date" class="form-control" name="tax_date">
+                            <input type="date" class="form-control" value="{{ old('tax_date') }}"
+                                name="tax_date">
+                            <x-input-error :messages="$errors->get('tax_date')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Nomor BPKB</label>
-                            <input type="number" class="form-control" name="bpkb_number" placeholder="Masukan No.BPKB">
+                            <input type="number" class="form-control" value="{{ old('bpkb_number') }}"
+                                name="bpkb_number" placeholder="Masukan No.BPKB">
+                            <x-input-error :messages="$errors->get('bpkb_number')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Kode Lokasi</label>
-                            <input type="text" class="form-control" name="location_code"
-                                placeholder="Masukan kode lokasi">
+                            <input type="text" class="form-control" value="{{ old('location_code') }}"
+                                name="location_code" placeholder="Masukan kode lokasi">
                         </div>
                         <div class="form-group">
                             <label>No Urut Pendaftaran</label>
-                            <input type="text" class="form-control" name="registration_queue_number"
+                            <input type="text" class="form-control"
+                                value="{{ old('registration_queue_number') }}" name="registration_queue_number"
                                 placeholder="Nomor urut pendaftaran">
                         </div>
 
                         <div class="form-group">
                             <label>No.Pol Kendaraan lama (jika ada)</label>
-                            <input type="text" class="form-control" name="old_vin"
+                            <input type="text" class="form-control" value="{{ old('old_vin') }}" name="old_vin"
                                 placeholder="No.Pol kendaraan lama (optional)">
                         </div>
 
@@ -116,7 +134,7 @@
                                         {{ $cabang->location_code . ' - ' . $cabang->location_name }}</option>
                                 @endforeach
                             </select>
-
+                            <x-input-error :messages="$errors->get('location_branch_vehicle')" class="mt-2" style="color: red;" />
                         </div>
                         <br>
                         <h5 style="color: black;font-weight:bold;">Spesifikasi Mesin</h5>
@@ -135,40 +153,69 @@
                                 <option value="hidrogen">Hidrogen</option>
                                 <option value="cng">Gas Alam (CNG)</option>
                             </select>
+                            <x-input-error :messages="$errors->get('fuel_type')" class="mt-2" style="color: red;" />
                         </div>
 
                         <div class="form-group">
                             <label>Isi Silinder/Daya Listrik</label>
-                            <input type="number" class="form-control" name="cylinder_capacity"
-                                placeholder="Isi silinder" autocomplete="off">
+                            <input type="number" class="form-control"value="{{ old('cylinder_capacity') }}"
+                                name="cylinder_capacity" placeholder="Isi silinder" autocomplete="off">
+                            <x-input-error :messages="$errors->get('cylinder_capacity')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Transmisi Kendaraan</label>
                             <select class="form-control" name="transmission">
                                 <option value="">--- Pilih Transmisi ---</option>
-                                <option value="MT">Manual Transmission (MT)</option>
-                                <option value="AT">Automatic Transmission (AT)</option>
+                                <option value="Manual">Manual Transmission (MT)</option>
+                                <option value="Automatic">Automatic Transmission (AT)</option>
                             </select>
+                            <x-input-error :messages="$errors->get('transmission')" class="mt-2" style="color: red;" />
                         </div>
+
+                        <div class="form-group">
+                            <label>Kunci Cadangan</label>
+                            <select class="form-control" name="backup_vehicle_key">
+                                <option value="">--- Kunci Serep/Kunci Cadangan ---</option>
+                                <option value="Ada">Ada</option>
+                                <option value="Tidak Ada">Tidak Ada</option>
+                            </select>
+                            <x-input-error :messages="$errors->get('backup_vehicle_key')" class="mt-2" style="color: red;" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Buku Servis</label>
+                            <select class="form-control" name="services_book">
+                                <option value="">--- Buku Servis ---</option>
+                                <option value="Ada">Ada</option>
+                                <option value="Tidak Ada">Tidak Ada</option>
+                            </select>
+                            <x-input-error :messages="$errors->get('services_book')" class="mt-2" style="color: red;" />
+                        </div>
+
                         <div class="form-group">
                             <label>Nomor Mesin</label>
-                            <input type="text" class="form-control" name="engine_number"
-                                placeholder="Nomor Mesin" autocomplete="off">
+                            <input type="text" class="form-control" value="{{ old('engine_number') }}"
+                                name="engine_number" placeholder="Nomor Mesin" autocomplete="off">
+                            <x-input-error :messages="$errors->get('engine_number')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Nomor Rangka</label>
-                            <input type="text" class="form-control" name="vehicle_identity_number"
-                                placeholder="Nomor Rangka Kendaraan" autocomplete="off">
+                            <input type="text" class="form-control" value="{{ old('vehicle_identity_number') }}"
+                                name="vehicle_identity_number" placeholder="Nomor Rangka Kendaraan"
+                                autocomplete="off">
+                            <x-input-error :messages="$errors->get('vehicle_identity_number')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Nomor Coding</label>
-                            <input type="text" class="form-control" name="coding_number"
-                                placeholder="Nomor Coding" autocomplete="off">
+                            <input type="text" class="form-control" value="{{ old('coding_number') }}"
+                                name="coding_number" placeholder="Nomor Coding" autocomplete="off">
+                            <x-input-error :messages="$errors->get('coding_number')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
-                            <label>Warna TNKB</label>
-                            <input type="text" class="form-control" name="licence_plate_color"
-                                placeholder="Warna TNKB" autocomplete="off">
+                            <label>Warna Plat Nomor Kendaraan (TNKB)</label>
+                            <input type="text" class="form-control" value="{{ old('licence_plate_color') }}"
+                                name="licence_plate_color" placeholder="Warna TNKB" autocomplete="off">
+                            <x-input-error :messages="$errors->get('licence_plate_color')" class="mt-2" style="color: red;" />
                         </div>
 
                         <br>
@@ -183,44 +230,32 @@
                                     <option value="{{ $status->id }}">{{ $status->category_name }}</option>
                                 @endforeach
                             </select>
+                            <x-input-error :messages="$errors->get('status_vehicle_id')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Harga Unit Kendaraan</label>
-                            <input type="text" class="form-control" name="price"
+                            <input type="text" class="form-control" value="{{ old('price') }}" name="price"
                                 placeholder="Masukan harga unit kendaraan" autocomplete="off">
+                            <x-input-error :messages="$errors->get('price')" class="mt-2" style="color: red;" />
                         </div>
                         <div class="form-group">
                             <label>Harga Kredit Unit Kendaraan</label>
                             <input type="text" class="form-control"
-                                placeholder="Masukan harga kredit unit kendaraan" name="credit_price"
-                                autocomplete="off">
+                                placeholder="Masukan harga kredit unit kendaraan" value="{{ old('credit_price') }}"
+                                name="credit_price" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label>Nama Pemilik</label>
-                            <input type="text" class="form-control" name="name_of_owner"
-                                placeholder="Masukan nama pemilik" autocomplete="off">
+                            <input type="text" class="form-control" value="{{ old('name_of_owner') }}"
+                                name="name_of_owner" placeholder="Masukan nama pemilik" autocomplete="off">
                         </div>
                         <div class="form-group">
                             <label>Alamat Pemilik</label>
-                            <input type="text" class="form-control" name="address"
+                            <input type="text" class="form-control" value="{{ old('address') }}" name="address"
                                 placeholder="Masukan alamat pemilik" autocomplete="off">
                         </div>
 
-                        {{-- <h5 style="color: black;font-weight:bold;">Upload Foto Mobil</h5>
-                <hr>
-                <div class="form-group">
-                    <label for="">Upload foto mobil (Maks 15 Foto)</label>
-                <input type="file" name="images[]" multiple required>  
-                </div>
-                <br>
-                <h5 style="color: black;font-weight:bold;">Upload Dokumen/File</h5>
-                <hr>
-                <div class="form-group">
-                    <label for="">Upload dokumen (STNK & BPKB)</label>
-                    <input type="file" multiple name="document_files[]">  
-                </div> --}}
-
-                        <button type="submit" class="btn btn-primary">Simpan</button>
+                        <button type="submit" class="btn btn-primary">Simpan Data</button>
 
                     </form>
 

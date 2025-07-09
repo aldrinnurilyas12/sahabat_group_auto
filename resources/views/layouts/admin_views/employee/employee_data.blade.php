@@ -45,7 +45,7 @@
                             <h5 style="color: black;"><strong>Data Karyawan PT Sahabat Group Auto</strong></h5>
                             <br>
                             <div style="display: flex; gap:10px; font-family:inter,sans-serif;" class="btn-content">
-                                @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '5')
+                                @if (in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, ['5', '12', '13']))
                                     <a href="{{ route('add_employee') }}" class="btn btn-primary">
                                         <i class="fas fa-plus-circle"></i>&nbsp;Tambah Karyawan
                                     </a>
@@ -171,7 +171,6 @@
                                                             '7',
                                                             '15',
                                                         ]))
-                                                        ;
                                                         <th>Aksi</th>
                                                     @else
                                                     @endif
@@ -183,6 +182,7 @@
                                                     <th>Telepon</th>
                                                     <th>Email</th>
                                                     <th>Posisi</th>
+                                                    <th>Level Posisi</th>
                                                     <th>Department</th>
                                                     <th>Tipe Pekerjaan</th>
                                                     <th>Kantor</th>
@@ -241,13 +241,21 @@
                                                         <td>{{ $emp->phone_number }}</td>
                                                         <td>{{ $emp->email }}</td>
                                                         <td>{{ $emp->job_position }}</td>
+                                                        @if ($emp->level_position_name)
+                                                            <td>{{ $emp->level_position_name }}</td>
+                                                        @else
+                                                            <td>-</td>
+                                                        @endif
                                                         <td>{{ $emp->department_name }}</td>
                                                         <td>{{ $emp->type_of_employee }}</td>
                                                         <td>{{ $emp->location_name }}</td>
                                                         <td>{{ 'Rp ' . number_format($emp->salary) }}</td>
-                                                        <td>{{ 'Rp ' . number_format($emp->tunjangan_transport) }}</td>
-                                                        <td>{{ 'Rp ' . number_format($emp->tunjangan_kesehatan) }}</td>
-                                                        <td>{{ 'Rp ' . number_format($emp->tunjangan_lainnya) }}</td>
+                                                        <td>{{ 'Rp ' . number_format($emp->tunjangan_transport) }}
+                                                        </td>
+                                                        <td>{{ 'Rp ' . number_format($emp->tunjangan_kesehatan) }}
+                                                        </td>
+                                                        <td>{{ 'Rp ' . number_format($emp->tunjangan_lainnya) }}
+                                                        </td>
                                                         <td>{{ 'Rp ' . number_format($emp->salary_total) }}</td>
                                                         <td>{{ $emp->is_active }}</td>
                                                         <td>{{ old('start_date', $emp->start_date ? \Carbon\Carbon::parse($emp->start_date)->format('d-m-Y') : '') }}

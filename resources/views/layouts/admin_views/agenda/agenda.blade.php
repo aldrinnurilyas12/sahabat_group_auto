@@ -69,6 +69,7 @@
                                         <th>Aksi</th>
                                         <th>Department</th>
                                         <th>Kantor</th>
+                                        <th>Pemimpin Meeting</th>
                                         <th>Agenda</th>
                                         <th>Tanggal Agenda</th>
                                         <th>Jam Mulai</th>
@@ -95,8 +96,24 @@
                                                         data-target="#deleteUnit{{ $agendas->id }}"><i
                                                             class="fas fa-trash"></i></a>
                                             </td>
-                                            <td>{{ $agendas->department }}</td>
-                                            <td>{{ $agendas->branch }}</td>
+
+                                            @if ($agendas->department_name == null)
+                                                <td>Semua Department</td>
+                                            @else
+                                                <td>{{ $agendas->department_name }}</td>
+                                            @endif
+
+                                            @if ($agendas->branch == null)
+                                                <td>Semua Kantor</td>
+                                            @else
+                                                <td>{{ $agendas->branch }}</td>
+                                            @endif
+
+                                            @if ($agendas->meeting_leader == null)
+                                                <td>-</td>
+                                            @else
+                                                <td>{{ $agendas->name }}</td>
+                                            @endif
                                             <td>{{ $agendas->agenda_name }}</td>
                                             <td>{{ \Carbon\Carbon::parse($agendas->agenda_date)->format('d F Y') }}
                                             </td>

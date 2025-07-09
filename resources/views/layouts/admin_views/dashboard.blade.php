@@ -50,6 +50,8 @@
                                 class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
                     </div>
 
+
+
                     <!-- Content Row -->
                     <div class="row">
                         <div class="col-xl-2 col-md-6 mb-4">
@@ -233,14 +235,24 @@
                                                 </tr>
                                             </thead>
 
+
                                             <tbody>
                                                 <?php $no = 1; ?>
                                                 @foreach ($agenda as $agendas)
                                                     <tr style="width: 200px;">
                                                         <td><?php echo $no++; ?></td>
                                                         <td>{{ $agendas->agenda_name }}</td>
-                                                        <td>{{ $agendas->department }}</td>
-                                                        <td>{{ $agendas->branch }}</td>
+                                                        @if ($agendas->department_name == null)
+                                                            <td>Semua Department</td>
+                                                        @else
+                                                            <td>{{ $agendas->department_name }}</td>
+                                                        @endif
+
+                                                        @if ($agendas->branch == null)
+                                                            <td>Semua Kantor</td>
+                                                        @else
+                                                            <td>{{ $agendas->branch }}</td>
+                                                        @endif
                                                         <td>{{ \Carbon\Carbon::parse($agendas->agenda_date)->format('d F Y') }}
                                                         </td>
                                                         <td>{{ $agendas->start_time }}</td>

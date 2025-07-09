@@ -228,6 +228,7 @@
                                                 @elseif($vehicle->tax_date == null)
                                                     {{ 'Belum' }}
                                                 @else
+                                                    -
                                                 @endif
                                             </p>
                                         </div>
@@ -239,34 +240,55 @@
                                                 @if ($vehicle->bpkb_number)
                                                     Ada
                                                 @elseif($vehicle->bpkb_number == null)
+                                                    -
+                                                @else
+                                                @endif
+                                            </p>
+                                        </div>
+
+                                        <div style="display: block; gap:5px;align-items:center;"
+                                            class="detail-sub-info">
+                                            <p style="font-size: 12px; color:gray;margin-bottom:0;">Kunci Cadangan</p>
+                                            <p style="margin-bottom: 0;font-weight:bold;">
+                                                @if ($vehicle->backup_vehicle_key)
+                                                    Ada
+                                                @elseif($vehicle->backup_vehicle_key == null)
                                                     Tidak
                                                 @else
                                                 @endif
                                             </p>
                                         </div>
 
-
-
-
+                                        <div style="display: block; gap:5px;align-items:center;"
+                                            class="detail-sub-info">
+                                            <p style="font-size: 12px; color:gray;margin-bottom:0;">Buku Servis</p>
+                                            <p style="margin-bottom: 0;font-weight:bold;">
+                                                @if ($vehicle->services_book)
+                                                    Ada
+                                                @elseif($vehicle->services_book == null)
+                                                    Tidak
+                                                @else
+                                                @endif
+                                            </p>
+                                        </div>
                                     </div>
+                                    <div style="display: flex; flex-wrap:wrap; gap:10px;align-items:center;"
+                                        class="contact-info">
+                                        <a href="/vehicle_appointment/#appointment-create"
+                                            style="width:max-content;margin-top:20px;background-color: #212529;"
+                                            class="btn btn-dark">
+                                            Jadwalkan Test Drive
+                                        </a>
+
+                                        <a href="https://wa.me/{{ $contact->first()->phone_number }}"
+                                            style="width:max-content;margin-top:20px;color:black;">
+                                            Hubungi Sales
+                                        </a>
+                                    </div>
+
+
                                 </div>
-                                <div style="display: flex; flex-wrap:wrap; gap:10px;align-items:center;"
-                                    class="contact-info">
-                                    <a href="/vehicle_appointment/#appointment-create"
-                                        style="width:max-content;margin-top:20px;background-color: #212529;"
-                                        class="btn btn-dark">
-                                        Jadwalkan Test Drive
-                                    </a>
-
-                                    <a href="https://wa.me/{{ $contact->first()->phone_number }}"
-                                        style="width:max-content;margin-top:20px;color:black;">
-                                        Hubungi Sales
-                                    </a>
-                                </div>
-
-
                             </div>
-                        </div>
                     @endforeach
 
                 </div>

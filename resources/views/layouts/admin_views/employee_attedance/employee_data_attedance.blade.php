@@ -307,7 +307,7 @@
                                                 <th>Tipe Presensi</th>
                                                 <th>Alasan</th>
                                                 <th>Tanggal Presensi</th>
-                                                <th>Foto</th>
+                                                <th>Attachment</th>
                                                 <th>Created at</th>
                                                 <th>Created by</th>
                                                 <th>Updated at</th>
@@ -386,7 +386,17 @@
                                                     </td>
                                                     <td>{{ $emp->reasons }}</td>
                                                     <td>{{ $emp->attedance_date }}</td>
-                                                    <td>{{ $emp->fotos }}</td>
+                                                    <td>
+                                                        @if ($emp->surat_sakit)
+                                                            <a style="color:black;" class="btn btn-warning"
+                                                                href="#" data-toggle="modal"
+                                                                data-target="#showAttachment{{ $emp->id }}">
+                                                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                                                lihat</a>
+                                                        @else
+                                                            -
+                                                        @endif
+                                                    </td>
                                                     <td>{{ $emp->created_at }}</td>
                                                     <td>{{ $emp->created_by }}</td>
                                                     <td>{{ $emp->updated_at }}</td>
@@ -425,6 +435,26 @@
         <div class="spinner-border" role="status">
         </div>
     </div>
+
+
+    @foreach ($employee_attedance as $attachment)
+        <div class="modal fade" id="showAttachment{{ $attachment->id }}" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalLabel{{ $attachment->id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel{{ $attachment->id }}">Surat Sakit :
+                            {{ $attachment->nik . ' - ' . $attachment->name }}</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <iframe style="height: 500px;" src="{{ asset('storage/' . $attachment->surat_sakit) }}"
+                        frameborder="0"></iframe>
+                </div>
+            </div>
+        </div>
+    @endforeach
 
     <style>
         #loadingSpinnerWrapper {
@@ -576,7 +606,7 @@
             mirror: false
         });
         scanner.addListener('scan', function(content) {
-            alert('QR Code ditemukan: ' + content);
+            // alert('QR Code ditemukan: ' + content);
 
 
             const data = JSON.parse(content);
@@ -587,10 +617,10 @@
                 String(today.getMonth() + 1).padStart(2, '0') + '-' +
                 String(today.getDate()).padStart(2, '0');
 
+            // REVISI ATTEDANCE DATE DI BACKEND 
             axios.post('/send_attendance_employee', {
                     employee_id: employee_id,
-                    attedance_type: 'hadir',
-                    attedance_date: attendanceDate
+
                 })
                 .then(function(response) {
                     if (response.data.status === 'success') {
@@ -599,7 +629,10 @@
                             title: 'Berhasil!',
                             text: response.data.message,
                             confirmButtonColor: '#3085d6',
-                            confirmButtonText: 'OK'
+                            confirmButtonText: 'OK',
+                            timer: 2000
+                        }).then(() => {
+                            location.reload();
                         });
                     } else {
                         Swal.fire({
@@ -607,7 +640,10 @@
                             title: 'Gagal!',
                             text: response.data.message,
                             confirmButtonColor: '#3085d6',
-                            confirmButtonText: 'OK'
+                            confirmButtonText: 'OK',
+                            timer: 2000
+                        }).then(() => {
+                            location.reload();
                         });
                     }
                 })
@@ -617,7 +653,8 @@
                         title: 'Gagal!',
                         text: response.data.message,
                         confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
+                        confirmButtonText: 'OK',
+                        timer: 2000
                     });
                 });
         });

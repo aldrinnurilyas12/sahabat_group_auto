@@ -111,11 +111,11 @@
                                         <div style="display: flex;flex-wrap:wrap; gap:10px;width:100%;justify-content:center;"
                                             class="status">
                                             <p>Status Unit:</p>
-                                            @if ($vehicle->first()->category_name == 'Unit Terjual')
+                                            @if ($vehicle->first()->status_vehicle == 'Unit Terjual')
                                                 <h5 class="btn-active-status-sold">
-                                                    {{ $vehicle->first()->category_name }}</h5>
+                                                    {{ $vehicle->first()->status_vehicle }}</h5>
                                             @else
-                                                <h5 class="btn-active-status">{{ $vehicle->first()->category_name }}
+                                                <h5 class="btn-active-status">{{ $vehicle->first()->status_vehicle }}
                                                 </h5>
                                                 <a style="font-size:12px; text-decoration:underline;" href="#"
                                                     data-toggle="modal" data-target="#changeStatusModal">Ubah Status <i
@@ -126,7 +126,7 @@
 
                                     <div style="display: flex;flex-wrap:wrap; gap:10px;width:100%;justify-content:center;"
                                         class="payment-method">
-                                        @if ($vehicle->first()->category_name == 'Unit Terjual')
+                                        @if ($vehicle->first()->status_vehicle == 'Unit Terjual')
                                             <p>Metode Pembayaran : </p>
                                             @if ($vehicle->first()->payment_method == null)
                                                 <p class="text-danger">Belum ada</p>
@@ -242,6 +242,23 @@
                                                     <tr>
                                                         <td class="title">Transmisi</td>
                                                         <td>{{ $cars->transmission }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title">Kunci Cadangan</td>
+                                                        @if ($cars->backup_vehicle_key)
+                                                            <td>{{ $cars->backup_vehicle_key }}</td>
+                                                        @else
+                                                            <td>-</td>
+                                                        @endif
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="title">Buku Servis</td>
+                                                        @if ($cars->services_book)
+                                                            <td>{{ $cars->services_book }}</td>
+                                                        @else
+                                                            <td>-</td>
+                                                        @endif
+                                                    </tr>
                                                     <tr>
                                                         <td class="title">Nomor Rangka</td>
                                                         <td>{{ $cars->vehicle_identity_number }}</td>
@@ -396,9 +413,11 @@
                                 {{-- document --}}
                                 <div class="tab-pane fade" id="ex1-tabs-3" role="tabpanel"
                                     aria-labelledby="ex1-tab-3">
-                                    <div style="font-size: 13px;" class="alert alert-warning">
+                                    <div style="font-size: 13px;" class="alert alert-info">
                                         <ul>
                                             <li>Maksimal upload 10 File Dokumen</li>
+                                            <li>Dokumen bisa berupa : STNK, BPKB, Surat Pembelian Kendaraan dan lainnya
+                                            </li>
                                             <li>Foto harus berektensi : jpg,png,jpeg,pdf,excel,dan word.</li>
                                         </ul>
                                     </div>
@@ -409,12 +428,20 @@
 
                                     <div class="btn-content">
                                         <div style="display: flex;gap:10px;" class="btn-container-doc">
-                                            <form action="{{ route('download.document', $vehicle->first()->id) }}"
-                                                method="GET">
-                                                <button style="margin-bottom: 20px;" class="btn btn-primary"
-                                                    type="submit"><i class="fas fa-download"></i> &nbsp; Download
+
+                                            @if ($documents->isNotEmpty())
+                                                <form action="{{ route('download.document', $vehicle->first()->id) }}"
+                                                    method="GET">
+                                                    <button style="margin-bottom: 20px;" class="btn btn-primary"
+                                                        type="submit"><i class="fas fa-download"></i> &nbsp; Download
+                                                        Dokumen</button>
+                                                </form>
+                                            @else
+                                                <button style="margin-bottom: 20px;" class="btn btn-secondary"
+                                                    type="button"><i class="fas fa-download"></i> &nbsp; Download
                                                     Dokumen</button>
-                                            </form>
+                                            @endif
+
 
                                             {{-- BUTTON FOR DELETE ALL DOCUMENTS --}}
                                             {{-- <div class="form-delete-doc">
@@ -446,30 +473,37 @@
                                     </div>
                                     <br>
                                     <div style="display: flex; flex-wrap:wrap;gap:5px;" class="container-image">
-                                        @foreach ($documents as $item)
-                                            <div class="doc-display">
-                                                <img height="200" width="200"
-                                                    src="{{ asset('storage/' . $item->document_files) }}">
-                                                <div class="form-delete-doc">
-                                                    <form
-                                                        action="{{ route('delete_onlychoose_document', ['id' => $item->id]) }}"
-                                                        method="POST">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button style="margin-top:5px;" type="submit"
-                                                            style="margin-bottom: 20px;" class="btn btn-danger"><i
-                                                                class="fas fa-trash"></i></button>
-                                                    </form>
+
+                                        @if ($documents->isNotEmpty())
+                                            @foreach ($documents as $item)
+                                                <div class="doc-display">
+                                                    <img height="200" width="200"
+                                                        src="{{ asset('storage/' . $item->document_files) }}">
+                                                    <div class="form-delete-doc">
+                                                        <form
+                                                            action="{{ route('delete_onlychoose_document', ['id' => $item->id]) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button style="margin-top:5px;" type="submit"
+                                                                style="margin-bottom: 20px;" class="btn btn-danger"><i
+                                                                    class="fas fa-trash"></i></button>
+                                                        </form>
+                                                    </div>
                                                 </div>
+                                            @endforeach
+                                        @else
+                                            <div style="width: 100%;text-align:center;" class="alert alert-info">
+                                                <p>Belum ada dokumen untuk unit ini</p>
                                             </div>
-                                        @endforeach
+                                        @endif
                                     </div>
                                 </div>
 
                                 {{-- images content --}}
                                 <div class="tab-pane fade" id="ex1-tabs-4" role="tabpanel"
                                     aria-labelledby="ex1-tab-4">
-                                    <div style="font-size: 13px;" class="alert alert-warning">
+                                    <div style="font-size: 13px;" class="alert alert-info">
                                         <ul>
                                             <li>Maksimal upload 15 Foto</li>
                                             <li>Foto harus berektensi : jpg,png,jpeg.</li>
@@ -485,13 +519,22 @@
                                             @foreach ($vehicle as $item)
                                                 <div class="btn-container-img">
                                                     <div class="form-download">
-                                                        <form action="{{ route('download.images', $item->id) }}"
-                                                            method="GET">
+                                                        @if ($images->isNotEmpty())
+                                                            <form action="{{ route('download.images', $item->id) }}"
+                                                                method="GET">
+                                                                <button style="margin-bottom: 20px;"
+                                                                    class="btn btn-primary" type="submit"><i
+                                                                        class="fas fa-download"></i> &nbsp; Download
+                                                                    Foto
+                                                                    Unit</button>
+                                                            </form>
+                                                        @else
                                                             <button style="margin-bottom: 20px;"
-                                                                class="btn btn-primary" type="submit"><i
-                                                                    class="fas fa-download"></i> &nbsp; Download Foto
+                                                                class="btn btn-secondary" type="button"><i
+                                                                    class="fas fa-download"></i> &nbsp; Download
+                                                                Foto
                                                                 Unit</button>
-                                                        </form>
+                                                        @endif
                                                     </div>
 
                                                     {{-- BUTTON FOR ALL FOTOS --}}
@@ -526,30 +569,37 @@
                                     </div>
                                     <br>
                                     <div style="display: flex; flex-wrap:wrap;gap:5px;" class="container-image">
-                                        @foreach ($images as $galery)
-                                            <div class="img-display">
-                                                <img height="200" width="200"
-                                                    src="{{ asset('storage/' . $galery->images) }}">
-                                                <div class="form-delete-img">
-                                                    <form
-                                                        action="{{ route('delete_onlychoose_images', ['id' => $galery->id]) }}"
-                                                        method="POST">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button style="margin-top:5px;" type="submit"
-                                                            style="margin-bottom: 20px;" class="btn btn-danger"><i
-                                                                class="fas fa-trash"></i></button>
-                                                    </form>
+                                        @if ($images->isNotEmpty())
+                                            @foreach ($images as $galery)
+                                                <div class="img-display">
+                                                    <img height="200" width="200"
+                                                        src="{{ asset('storage/' . $galery->images) }}">
+                                                    <div class="form-delete-img">
+                                                        <form
+                                                            action="{{ route('delete_onlychoose_images', ['id' => $galery->id]) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button style="margin-top:5px;" type="submit"
+                                                                style="margin-bottom: 20px;" class="btn btn-danger"><i
+                                                                    class="fas fa-trash"></i></button>
+                                                        </form>
+                                                    </div>
                                                 </div>
+                                            @endforeach
+                                        @else
+                                            <div style="width: 100%;text-align:center;" class="alert alert-info">
+                                                <p>Belum ada foto untuk unit ini</p>
                                             </div>
-                                        @endforeach
+
+                                        @endif
                                     </div>
                                 </div>
 
                                 {{-- media player --}}
                                 <div class="tab-pane fade" id="ex1-tabs-5" role="tabpanel"
                                     aria-labelledby="ex1-tab-5">
-                                    <div style="font-size: 13px;" class="alert alert-warning">
+                                    <div style="font-size: 13px;" class="alert alert-info">
                                         <ul>
                                             <li>Maksimal upload 5 File Media</li>
                                             <li>Media bisa berupa Video dan Suara : MP4 & MP3</li>
@@ -618,25 +668,31 @@
 
                                     <label style="color: black;" for=""><strong>Video Unit</strong></label>
                                     <div style="display: flex; flex-wrap:wrap;gap:15px;" class="container-image">
-                                        @foreach ($media_video as $video)
-                                            <div class="img-display">
-                                                <video width="200" height="200" controls>
-                                                    <source src="{{ asset('storage/' . $video->media_files) }}"
-                                                        type="video/mp4">
-                                                </video>
-                                                <div class="form-delete-doc">
-                                                    <form
-                                                        action="{{ route('delete_onlychoose_video', ['id' => $video->id]) }}"
-                                                        method="POST">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button style="margin-top:5px;" type="submit"
-                                                            style="margin-bottom: 20px;" class="btn btn-danger"><i
-                                                                class="fas fa-trash"></i></button>
-                                                    </form>
+                                        @if ($media_video->isNotEmpty())
+                                            @foreach ($media_video as $video)
+                                                <div class="img-display">
+                                                    <video width="200" height="200" controls>
+                                                        <source src="{{ asset('storage/' . $video->media_files) }}"
+                                                            type="video/mp4">
+                                                    </video>
+                                                    <div class="form-delete-doc">
+                                                        <form
+                                                            action="{{ route('delete_onlychoose_video', ['id' => $video->id]) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button style="margin-top:5px;" type="submit"
+                                                                style="margin-bottom: 20px;" class="btn btn-danger"><i
+                                                                    class="fas fa-trash"></i></button>
+                                                        </form>
+                                                    </div>
                                                 </div>
+                                            @endforeach
+                                        @else
+                                            <div style="width: 100%;text-align:center;" class="alert alert-info">
+                                                <p>Belum ada video untuk unit ini</p>
                                             </div>
-                                        @endforeach
+                                        @endif
                                     </div>
                                     <br>
                                     <hr>
@@ -644,26 +700,32 @@
                                     <label style="color: black;" for=""><strong>Suara Mesin
                                             Unit</strong></label>
                                     <div style="display:flex;" class="sound-display">
-                                        @foreach ($media_sound as $sound)
-                                            <div style="display:block;" class="sound-display">
-                                                <audio controls>
-                                                    <source src="{{ asset('storage/' . $sound->media_files) }}"
-                                                        type="audio/mpeg">
-                                                </audio>
-                                                <br>
-                                                <div class="form-delete-doc">
-                                                    <form
-                                                        action="{{ route('delete_onlychoose_sound', ['id' => $sound->id]) }}"
-                                                        method="POST">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button style="margin-top:5px;" type="submit"
-                                                            style="margin-bottom: 20px;" class="btn btn-danger"><i
-                                                                class="fas fa-trash"></i></button>
-                                                    </form>
+                                        @if ($media_sound->isNotEmpty())
+                                            @foreach ($media_sound as $sound)
+                                                <div style="display:block;" class="sound-display">
+                                                    <audio controls>
+                                                        <source src="{{ asset('storage/' . $sound->media_files) }}"
+                                                            type="audio/mpeg">
+                                                    </audio>
+                                                    <br>
+                                                    <div class="form-delete-doc">
+                                                        <form
+                                                            action="{{ route('delete_onlychoose_sound', ['id' => $sound->id]) }}"
+                                                            method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button style="margin-top:5px;" type="submit"
+                                                                style="margin-bottom: 20px;" class="btn btn-danger"><i
+                                                                    class="fas fa-trash"></i></button>
+                                                        </form>
+                                                    </div>
                                                 </div>
+                                            @endforeach
+                                        @else
+                                            <div style="width: 100%;text-align:center;" class="alert alert-info">
+                                                <p>Belum ada suara mesin untuk unit ini</p>
                                             </div>
-                                        @endforeach
+                                        @endif
                                     </div>
 
                                 </div>

@@ -49,7 +49,7 @@ class MaintenanceUnitController extends Controller
 
 
         $maintenance_data = DB::table('maintenance_unit as mtc')
-            ->select('vehicle_id', 'unit', DB::raw('SUM(cost) as total_cost'))
+            ->select('vehicle_id', 'unit', DB::raw('SUM(cost) as total_cost'), 'status_vehicle')
             ->leftJoin('v_vehicle as vhc', 'mtc.vehicle_id', '=', 'vhc.id')
             ->where('location_name', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
             ->groupBy('vehicle_id', 'unit')
@@ -85,7 +85,7 @@ class MaintenanceUnitController extends Controller
 
         $maintenance_data = DB::table('v_vehicle')
             ->where('location_name', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
-            ->whereNotIn('category_name', ['Unit Terjual', 'Unit Booked'])
+            ->whereNotIn('status_vehicle', ['Unit Terjual', 'Unit Booked'])
             ->get();
 
         $mechanic = DB::table('v_employee')
@@ -194,7 +194,7 @@ class MaintenanceUnitController extends Controller
 
         $maintenance_data = DB::table('v_vehicle')
             ->where('location_name', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)
-            ->whereNotIn('category_name', ['Unit Terjual', 'Unit Booked'])
+            ->whereNotIn('status_vehicle', ['Unit Terjual', 'Unit Booked'])
             ->get();
 
         $mechanic = DB::table('v_employee')
@@ -435,6 +435,7 @@ class MaintenanceUnitController extends Controller
             ->select('vh.unit', 'm.id', 'm.maintenance_type', 'm.maintenance_detail', 'm.cost', 'maintenance_date', 'm.mechanic_name', 'm.foto', 'm.car_repair_shop', 'm.maintenance_date')
             ->leftJoin('v_vehicle as vh', 'm.vehicle_id', '=', 'vh.id')
             ->where('m.vehicle_id', $request->vehicle_id)
+            ->orderBy('m.created_at', 'DESC')
             ->get();
 
         $repair_date = Carbon::parse($maintenance_data->first()->maintenance_date);
@@ -442,9 +443,9 @@ class MaintenanceUnitController extends Controller
         $repair_cost = DB::table('maintenance_unit')
             ->where('vehicle_id', $request->vehicle_id)->sum('cost');
 
-        if (!$maintenance_data) {
-            return redirect()->back();
-        }
+        // if (!$maintenance_data) {
+        //     return redirect()->back();
+        // }
         return view('layouts.admin_views.maintenance_unit.cashbone_detail', compact('maintenance_data', 'sidebar_menu', 'grouped_sub_menu', 'repair_date', 'repair_cost'));
     }
 }

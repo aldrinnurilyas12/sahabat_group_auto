@@ -8,6 +8,7 @@ use App\Models\AgendaModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use App\Http\Controllers\Api\MasterMainMenuController;
+use Carbon\Carbon;
 
 class AgendaController extends Controller
 {
@@ -26,7 +27,26 @@ class AgendaController extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        $agenda = DB::table('agenda')->orderBy('created_at', 'DESC')->get();
+
+
+        $agenda = DB::table('v_agenda as va')
+            ->select(
+                'va.id',
+                'va.department_name',
+                'va.branch',
+                'va.meeting_leader',
+                've.name',
+                'va.agenda_name',
+                'va.agenda_date',
+                'va.start_time',
+                'va.end_time',
+                'va.created_at',
+                'va.created_by',
+                'va.updated_by',
+                'va.updated_at'
+            )
+            ->leftJoin('v_employee as ve', 'va.meeting_leader', '=', 've.nik')
+            ->orderBy('created_at', 'DESC')->get();
         return view('layouts.admin_views.agenda.agenda', compact('agenda', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -42,7 +62,9 @@ class AgendaController extends Controller
         $branch = DB::table('branch')->get();
         $department = DB::table('department')->get();
 
-        return view('layouts.admin_views.agenda.create.agenda_create', compact('branch', 'department', 'grouped_sub_menu', 'sidebar_menu'));
+        $meeting_leader = DB::table('v_employee')->get();
+
+        return view('layouts.admin_views.agenda.create.agenda_create', compact('branch', 'department', 'meeting_leader', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     public function insertLogActivityUsers($log_activity)
@@ -59,8 +81,7 @@ class AgendaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'department' => 'required',
-            'branch' => 'required',
+            'meeting_leader' => 'required',
             'agenda_name' => 'required',
             'agenda_date' => 'required',
             'start_time' => 'required',
@@ -76,6 +97,7 @@ class AgendaController extends Controller
                 AgendaModel::create([
                     'department' => $request->department,
                     'branch' => $request->branch,
+                    'meeting_leader' => $request->meeting_leader,
                     'agenda_name' => $request->agenda_name,
                     'agenda_date' => $request->agenda_date,
                     'start_time' => $request->start_time,
@@ -94,6 +116,7 @@ class AgendaController extends Controller
             AgendaModel::create([
                 'department' => $request->department,
                 'branch' => $request->branch,
+                'meeting_leader' => $request->meeting_leader,
                 'agenda_name' => $request->agenda_name,
                 'agenda_date' => $request->agenda_date,
                 'start_time' => $request->start_time,
@@ -129,11 +152,16 @@ class AgendaController extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        $agenda = DB::table('agenda')->where('id', $request->id)->get();
+        $agenda = DB::table('v_agenda')->where('id', $request->id)->get();
         $branch = DB::table('branch')->get();
         $department = DB::table('department')->get();
 
-        return view('layouts.admin_views.agenda.edit.agenda_edit', compact('branch', 'agenda', 'department', 'grouped_sub_menu', 'sidebar_menu'));
+        $meeting_leader = DB::table('v_employee')->get();
+
+        $find_agenda = AgendaModel::find($request->id);
+        $agendas_date = Carbon::parse($find_agenda->agenda_date);
+
+        return view('layouts.admin_views.agenda.edit.agenda_edit', compact('branch', 'agenda', 'department', 'meeting_leader', 'agendas_date', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     /**
@@ -142,8 +170,6 @@ class AgendaController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'department' => 'required',
-            'branch' => 'required',
             'agenda_name' => 'required',
         ]);
 
@@ -156,6 +182,7 @@ class AgendaController extends Controller
                 DB::table('agenda')->where('id', $request->id)->update([
                     'department' => $request->department,
                     'branch' => $request->branch,
+                    'meeting_leader' => $request->meeting_leader,
                     'agenda_name' => $request->agenda_name,
                     'agenda_date' => $request->agenda_date,
                     'start_time' => $request->start_time,
@@ -174,6 +201,7 @@ class AgendaController extends Controller
             DB::table('agenda')->where('id', $request->id)->update([
                 'department' => $request->department,
                 'branch' => $request->branch,
+                'meeting_leader' => $request->meeting_leader,
                 'agenda_name' => $request->agenda_name,
                 'agenda_date' => $request->agenda_date,
                 'start_time' => $request->start_time,

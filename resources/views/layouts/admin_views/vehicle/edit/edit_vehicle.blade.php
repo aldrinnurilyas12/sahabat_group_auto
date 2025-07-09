@@ -1,223 +1,316 @@
-<link rel="stylesheet" href="{{asset('assets/css/form.css')}}">
+<link rel="stylesheet" href="{{ asset('assets/css/form.css') }}">
 <link href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-<link
-    href="https://fonts.googleapis.com/css?family=Inter:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+<link href="https://fonts.googleapis.com/css?family=Inter:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
     rel="stylesheet">
-<link rel="stylesheet" href="{{asset('assets/css/form.css')}}">
+<link rel="stylesheet" href="{{ asset('assets/css/form.css') }}">
 <!-- Custom styles for this template-->
-<link href="{{ asset('assets/css/sb-admin-2.min.css')}}" rel="stylesheet">
-<link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
+<link href="{{ asset('assets/css/sb-admin-2.min.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
 <title>Edit data Kendaraan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
 
 <body>
 
-<div id="wrapper">
+    <div id="wrapper">
 
-    @include('layouts.admin_views.sidebar')
+        @include('layouts.admin_views.sidebar')
 
-    <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
-        <!-- Main Content -->
-        <div  id="content">
-            @include('layouts.admin_views.header')
-            <h4 style="text-align:center;color:black;font-weight:bold;">Edit Data Kendaraan</h4>
-            <div class="form-group-content">
-            
-            @foreach ($vehicle as $vehicles)
-            <form class="form_input" method="POST" action="{{ route('update_vehicle.update',  $vehicles->id)}}">
-                @csrf
-                @method('PUT')
-                <div class="form-group">
-                <label >VIN/NO.POL Kendaraan <span style="color: red">*</span></label>
-                <input type="text" class="form-control" value="{{$vehicles->vehicle_registration_number}}" name="vehicle_registration_number" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label for="">Brand/Merk</label>
-                        <select class="form-control" name="brand" id="">
-                            @foreach($brand as $merk)
-                            <option value="{{$merk->id}}" {{$merk->brand_name == $vehicles->brand ? 'selected' : '' }}>{{$merk->brand_name}}</option>
-                            @endforeach
-                        </select>
-                </div>
-                <div class="form-group">
-                    <label >Tipe Kendaraan</label>
-                    <input type="text" class="form-control" name="vehicle_type" value="{{$vehicles->vehicle_type}}" autocomplete="off">
-                    </div>
-                <div class="form-group">
-                    <label>Model</label>
-                    <select class="form-control" name="vehicle_category" id="">
-                        @foreach ($vehicle_type as $type)
-                        <option value="{{$type->id}}" {{$type->id == $vehicles->vehicle_category ? 'selected' : '' }}>{{$type->vehicle_type}}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label >Jenis Kendaraan</label>
-                    <select class="form-control" name="model" >
-                      @foreach($vehicle_model as $model)
-                      <option value="{{$model->model_name}}" {{$model->model_name == $vehicles->model ? 'selected' : '' }}>{{$model->model_name}}</option>
-                      @endforeach
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <!-- Main Content -->
+            <div id="content">
+                @include('layouts.admin_views.header')
+                <h4 style="text-align:center;color:black;font-weight:bold;">Edit Data Kendaraan</h4>
+                <div class="form-group-content">
 
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label >KM saat ini</label>
-                    <input type="text" class="form-control" name="current_km" value="{{$vehicles->current_km}}" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label >Warna</label>
-                    <input type="text" class="form-control" name="color"  value="{{$vehicles->color}}" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label >Tahun Pembuatan</label>
-                    <input type="number" class="form-control" step="1" value="{{$vehicles->manufacture_year}}"  name="manufacture_year">
-                </div>
-                <div class="form-group">
-                    <label >Tahun Registrasi</label>
-                    <input type="number" class="form-control" step="1" value="{{$vehicles->registration_year}}"  name="registration_year">
-                </div>
-                <div class="form-group">
-                    <label >Tanggal Pajak</label>
-                    <input value="{{ \Carbon\Carbon::parse($vehicles->tax_date)->format('Y-m-d') }}" type="date" class="form-control" name="tax_date">
-                </div>
-                <div class="form-group">
-                    <label >Nomor BPKB</label>
-                    <input type="text" class="form-control" value="{{$vehicles->bpkb_number}}" name="bpkb_number" placeholder="Masukan No.BPKB">
-                </div>
-                <div class="form-group">
-                    <label >Kode Lokasi</label>
-                    <input type="text" class="form-control" value="{{$vehicles->location_code}}" name="location_code">
-                </div>
-                <div class="form-group">
-                    <label >No Urut Pendaftaran</label>
-                    <input type="text" class="form-control" value="{{$vehicles->registration_queue_number}}" name="registration_queue_number">
-                </div>
+                    @foreach ($vehicle as $vehicles)
+                        <form class="form_input" method="POST"
+                            action="{{ route('update_vehicle.update', $vehicles->id) }}">
+                            @csrf
+                            @method('PUT')
+                            <div class="form-group">
+                                <label>VIN/NO.POL Kendaraan <span style="color: red">*</span></label>
+                                <input type="text" class="form-control"
+                                    value="{{ $vehicles->vehicle_registration_number }}"
+                                    name="vehicle_registration_number" autocomplete="off">
+                                <x-input-error :messages="$errors->get('vehicle_registration_number')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label for="">Brand/Merk</label>
+                                <select class="form-control" name="brand" id="">
+                                    @foreach ($brand as $merk)
+                                        <option value="{{ $merk->id }}"
+                                            {{ $merk->brand_name == $vehicles->brand ? 'selected' : '' }}>
+                                            {{ $merk->brand_name }}</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('brand')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label>Tipe Kendaraan</label>
+                                <input type="text" class="form-control" name="vehicle_type"
+                                    value="{{ $vehicles->vehicle_type }}" autocomplete="off">
+                                <x-input-error :messages="$errors->get('vehicle_type')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label>Model</label>
+                                <select class="form-control" name="vehicle_category" id="">
+                                    @foreach ($vehicle_type as $type)
+                                        <option value="{{ $type->id }}"
+                                            {{ $type->id == $vehicles->vehicle_category ? 'selected' : '' }}>
+                                            {{ $type->vehicle_type }}</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('vehicle_category')" class="mt-2" style="color: red;" />
+                            </div>
 
-                <div class="form-group">
-                    <label >No.Pol Kendaraan lama (jika ada)</label>
-                    <input type="text" class="form-control" value="{{$vehicles->old_vin}}" name="old_vin">
-                </div>
-        
-                <div class="form-group">
+                            <div class="form-group">
+                                <label>Jenis Kendaraan</label>
+                                <select class="form-control" name="model">
+                                    @foreach ($vehicle_model as $model)
+                                        <option value="{{ $model->model_name }}"
+                                            {{ $model->model_name == $vehicles->model ? 'selected' : '' }}>
+                                            {{ $model->model_name }}</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error :messages="$errors->get('model')" class="mt-2" style="color: red;" />
+                            </div>
 
-                    <label for="branch_id">Lokasi cabang kendaraan</label>
-                
-                    <select class="form-control" name="location_branch_vehicle" id="branch_id">
-                        @foreach($branch as $cabang)
-                            <option value="{{$cabang->id}}" {{$cabang->location_name == $vehicles->location_unit ? 'selected' : '' }}>{{$cabang->location_name}}</option>
-                
-                        @endforeach
-                
-                    </select>
-                
-                </div>
-                <br>
-                <h5 style="color: black;font-weight:bold;">Spesifikasi Mesin</h5>
-                <hr>
-                <div class="form-group">
-                    <label >Tipe Bahan Bakar</label>
-                    <input type="text" class="form-control" value="{{$vehicles->fuel_type}}" name="fuel_type" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label >Isi Silinder/Daya Listrik</label>
-                    <input type="text" class="form-control" value="{{$vehicles->cylinder_capacity}}" name="cylinder_capacity" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label >Transmisi Kendaraan</label>
-                    <select class="form-control" name="transmission" id="">
-                        @foreach($transmission as $transmisi_vehicle)
-                        <option value="{{$transmisi_vehicle->transmission}}" {{$transmisi_vehicle->transmission == $vehicles->transmission ? 'selected' : '' }}>{{$transmisi_vehicle->transmission}}</option>
-                        @endforeach
-                        {{-- <option value="MT">Manual Transmission (MT)</option>
+                            <div class="form-group">
+                                <label>KM saat ini</label>
+                                <input type="text" class="form-control" name="current_km"
+                                    value="{{ $vehicles->current_km }}" autocomplete="off">
+                                <x-input-error :messages="$errors->get('current_km')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label>Warna</label>
+                                <input type="text" class="form-control" name="color"
+                                    value="{{ $vehicles->color }}" autocomplete="off">
+                                <x-input-error :messages="$errors->get('color')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label>Tahun Pembuatan</label>
+                                <input type="number" class="form-control" step="1"
+                                    value="{{ $vehicles->manufacture_year }}" name="manufacture_year">
+                                <x-input-error :messages="$errors->get('manufacture_year')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label>Tahun Registrasi</label>
+                                <input type="number" class="form-control" step="1"
+                                    value="{{ $vehicles->registration_year }}" name="registration_year">
+                                <x-input-error :messages="$errors->get('registration_year')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label>Tanggal Pajak</label>
+                                <input value="{{ \Carbon\Carbon::parse($vehicles->tax_date)->format('Y-m-d') }}"
+                                    type="date" class="form-control" name="tax_date">
+                                <x-input-error :messages="$errors->get('tax_date')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label>Nomor BPKB</label>
+                                <input type="text" class="form-control" value="{{ $vehicles->bpkb_number }}"
+                                    name="bpkb_number" placeholder="Masukan No.BPKB">
+                                <x-input-error :messages="$errors->get('bpkb_number')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label>Kode Lokasi</label>
+                                <input type="text" class="form-control" value="{{ $vehicles->location_code }}"
+                                    name="location_code">
+
+                            </div>
+                            <div class="form-group">
+                                <label>No Urut Pendaftaran</label>
+                                <input type="text" class="form-control"
+                                    value="{{ $vehicles->registration_queue_number }}"
+                                    name="registration_queue_number">
+                                <x-input-error :messages="$errors->get('registration_queue_number')" class="mt-2" style="color: red;" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>No.Pol Kendaraan lama (jika ada)</label>
+                                <input type="text" class="form-control" value="{{ $vehicles->old_vin }}"
+                                    name="old_vin">
+                            </div>
+
+                            <div class="form-group">
+
+                                <label for="branch_id">Lokasi cabang kendaraan</label>
+
+                                <select class="form-control" name="location_branch_vehicle" id="branch_id">
+                                    @foreach ($branch as $cabang)
+                                        <option value="{{ $cabang->id }}"
+                                            {{ $cabang->location_name == $vehicles->location_unit ? 'selected' : '' }}>
+                                            {{ $cabang->location_name }}</option>
+                                    @endforeach
+
+                                </select>
+
+                            </div>
+                            <br>
+                            <h5 style="color: black;font-weight:bold;">Spesifikasi Mesin</h5>
+                            <hr>
+                            <div class="form-group">
+                                <label>Tipe Bahan Bakar</label>
+                                <input type="text" class="form-control" value="{{ $vehicles->fuel_type }}"
+                                    name="fuel_type" autocomplete="off">
+                                <x-input-error :messages="$errors->get('fuel_type')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label>Isi Silinder/Daya Listrik</label>
+                                <input type="text" class="form-control"
+                                    value="{{ $vehicles->cylinder_capacity }}" name="cylinder_capacity"
+                                    autocomplete="off">
+                                <x-input-error :messages="$errors->get('cylinder_capacity')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label>Transmisi Kendaraan</label>
+                                <select class="form-control" name="transmission" id="">
+                                    @foreach ($transmission as $transmisi_vehicle)
+                                        <option value="{{ $transmisi_vehicle->transmission }}"
+                                            {{ $transmisi_vehicle->transmission == $vehicles->transmission ? 'selected' : '' }}>
+                                            {{ $transmisi_vehicle->transmission }}</option>
+                                    @endforeach
+                                    {{-- <option value="MT">Manual Transmission (MT)</option>
                         <option value="AT">Automatic Transmission (AT)</option> --}}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label >Nomor Mesin</label>
-                    <input type="text" class="form-control" value="{{$vehicles->engine_number}}" name="engine_number" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label >Nomor Rangka</label>
-                    <input type="text" class="form-control" value="{{$vehicles->vehicle_identity_number}}" name="vehicle_identity_number" value="{{$vehicles->vehicle_identity_number}}" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label >Nomor Coding</label>
-                    <input type="text" class="form-control" value="{{$vehicles->coding_number}}" name="coding_number"  autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label >Warna TNKB</label>
-                    <input type="text" class="form-control" value="{{$vehicles->licence_plate_color}}" name="licence_plate_color" autocomplete="off">
-                </div>
-                <br>
-                <h5 style="color: black;font-weight:bold;">Informasi lainnya</h5>
-                <hr>
-                <div class="form-group">
-                    <label for="">Status Unit Kendaraan</label>
-                        <select class="form-control" name="status_vehicle_id" id="">
-                          
-                            @foreach($status_category as $status)
-                            <option value="{{$status->id}}" {{$status->category_name == $vehicles->category_name ? 'selected' : '' }}>{{$status->category_name}}</option>
-                            @endforeach
-                        </select>
-                </div>
-                <div class="form-group">
-                    <label >Harga Unit Kendaraan</label>
-                    <input type="text" class="form-control" value="{{$vehicles->price}}" name="price" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label >Harga Kredit Unit Kendaraan</label>
-                    <input type="text" class="form-control" value="{{$vehicles->credit_price}}" name="credit_price" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label >Nama Pemilik</label>
-                    <input type="text" class="form-control" value="{{$vehicles->name_of_owner}}" name="name_of_owner" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label >Alamat Pemilik</label>
-                    <input type="text" class="form-control" value="{{$vehicles->address}}" name="address"  placeholder="Masukan alamat pemilik" autocomplete="off">
-                </div>
+                                </select>
+                            </div>
 
-                <button type="submit" class="btn btn-primary">Simpan</button>
-            </form> 
-            @endforeach
-           
+                            <div class="form-group">
+                                <label>Kunci Cadangan</label>
+                                <select class="form-control" name="backup_vehicle_key">
+                                    <option value="">=== Kunci Cadangan ===</option>
+                                    <option value="Ada"
+                                        {{ $vehicles->backup_vehicle_key == 'Ada' ? 'selected' : '' }}>Ada</option>
+                                    <option value="Tidak Ada"
+                                        {{ $vehicles->backup_vehicle_key == 'Tidak Ada' ? 'selected' : '' }}>Tidak
+                                        Ada</option>
+                                </select>
+                                <x-input-error :messages="$errors->get('backup_vehicle_key')" class="mt-2" style="color: red;" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Buku Servis</label>
+                                <select class="form-control" name="services_book">
+                                    <option value="">=== Buku Servis ===</option>
+                                    <option value="Ada" {{ $vehicles->services_book == 'Ada' ? 'selected' : '' }}>
+                                        Ada
+                                    </option>
+                                    <option value="Tidak Ada"
+                                        {{ $vehicles->services_book == 'Tidak Ada' ? 'selected' : '' }}>
+                                        Tidak
+                                        Ada
+                                    </option>
+                                </select>
+                                <x-input-error :messages="$errors->get('services_book')" class="mt-2" style="color: red;" />
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Nomor Mesin</label>
+                                <input type="text" class="form-control" value="{{ $vehicles->engine_number }}"
+                                    name="engine_number" autocomplete="off">
+                                <x-input-error :messages="$errors->get('engine_number')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label>Nomor Rangka</label>
+                                <input type="text" class="form-control"
+                                    value="{{ $vehicles->vehicle_identity_number }}" name="vehicle_identity_number"
+                                    value="{{ $vehicles->vehicle_identity_number }}" autocomplete="off">
+                                <x-input-error :messages="$errors->get('vehicle_identity_number')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label>Nomor Coding</label>
+                                <input type="text" class="form-control" value="{{ $vehicles->coding_number }}"
+                                    name="coding_number" autocomplete="off">
+                                <x-input-error :messages="$errors->get('coding_number')" class="mt-2" style="color: red;" />
+                            </div>
+                            <div class="form-group">
+                                <label>Warna Plat Nomor Kendaraan (TNKB)</label>
+                                <input type="text" class="form-control"
+                                    value="{{ $vehicles->licence_plate_color }}" name="licence_plate_color"
+                                    autocomplete="off">
+                                <x-input-error :messages="$errors->get('licence_plate_color')" class="mt-2" style="color: red;" />
+                            </div>
+                            <br>
+                            <h5 style="color: black;font-weight:bold;">Informasi lainnya</h5>
+                            <hr>
+                            <div class="form-group">
+                                <label for="">Status Unit Kendaraan</label>
+                                <select class="form-control" name="status_vehicle_id" id="">
+                                    @foreach ($status_category as $status)
+                                        <option value="{{ $status->id }}"
+                                            {{ $status->category_name == $vehicles->status_vehicle ? 'selected' : '' }}>
+                                            {{ $status->category_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Harga Unit Kendaraan</label>
+                                <input type="text" class="form-control" value="{{ $vehicles->price }}"
+                                    name="price" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label>Harga Kredit Unit Kendaraan</label>
+                                <input type="text" class="form-control" value="{{ $vehicles->credit_price }}"
+                                    name="credit_price" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label>Nama Pemilik</label>
+                                <input type="text" class="form-control" value="{{ $vehicles->name_of_owner }}"
+                                    name="name_of_owner" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label>Alamat Pemilik</label>
+                                <input type="text" class="form-control" value="{{ $vehicles->address }}"
+                                    name="address" placeholder="Masukan alamat pemilik" autocomplete="off">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Ubah & Simpan data</button>
+                        </form>
+                    @endforeach
+
+                </div>
             </div>
+
+            @include('layouts.admin_views.footer')
+
         </div>
 
-        @include('layouts.admin_views.footer')
-       
-    </div>
 
-   
-</div>
-{{-- spinner --}}
-<div id="loadingSpinnerWrapper">
-    <div class="spinner-border" role="status">
     </div>
-  </div>
+    {{-- spinner --}}
+    <div id="loadingSpinnerWrapper">
+        <div class="spinner-border" role="status">
+        </div>
+    </div>
 </body>
-  
-  <style>
+
+<style>
     #loadingSpinnerWrapper {
-    position: fixed; /* Fix posisi spinner */
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: none; /* Spinner disembunyikan saat halaman dimuat */
-    justify-content: center; /* Horizontal center */
-    align-items: center; /* Vertical center */
-    background-color: rgba(0, 0, 0, 0.517); /* Background semi-transparan */
-    z-index: 9999; /* Pastikan spinner berada di atas konten lainnya */
-  }
-  
-  .spinner-border {
-    color: yellow;
-    width: 3rem;
-    height: 3rem; /* Pastikan tinggi spinner diatur */
-  }
-  
-  </style>
+        position: fixed;
+        /* Fix posisi spinner */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: none;
+        /* Spinner disembunyikan saat halaman dimuat */
+        justify-content: center;
+        /* Horizontal center */
+        align-items: center;
+        /* Vertical center */
+        background-color: rgba(0, 0, 0, 0.517);
+        /* Background semi-transparan */
+        z-index: 9999;
+        /* Pastikan spinner berada di atas konten lainnya */
+    }
+
+    .spinner-border {
+        color: yellow;
+        width: 3rem;
+        height: 3rem;
+        /* Pastikan tinggi spinner diatur */
+    }
+</style>
 
 @if (session('alert'))
     <script type="text/javascript">
@@ -228,23 +321,23 @@
 
 <script>
     window.addEventListener('load', function() {
-       var loadingSpinnerWrapper = document.getElementById('loadingSpinnerWrapper');
-   
-       // Log elemen untuk memastikan spinner ditemukan
-       console.log(loadingSpinnerWrapper);  // Cek apakah elemen ditemukan
-   
-       if (loadingSpinnerWrapper) {
-           // Menampilkan spinner saat halaman dimuat
-           loadingSpinnerWrapper.style.display = 'flex';
-           console.log("Spinner muncul, timer akan dimulai.");
-   
-           // Menyembunyikan spinner setelah 2 detik (2000ms)
-           setTimeout(function() {
-               console.log("2 detik berlalu, menyembunyikan spinner.");
-               loadingSpinnerWrapper.style.display = 'none';  // Sembunyikan spinner setelah 2 detik
-           }, 1000);  // 2000ms = 2 detik
-       } else {
-           console.log("Elemen spinner tidak ditemukan!");
-       }
-   });
-   </script>
+        var loadingSpinnerWrapper = document.getElementById('loadingSpinnerWrapper');
+
+        // Log elemen untuk memastikan spinner ditemukan
+        console.log(loadingSpinnerWrapper); // Cek apakah elemen ditemukan
+
+        if (loadingSpinnerWrapper) {
+            // Menampilkan spinner saat halaman dimuat
+            loadingSpinnerWrapper.style.display = 'flex';
+            console.log("Spinner muncul, timer akan dimulai.");
+
+            // Menyembunyikan spinner setelah 2 detik (2000ms)
+            setTimeout(function() {
+                console.log("2 detik berlalu, menyembunyikan spinner.");
+                loadingSpinnerWrapper.style.display = 'none'; // Sembunyikan spinner setelah 2 detik
+            }, 1000); // 2000ms = 2 detik
+        } else {
+            console.log("Elemen spinner tidak ditemukan!");
+        }
+    });
+</script>

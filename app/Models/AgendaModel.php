@@ -13,6 +13,7 @@ class AgendaModel extends Model
     protected $fillable = [
         'department',
         'branch',
+        'meeting_leader',
         'agenda_name',
         'agenda_date',
         'start_time',

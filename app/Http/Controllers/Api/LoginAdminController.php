@@ -85,7 +85,8 @@ class LoginAdminController extends Controller
                 'employee.is_active',
                 'up.users_foto',
                 'jp.position_name',
-                'd.department_name'
+                'd.department_name',
+                DB::raw('left(name,1) as user_name')
             )
             ->leftJoin('employee', 'users.employee_id', '=', 'employee.id')
             ->leftJoin('branch', 'employee.branch_id', '=', 'branch.id')

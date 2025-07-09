@@ -94,6 +94,20 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="">Posisi Level Pekerjaan <span style="color: red">*</span></label>
+
+                            <select class="form-control" name="job_level_position" id="">
+                                <option value="">--- pilih level posisi ---</option>
+                                @foreach ($job_level_position as $level)
+                                    <option value="{{ $level->id }}">
+                                        {{ $level->level_position_name }}</option>
+                                @endforeach
+                                <x-input-error :messages="$errors->get('job_level_position')" class="mt-2" />
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
                             <label for="">Jenis Pekerjaan Karyawan<span style="color: red">*</span></label>
 
                             <select class="form-control" name="type_of_employee" id="">

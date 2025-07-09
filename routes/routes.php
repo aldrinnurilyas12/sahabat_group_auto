@@ -68,7 +68,7 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
     Route::get('login_admin_sahabat_group', [LoginAdminController::class, 'login_gateway'])
-        ->name('login_login_admin_sahabat_group');
+        ->name('login_admin_sahabat_group');
     Route::post('login_execute', [LoginAdminController::class, 'store'])->name('login_execute');
     Route::get('sahabatmotor', [LandingPageController::class, 'index'])->name('sahabatmotor');
     // route post request vehicle
@@ -105,7 +105,7 @@ Route::middleware('guest')->group(function () {
 });
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware('check_maintenance')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 

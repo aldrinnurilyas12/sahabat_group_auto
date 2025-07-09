@@ -25,6 +25,8 @@ class VehicleModel extends Model
         'fuel_type',
         'cylinder_capacity',
         'transmission',
+        'backup_vehicle_key',
+        'services_book',
         'vehicle_identity_number',
         'engine_number',
         'coding_number',

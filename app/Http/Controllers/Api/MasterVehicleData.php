@@ -38,7 +38,7 @@ class MasterVehicleData extends Controller
         $status_category = DB::table('status_category')->get();
         $branch = DB::table('branch')->get();
         $vehicle = DB::table('v_vehicle')->get();
-        $vehicle_sold = DB::table('v_vehicle')->where('category_name', 'Unit Terjual')->get();
+        $vehicle_sold = DB::table('v_vehicle')->where('status_vehicle', 'Unit Terjual')->get();
         $selectedStatus = $request->status;
         $selectedLocation = $request->location_unit;
         return view('layouts.admin_views.vehicle.vehicle', compact('vehicle', 'branch', 'status_category', 'vehicle_sold', 'grouped_sub_menu', 'sidebar_menu', 'selectedStatus', 'selectedLocation'));
@@ -99,6 +99,9 @@ class MasterVehicleData extends Controller
         $branch = DB::table('branch')->get();
         $status_category = DB::table('status_category')->get();
         $selectedBranch = null;
+        $services_book = DB::table('vehicle')->distinct()->select('services_book')->get();
+        $backup_key = DB::table('vehicle')->distinct()->select('backup_vehicle_key')->get();
+
 
 
         if ($request->has('id')) {
@@ -107,7 +110,7 @@ class MasterVehicleData extends Controller
         }
 
         $vehicle_type = DB::table('vehicle_type')->get();
-        return view('layouts.admin_views.vehicle.edit.edit_vehicle', compact('vehicle', 'vehicle_type', 'status_category', 'selectedBranch', 'brand', 'branch', 'grouped_sub_menu', 'sidebar_menu', 'transmission', 'vehicle_model'));
+        return view('layouts.admin_views.vehicle.edit.edit_vehicle', compact('vehicle', 'vehicle_type', 'status_category', 'selectedBranch', 'brand', 'branch', 'grouped_sub_menu', 'sidebar_menu', 'transmission', 'vehicle_model', 'backup_key', 'services_book'));
     }
 
     public function store(Request $request)
@@ -117,8 +120,31 @@ class MasterVehicleData extends Controller
         $request->validate([
             'vehicle_registration_number' => 'required|unique:vehicle',
             'images.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:4048',
-            'document_files.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:4048'
+            'document_files.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:4048',
+            'current_km' => 'required',
+            'brand' => 'required',
+            'manufacture_year' => 'required',
+            'vehicle_category' => 'required',
+            'model' => 'required',
+            'vehicle_type' => 'required',
+            'color' => 'required',
+            'fuel_type' => 'required',
+            'cylinder_capacity' => 'required',
+            'transmission' => 'required',
+            'backup_vehicle_key' => 'required',
+            'services_book' => 'required',
+            'vehicle_identity_number' => 'required',
+            'engine_number' => 'required',
+            'coding_number' => 'required',
+            'licence_plate_color' => 'required',
+            'registration_year' => 'required',
+            'tax_date' => 'required',
+            'bpkb_number' => 'required',
+            'status_vehicle_id' => 'required',
+            'location_branch_vehicle' => 'required'
         ]);
+
+
         $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
         if ($SETTING_TIME->open_schedule_time == 'on') {
@@ -137,12 +163,15 @@ class MasterVehicleData extends Controller
                     'fuel_type' => $request->fuel_type,
                     'cylinder_capacity' => $request->cylinder_capacity,
                     'transmission' => $request->transmission,
+                    'backup_vehicle_key' => $request->backup_vehicle_key,
+                    'services_book' => $request->services_book,
                     'vehicle_identity_number' => $request->vehicle_identity_number,
                     'engine_number' => $request->engine_number,
                     'coding_number' => $request->coding_number,
                     'licence_plate_color' => $request->licence_plate_color,
                     'old_vin' => $request->old_vin,
                     'registration_year' => $request->registration_year,
+                    'tax_date' => $request->tax_date,
                     'bpkb_number' => $request->bpkb_number,
                     'location_code' => $request->location_code,
                     'registration_queue_number' => $request->registration_queue_number,
@@ -154,33 +183,6 @@ class MasterVehicleData extends Controller
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
 
                 ]);
-
-                // if ($request->hasFile('images')) {
-                //     foreach ($request->file('images') as $image) {
-                //         $imagePath = $image->storeAs('vehicle_images', uniqid() . '.' . $image->getClientOriginalExtension(), 'public');
-                //         VehicleFotos::create([
-                //             'vehicle_id' => $save_data->id,
-                //             'images' => $imagePath,
-                //             'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                //             'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-                //         ]);
-                //     }
-                // }
-
-
-                // if ($request->hasFile('document_files')) {
-                //     foreach ($request->file('document_files') as $document) {
-                //         $documentPath = $document->storeAs('document', uniqid() . '.' . $document->getClientOriginalExtension(), 'public');
-                //         DocumentModel::create([
-                //             'vehicle_id' => $save_data->id,
-                //             'document_files' => $documentPath,
-                //             'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                //             'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-                //         ]);
-                //     }
-                // }
-
-
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Berhasil disimpan!');
                 return redirect()->route('master_vehicle_data.index');
@@ -203,12 +205,15 @@ class MasterVehicleData extends Controller
                 'fuel_type' => $request->fuel_type,
                 'cylinder_capacity' => $request->cylinder_capacity,
                 'transmission' => $request->transmission,
+                'backup_vehicle_key' => $request->backup_vehicle_key,
+                'services_book' => $request->services_book,
                 'vehicle_identity_number' => $request->vehicle_identity_number,
                 'engine_number' => $request->engine_number,
                 'coding_number' => $request->coding_number,
                 'licence_plate_color' => $request->licence_plate_color,
                 'old_vin' => $request->old_vin,
                 'registration_year' => $request->registration_year,
+                'tax_date' => $request->tax_date,
                 'bpkb_number' => $request->bpkb_number,
                 'location_code' => $request->location_code,
                 'registration_queue_number' => $request->registration_queue_number,
@@ -308,6 +313,30 @@ class MasterVehicleData extends Controller
     public function update(Request $request)
     {
 
+        $request->validate([
+            'vehicle_registration_number' => 'required',
+            'current_km' => 'required',
+            'brand' => 'required',
+            'manufacture_year' => 'required',
+            'vehicle_category' => 'required',
+            'model' => 'required',
+            'vehicle_type' => 'required',
+            'color' => 'required',
+            'fuel_type' => 'required',
+            'cylinder_capacity' => 'required',
+            'transmission' => 'required',
+            'backup_vehicle_key' => 'required',
+            'services_book' => 'required',
+            'vehicle_identity_number' => 'required',
+            'engine_number' => 'required',
+            'coding_number' => 'required',
+            'licence_plate_color' => 'required',
+            'registration_year' => 'required',
+            'bpkb_number' => 'required',
+            'status_vehicle_id' => 'required'
+        ]);
+
+
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
         $SETTING_TIME = DB::table('settings_schedule_time')->first();
@@ -328,6 +357,8 @@ class MasterVehicleData extends Controller
                     'fuel_type' => $request->fuel_type,
                     'cylinder_capacity' => $request->cylinder_capacity,
                     'transmission' => $request->transmission,
+                    'backup_vehicle_key' => $request->backup_vehicle_key,
+                    'services_book' => $request->services_book,
                     'vehicle_identity_number' => $request->vehicle_identity_number,
                     'engine_number' => $request->engine_number,
                     'coding_number' => $request->coding_number,
@@ -367,6 +398,8 @@ class MasterVehicleData extends Controller
                 'fuel_type' => $request->fuel_type,
                 'cylinder_capacity' => $request->cylinder_capacity,
                 'transmission' => $request->transmission,
+                'backup_vehicle_key' => $request->backup_vehicle_key,
+                'services_book' => $request->services_book,
                 'vehicle_identity_number' => $request->vehicle_identity_number,
                 'engine_number' => $request->engine_number,
                 'coding_number' => $request->coding_number,

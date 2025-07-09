@@ -55,7 +55,7 @@
                                             @csrf
                                             <input type="text" name="location_unit" value="{{ $selectedLocation }}"
                                                 hidden>
-                                            <input type="text" name="category_name" value="{{ $selectedStatus }}"
+                                            <input type="text" name="status_vehicle" value="{{ $selectedStatus }}"
                                                 hidden>
                                             <button type="submit" class="btn btn-success">
                                                 <i class="fas fa-file-excel"></i>
@@ -135,6 +135,12 @@
 
 
                             </div>
+
+                            <div class="information">
+                                <div class="alert alert-info">
+                                    Jika ingin menambahkan media files seperti : Foto dan Video klik button "Detail"
+                                </div>
+                            </div>
                         </div>
                         <div class="card-body">
 
@@ -164,6 +170,8 @@
                                                     <th>Jenis Bahan Bakar</th>
                                                     <th>Kapasitas Silinder</th>
                                                     <th>Transmisi</th>
+                                                    <th>Kunci Cadangan</th>
+                                                    <th>Buku Servis</th>
                                                     <th>Nomor Rangka</th>
                                                     <th>Nomor Mesin</th>
                                                     <th>Nomor Coding</th>
@@ -192,9 +200,9 @@
                                                             <a class="btn btn-info"
                                                                 href="{{ route('detail_vehicle', $cars->id) }}">Detail</a>
                                                             @if (
-                                                                $cars->category_name == 'Unit Terjual' ||
-                                                                    $cars->category_name == 'Unit Dalam Perbaikan' ||
-                                                                    $cars->category_name == 'Unit Booked')
+                                                                $cars->status_vehicle == 'Unit Terjual' ||
+                                                                    $cars->status_vehicle == 'Unit Dalam Perbaikan' ||
+                                                                    $cars->status_vehicle == 'Unit Booked')
                                                             @else
                                                                 <a class="btn btn-primary"
                                                                     href="{{ route('email_marketing_vehicle', $cars->id) }}">Promosikan</a>
@@ -215,21 +223,21 @@
                                                         </td>
                                                         <td>{{ $cars->vehicle_registration_number }}</td>
                                                         <td>
-                                                            @if ($cars->category_name == 'Unit Terjual')
+                                                            @if ($cars->status_vehicle == 'Unit Terjual')
                                                                 <p class="text-danger">
-                                                                    {{ $cars->category_name }}
+                                                                    {{ $cars->status_vehicle }}
                                                                 </p>
-                                                            @elseif($cars->category_name == 'Unit Booked')
+                                                            @elseif($cars->status_vehicle == 'Unit Booked')
                                                                 <p class="text-secondary">
-                                                                    {{ $cars->category_name }}
+                                                                    {{ $cars->status_vehicle }}
                                                                 </p>
-                                                            @elseif($cars->category_name == 'Unit Ready')
+                                                            @elseif($cars->status_vehicle == 'Unit Ready')
                                                                 <p class="text-success">
-                                                                    {{ $cars->category_name }}
+                                                                    {{ $cars->status_vehicle }}
                                                                 </p>
                                                             @else
                                                                 <p class="text-info">
-                                                                    {{ $cars->category_name }}
+                                                                    {{ $cars->status_vehicle }}
                                                                 </p>
                                                             @endif
                                                         </td>
@@ -244,6 +252,8 @@
                                                         <td>{{ $cars->fuel_type }}</td>
                                                         <td>{{ $cars->cylinder_capacity . 'cc' }}</td>
                                                         <td>{{ $cars->transmission }}</td>
+                                                        <td>{{ $cars->backup_vehicle_key }}</td>
+                                                        <td>{{ $cars->services_book }}</td>
                                                         <td>{{ $cars->vehicle_identity_number }}</td>
                                                         <td>{{ $cars->engine_number }}</td>
                                                         <td>{{ $cars->coding_number }}</td>

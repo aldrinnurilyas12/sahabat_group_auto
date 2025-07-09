@@ -69,6 +69,8 @@ class VehicleUnitExport implements FromCollection, WithHeadings, WithTitle, With
             'Bahan Bakar',
             'kapasitas silinder',
             'Transmisi',
+            'Kunci Cadangan',
+            'Buku Servis',
             'Nomor Rangka',
             'Nomor Mesin',
             'Nomor Coding',

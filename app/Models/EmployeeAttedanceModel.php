@@ -16,7 +16,7 @@ class EmployeeAttedanceModel extends Model
         'attedance_type',
         'reasons',
         'attedance_date',
-        'fotos',
+        'surat_sakit',
         'created_by',
         'updated_by'
     ];

@@ -109,12 +109,42 @@
 
                             <div class="form-group">
                                 <label for="">Jenis Pekerjaan Karyawan<span style="color: red">*</span></label>
+                                <small>
+                                    <p style="color: gray; font-style:italic;font-size:12px;">*pilih kembali jika
+                                        ingin merubah</p>
+                                </small>
                                 <select class="form-control" name="type_of_employee" id="">
                                     <option value="">=== Pilih Tipe Karyawan ===</option>
                                     <option value="permanent">Karyawan Tetap</option>
                                     <option value="contract">Karyawan Kontrak</option>
                                     <option value="freelance">Karwayan Freelance</option>
                                     <option value="internship">Karyawan Magang</option>
+                                </select>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label for="">Level Posisi saat ini</label>
+                                <input type="text"
+                                    value="{{ $emp->level_position_name ?: 'Anda belum memilih level posisi karyawan' }}"
+                                    class="form-control" readonly>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="">Jenis Level Posisi<span style="color: red">*</span></label>
+                                <small>
+                                    <p style="color: gray; font-style:italic;font-size:12px;">*pilih kembali jika
+                                        ingin merubah</p>
+                                </small>
+                                <select class="form-control" name="job_level_position" id="">
+                                    <option value="">=== Pilih Level Posisi Karyawan ===</option>
+
+                                    @foreach ($job_level_position as $level)
+                                        <option value="{{ $level->id }}"
+                                            {{ $level->level_position_name == $emp->level_position_name ? 'selected' : '' }}>
+                                            {{ $level->level_position_name }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
 

@@ -35,11 +35,24 @@ class EmployeeAttedance extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
+        $branch_location = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name;
+
+        $branch_head_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name = 'Head of Branch Operations';
+        $hr_head_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name = 'Head of Human Resource';
+
+        // COUNT TOTAL SEMUA
         $attedance_total = DB::table('employee_attedance')->where('employee_id', $users)->count();
         $attedance_present = DB::table('employee_attedance')->where('attedance_type', 'hadir')->where('employee_id', $users)->count();
         $attedance_izin = DB::table('employee_attedance')->where('attedance_type', 'izin')->where('employee_id', $users)->count();
         $attedance_abnormal = DB::table('employee_attedance')->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
         $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->value('total_alpha_ongoing');
+
+        $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->count();
+        $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->count();
+        $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->count();
+        $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->count();
+        $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->value('total_alpha_ongoing');
+
         $months = DB::table('months')->get();
         $years = [
             '2020',
@@ -55,53 +68,51 @@ class EmployeeAttedance extends Controller
         $bulan = $request->month;
         $tahun = $request->year;
 
-
-
         if (auth()->user()->role == '3') {
             $bulan = $request->month;
             $tahun = $request->year;
             if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id == '1') {
-                $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PLAZA AUTO')->whereMonth('attedance_date', Carbon::now()->month)->whereYear('attedance_date', Carbon::now()->year)->orderBy('created_at', 'desc')->get();
-                $employee_data = DB::table('v_employee')->where('location_name', 'PLAZA AUTO')->where('is_active', 'Ya')->get();
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereMonth('attedance_date', Carbon::now()->month)->whereYear('attedance_date', Carbon::now()->year)->orderBy('created_at', 'desc')->get();
+                $employee_data = DB::table('v_employee')->where('location_name', $branch_location)->where('is_active', 'Ya')->get();
                 $date_listed = DB::table('date_listed')->get();
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance_branch', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
+                return view('layouts.admin_views.employee_attedance.employee_data_attedance_branch', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'attendance_total_branch', 'attendance_present_branch', 'attendance_izin_branch', 'attendance_abnormal_branch', 'attendance_alpha_branch', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
             } elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id == '3') {
-                $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereMonth('attedance_date', Carbon::now()->month)->whereYear('attedance_date', Carbon::now()->year)->orderBy('created_at', 'desc')->get();
-                $employee_data = DB::table('v_employee')->where('location_name', 'PERMATA ABADI MOTOR')->where('is_active', 'Ya')->get();
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereMonth('attedance_date', Carbon::now()->month)->whereYear('attedance_date', Carbon::now()->year)->orderBy('created_at', 'desc')->get();
+                $employee_data = DB::table('v_employee')->where('location_name', $branch_location)->where('is_active', 'Ya')->get();
                 $date_listed = DB::table('date_listed')->get();
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance_branch', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
+                return view('layouts.admin_views.employee_attedance.employee_data_attedance_branch', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'attendance_total_branch', 'attendance_present_branch', 'attendance_izin_branch', 'attendance_abnormal_branch', 'attendance_alpha_branch', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
             } elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id == '5') {
-                $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereMonth('attedance_date', Carbon::now()->month)->whereYear('attedance_date', Carbon::now()->year)->orderBy('created_at', 'desc')->get();
-                $employee_data = DB::table('v_employee')->where('location_name', 'KURNIA ABADI MOTOR')->where('is_active', 'Ya')->get();
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereMonth('attedance_date', Carbon::now()->month)->whereYear('attedance_date', Carbon::now()->year)->orderBy('created_at', 'desc')->get();
+                $employee_data = DB::table('v_employee')->where('location_name', $branch_location)->where('is_active', 'Ya')->get();
                 $date_listed = DB::table('date_listed')->get();
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance_branch', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
+                return view('layouts.admin_views.employee_attedance.employee_data_attedance_branch', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'attendance_total_branch', 'attendance_present_branch', 'attendance_izin_branch', 'attendance_abnormal_branch', 'attendance_alpha_branch', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
             } else {
-                $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereMonth('attedance_date', Carbon::now()->month)->whereYear('attedance_date', Carbon::now()->year)->orderBy('created_at', 'desc')->get();
-                $employee_data = DB::table('v_employee')->where('location_name', 'MEGA ABADI MOTOR')->where('is_active', 'Ya')->get();
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereMonth('attedance_date', Carbon::now()->month)->whereYear('attedance_date', Carbon::now()->year)->orderBy('created_at', 'desc')->get();
+                $employee_data = DB::table('v_employee')->where('location_name', $branch_location)->where('is_active', 'Ya')->get();
                 $date_listed = DB::table('date_listed')->get();
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance_branch', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
+                return view('layouts.admin_views.employee_attedance.employee_data_attedance_branch', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'attendance_total_branch', 'attendance_present_branch', 'attendance_izin_branch', 'attendance_abnormal_branch', 'attendance_alpha_branch', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
             }
         } elseif (auth()->user()->role == '1' || auth()->user()->role == '2') {
             if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id == '1') {
                 $bulan = $request->month;
                 $tahun = $request->year;
-                $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PLAZA AUTO')->where('employee_id', $users)->whereDate('created_at', '=', now()->toDateString())->orderBy('created_at', 'desc')->get();
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $users)->whereDate('created_at', '=', now()->toDateString())->orderBy('created_at', 'desc')->get();
+                return view('layouts.admin_views.employee_attedance.employee_data_attedance', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'attendance_total_branch', 'attendance_present_branch', 'attendance_izin_branch', 'attendance_abnormal_branch', 'attendance_alpha_branch', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
             } elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id == '3') {
                 $bulan = $request->month;
                 $tahun = $request->year;
-                $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->where('employee_id', $users)->orderBy('created_at', 'desc')->get();
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $users)->orderBy('created_at', 'desc')->get();
+                return view('layouts.admin_views.employee_attedance.employee_data_attedance', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'attendance_total_branch', 'attendance_present_branch', 'attendance_izin_branch', 'attendance_abnormal_branch', 'attendance_alpha_branch', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
             } elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id == '5') {
                 $bulan = $request->month;
                 $tahun = $request->year;
-                $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->where('employee_id', $users)->orderBy('created_at', 'desc')->get();
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $users)->orderBy('created_at', 'desc')->get();
+                return view('layouts.admin_views.employee_attedance.employee_data_attedance', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'attendance_total_branch', 'attendance_present_branch', 'attendance_izin_branch', 'attendance_abnormal_branch', 'attendance_alpha_branch', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
             } else {
                 $bulan = $request->month;
                 $tahun = $request->year;
-                $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->where('employee_id', $users)->orderBy('created_at', 'desc')->get();
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $users)->orderBy('created_at', 'desc')->get();
+                return view('layouts.admin_views.employee_attedance.employee_data_attedance', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'attendance_total_branch', 'attendance_present_branch', 'attendance_izin_branch', 'attendance_abnormal_branch', 'attendance_alpha_branch', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
             }
         } else {
         }
@@ -118,7 +129,9 @@ class EmployeeAttedance extends Controller
         $bulan = $request->month;
         $tahun = $request->year;
 
-
+        $branch_location = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name;
+        $branch_head_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations';
+        $emp_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
 
         $user_data =  auth()->user();
         $users = $user_data->employee_id;
@@ -132,6 +145,13 @@ class EmployeeAttedance extends Controller
         $attedance_izin = DB::table('employee_attedance')->where('attedance_type', 'izin')->where('employee_id', $users)->count();
         $attedance_abnormal = DB::table('employee_attedance')->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
         $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->value('total_alpha_ongoing');
+
+
+        $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->count();
+        $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->count();
+        $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->count();
+        $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->count();
+        $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->value('total_alpha_ongoing');
         $months = DB::table('months')->get();
         $years = [
             '2020',
@@ -145,365 +165,208 @@ class EmployeeAttedance extends Controller
             '2028'
         ];
 
-        if (auth()->user()->role == '3') {
-            if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id == '1') {
-                $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PLAZA AUTO')->orderBy('created_at', 'desc')->get();
 
-                if ($bulan) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'alpha')->count();
-                }
-                if ($tahun) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
-                }
+        $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->orderBy('created_at', 'desc')->get();
 
-                if ($bulan && $tahun) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
-                }
+        if ($branch_head_login) {
+            if ($bulan) {
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
+                $attedance_total = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attedance_present = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->count();
+                $attedance_izin = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->count();
+                $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->count();
+                $attedance_alpha = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'alpha')->count();
 
-                if ($bulan === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($tahun === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($bulan === 'alldata' && $tahun === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PLAZA AUTO')->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'PLAZA AUTO')->where('attedance_type', 'alpha')->count();
-                }
-
-                $employee_data = DB::table('v_employee')->where('location_name', 'PLAZA AUTO')->where('is_active', 'Ya')->get();
-                $date_listed = DB::table('date_listed')->get();
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance_branch', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
-            } elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id == '3') {
-                $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                if ($bulan) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'alpha')->count();
-                }
-                if ($tahun) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($bulan && $tahun) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($bulan === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($tahun === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($bulan === 'alldata' && $tahun === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'PERMATA ABADI MOTOR')->where('attedance_type', 'alpha')->count();
-                }
-
-                $employee_data = DB::table('v_employee')->where('location_name', 'PERMATA ABADI MOTOR')->where('is_active', 'Ya')->get();
-                $date_listed = DB::table('date_listed')->get();
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance_branch', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
-            } elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id == '5') {
-                $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                if ($bulan) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'alpha')->count();
-                }
-                if ($tahun) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($bulan && $tahun) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($bulan === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($tahun === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($bulan === 'alldata' && $tahun === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'KURNIA ABADI MOTOR')->where('attedance_type', 'alpha')->count();
-                }
-
-
-                $employee_data = DB::table('v_employee')->where('location_name', 'KURNIA ABADI MOTOR')->where('is_active', 'Ya')->get();
-                $date_listed = DB::table('date_listed')->get();
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance_branch', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
-            } else {
-                $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-
-                if ($bulan) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'alpha')->count();
-                }
-                if ($tahun) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($bulan && $tahun) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($bulan === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($tahun === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'alpha')->count();
-                }
-
-                if ($bulan === 'alldata' && $tahun === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->count();
-                    $attedance_present = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->where('attedance_type', 'hadir')->count();
-                    $attedance_izin = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->where('attedance_type', 'izin')->count();
-                    $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->where('attedance_type', 'sakit')->count();
-                    $attedance_alpha = DB::table('V_employee_attedance')->where('branch', 'MEGA ABADI MOTOR')->where('attedance_type', 'alpha')->count();
-                }
-                $employee_data = DB::table('v_employee')->where('location_name', 'MEGA ABADI MOTOR')->where('is_active', 'Ya')->get();
-                $date_listed = DB::table('date_listed')->get();
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance_branch', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
+                $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('attedance_type', 'alpha')->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
             }
-        } elseif (auth()->user()->role == '1' || auth()->user()->role == '2') {
-            if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id == '1') {
-                $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PLAZA AUTO')->orderBy('created_at', 'desc')->get();
-                $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->value('total_alpha_ongoing');
-                $employee_data = DB::table('v_employee')->where('location_name', 'PLAZA AUTO')->where('is_active', 'Ya')->get();
-                $date_listed = DB::table('date_listed')->get();
+            if ($tahun) {
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
+                $attedance_total = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attedance_present = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
+                $attedance_izin = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
+                $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
+                $attedance_alpha = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
 
-                if ($bulan) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('employee_id', $users)->count();
-                    $attedance_present = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->where('employee_id', $users)->count();
-                    $attedance_izin = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->where('employee_id', $users)->count();
-                    $attedance_abnormal = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
-                    $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->whereRaw('YEAR(created_at) = ?', [$tahun])->value('total_alpha_ongoing');
-                }
-                if ($tahun) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('employee_id', $users)->count();
-                    $attedance_present = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->where('employee_id', $users)->count();
-                    $attedance_izin = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->where('employee_id', $users)->count();
-                    $attedance_abnormal = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
-                    $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->whereRaw('MONTH(created_at) = ?', [$bulan])->value('total_alpha_ongoing');
-                }
 
-                if ($bulan && $tahun) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('employee_id', $users)->count();
-                    $attedance_present = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->where('employee_id', $users)->count();
-                    $attedance_izin = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->where('employee_id', $users)->count();
-                    $attedance_abnormal = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
-                    $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->value('total_alpha_ongoing');
-                }
+                $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('attedance_type', 'alpha')->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+            }
 
-                if ($bulan === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PLAZA AUTO')->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('employee_id', $users)->count();
-                    $attedance_present = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->where('employee_id', $users)->count();
-                    $attedance_izin = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->where('employee_id', $users)->count();
-                    $attedance_abnormal = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
-                    $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->whereRaw('MONTH(created_at) = ?', [$bulan])->value('total_alpha_ongoing');
-                }
+            if ($bulan && $tahun) {
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
+                $attedance_total = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attedance_present = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
+                $attedance_izin = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
+                $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
+                $attedance_alpha = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
 
-                if ($tahun === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PLAZA AUTO')->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('employee_id', $users)->count();
-                    $attedance_present = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->where('employee_id', $users)->count();
-                    $attedance_izin = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->where('employee_id', $users)->count();
-                    $attedance_abnormal = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
-                    $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->whereRaw('YEAR(created_at) = ?', [$tahun])->value('total_alpha_ongoing');
-                }
+                $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('attedance_type', 'alpha')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+            }
 
-                if ($bulan === 'alldata' && $tahun === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PLAZA AUTO')->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('employee_attedance')->where('employee_id', $users)->count();
-                    $attedance_present = DB::table('employee_attedance')->where('attedance_type', 'hadir')->where('employee_id', $users)->count();
-                    $attedance_izin = DB::table('employee_attedance')->where('attedance_type', 'izin')->where('employee_id', $users)->count();
-                    $attedance_abnormal = DB::table('employee_attedance')->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
-                    $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->value('total_alpha_ongoing');
-                }
+            if ($bulan === 'alldata') {
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
+                $attedance_total = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attedance_present = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
+                $attedance_izin = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
+                $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
+                $attedance_alpha = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
 
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
-            } elseif (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id == '3') {
+                $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('attedance_type', 'alpha')->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+            }
 
-                $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PERMATA ABADI MOTOR')->orderBy('created_at', 'desc')->get();
-                $employee_data = DB::table('v_employee')->where('location_name', 'PERMATA ABADI MOTOR')->where('is_active', 'Ya')->get();
-                $date_listed = DB::table('date_listed')->get();
-                if ($bulan) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('employee_id', $users)->count();
-                    $attedance_present = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->where('employee_id', $users)->count();
-                    $attedance_izin = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->where('employee_id', $users)->count();
-                    $attedance_abnormal = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
-                    $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->whereRaw('YEAR(created_at) = ?', [$tahun])->value('total_alpha_ongoing');
-                }
-                if ($tahun) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('employee_id', $users)->count();
-                    $attedance_present = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->where('employee_id', $users)->count();
-                    $attedance_izin = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->where('employee_id', $users)->count();
-                    $attedance_abnormal = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
-                    $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->whereRaw('MONTH(created_at) = ?', [$bulan])->value('total_alpha_ongoing');
-                }
+            if ($tahun === 'alldata') {
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
+                $attedance_total = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attedance_present = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->count();
+                $attedance_izin = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->count();
+                $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->count();
+                $attedance_alpha = DB::table('V_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'alpha')->count();
 
-                if ($bulan && $tahun) {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('employee_id', $users)->count();
-                    $attedance_present = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->where('employee_id', $users)->count();
-                    $attedance_izin = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->where('employee_id', $users)->count();
-                    $attedance_abnormal = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
-                    $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->value('total_alpha_ongoing');
-                }
+                $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('attedance_type', 'alpha')->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+            }
 
-                if ($bulan === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('employee_id', $users)->count();
-                    $attedance_present = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->where('employee_id', $users)->count();
-                    $attedance_izin = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->where('employee_id', $users)->count();
-                    $attedance_abnormal = DB::table('employee_attedance')->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
-                    $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->whereRaw('MONTH(created_at) = ?', [$bulan])->value('total_alpha_ongoing');
-                }
+            if ($bulan === 'alldata' && $tahun === 'alldata') {
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->orderBy('created_at', 'desc')->get();
+                $attedance_total = DB::table('V_employee_attedance')->where('branch', $branch_location)->count();
+                $attedance_present = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('attedance_type', 'hadir')->count();
+                $attedance_izin = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('attedance_type', 'izin')->count();
+                $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('attedance_type', 'sakit')->count();
+                $attedance_alpha = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('attedance_type', 'alpha')->count();
 
-                if ($tahun === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PERMATA ABADI MOTOR')->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('employee_id', $users)->count();
-                    $attedance_present = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->where('employee_id', $users)->count();
-                    $attedance_izin = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->where('employee_id', $users)->count();
-                    $attedance_abnormal = DB::table('employee_attedance')->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
-                    $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->whereRaw('YEAR(created_at) = ?', [$tahun])->value('total_alpha_ongoing');
-                }
 
-                if ($bulan === 'alldata' && $tahun === 'alldata') {
-                    $employee_attedance = DB::table('v_employee_attedance')->where('employee_id', $users)->where('branch', 'PERMATA ABADI MOTOR')->orderBy('created_at', 'desc')->get();
-                    $attedance_total = DB::table('employee_attedance')->where('employee_id', $users)->count();
-                    $attedance_present = DB::table('employee_attedance')->where('attedance_type', 'hadir')->where('employee_id', $users)->count();
-                    $attedance_izin = DB::table('employee_attedance')->where('attedance_type', 'izin')->where('employee_id', $users)->count();
-                    $attedance_abnormal = DB::table('employee_attedance')->where('attedance_type', 'sakit')->where('employee_id', $users)->count();
-                    $attedance_alpha = DB::table('v_employee_attedance')->where('employee_id', $users)->value('total_alpha_ongoing');
-                }
+                $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->count();
+                $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->count();
+                $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->count();
+                $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->count();
+                $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('attedance_type', 'alpha')->count();
+            }
+        } else {
+            if ($bulan) {
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
+                $attedance_total = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attedance_present = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->count();
+                $attedance_izin = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->count();
+                $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->count();
+                $attedance_alpha = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'alpha')->count();
 
-                return view('layouts.admin_views.employee_attedance.employee_data_attedance', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
+                $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->where('attedance_type', 'alpha')->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+            }
+            if ($tahun) {
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
+                $attedance_total = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attedance_present = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
+                $attedance_izin = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
+                $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
+                $attedance_alpha = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
+
+
+                $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->where('attedance_type', 'alpha')->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+            }
+
+            if ($bulan && $tahun) {
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
+                $attedance_total = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attedance_present = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
+                $attedance_izin = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
+                $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
+                $attedance_alpha = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
+
+                $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->where('attedance_type', 'alpha')->whereRaw('MONTH(created_at) = ?', [$bulan])->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+            }
+
+            if ($bulan === 'alldata') {
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->orderBy('created_at', 'desc')->get();
+                $attedance_total = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attedance_present = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'hadir')->count();
+                $attedance_izin = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'izin')->count();
+                $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'sakit')->count();
+                $attedance_alpha = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->where('attedance_type', 'alpha')->count();
+
+                $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+                $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->where('attedance_type', 'alpha')->whereRaw('YEAR(created_at) = ?', [$tahun])->count();
+            }
+
+            if ($tahun === 'alldata') {
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->orderBy('created_at', 'desc')->get();
+                $attedance_total = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attedance_present = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'hadir')->count();
+                $attedance_izin = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'izin')->count();
+                $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'sakit')->count();
+                $attedance_alpha = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->where('attedance_type', 'alpha')->count();
+
+                $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->where('employee_id', $emp_id)->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+                $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->where('attedance_type', 'alpha')->whereRaw('MONTH(created_at) = ?', [$bulan])->count();
+            }
+
+            if ($bulan === 'alldata' && $tahun === 'alldata') {
+                $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->orderBy('created_at', 'desc')->get();
+                $attedance_total = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->count();
+                $attedance_present = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->where('attedance_type', 'hadir')->count();
+                $attedance_izin = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->where('attedance_type', 'izin')->count();
+                $attedance_abnormal = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->where('attedance_type', 'sakit')->count();
+                $attedance_alpha = DB::table('V_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->where('attedance_type', 'alpha')->count();
+
+
+                $attendance_total_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->count();
+                $attendance_present_branch = DB::table('v_employee_attedance')->where('attedance_type', 'hadir')->where('branch', $branch_location)->where('employee_id', $emp_id)->count();
+                $attendance_izin_branch = DB::table('v_employee_attedance')->where('attedance_type', 'izin')->where('branch', $branch_location)->where('employee_id', $emp_id)->count();
+                $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->where('employee_id', $emp_id)->count();
+                $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->where('employee_id', $emp_id)->where('attedance_type', 'alpha')->count();
             }
         }
+
+
+
+
+
+
+        $employee_data = DB::table('v_employee')->where('location_name', $branch_location)->where('is_active', 'Ya')->get();
+        $date_listed = DB::table('date_listed')->get();
+
+        if ($branch_head_login) {
+            return view('layouts.admin_views.employee_attedance.employee_data_attedance_branch', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'employee_data', 'attendance_total_branch', 'attendance_present_branch', 'attendance_izin_branch', 'attendance_abnormal_branch', 'attendance_alpha_branch', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
+        } else {
+            return view('layouts.admin_views.employee_attedance.employee_data_attedance', compact('attedance_abnormal', 'attedance_alpha', 'attedance_izin', 'attedance_present', 'attedance_total', 'employee_data', 'checking_data', 'employee_attedance', 'grouped_sub_menu', 'sidebar_menu', 'date_listed', 'months', 'years', 'bulan', 'tahun'));
+        }
     }
+
 
 
 
@@ -562,31 +425,59 @@ class EmployeeAttedance extends Controller
         $insertTime = (int) date('H');
 
         $request->validate([
-            'attedance_date' => 'required',
-            'attedance_type' => 'required'
+            'employee_id' => 'required',
+            'surat_sakit' => 'image|mimes:jpeg,png,jpg,gif|max:4048'
         ]);
 
         $today = date('Y-m-d');
+        $attendance_date = Carbon::now()->format('Y-m-d');
+
 
         $checking_attendance_today = DB::table('employee_attedance')
             ->where('employee_id', $request->employee_id)
             ->whereDate('attedance_date', $today)->exists();
 
 
+        // HAPUS JAM ABSEN DIBAWAH INI JIKA INGIN MELAKUKAN TESTING
         if ($insertTime >= 8 && $insertTime <= 18) {
             if ($insertTime >= 8  && $insertTime <= 10) {
 
                 if (!$checking_attendance_today) {
-                    EmployeeAttedanceModel::create([
-                        'employee_id' => $request->employee_id,
-                        'attedance_type' => $request->attedance_type,
-                        'reasons' => $request->reasons,
-                        'attedance_date' => $request->attedance_date,
-                        'fotos' => $request->fotos,
-                        'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                    if ($request->hasFile('surat_sakit')) {
+                        $letter = $request->file('surat_sakit');
+                        $folderPath = 'surat_sakit/' . $request->employee_id;
+                        $imagePath = $letter->storeAs($folderPath, uniqid() . '.' . $letter->getClientOriginalExtension(), 'public');
 
-                    ]);
+                        $attendance = EmployeeAttedanceModel::create([
+                            'employee_id' => $request->employee_id,
+                            'attedance_type' => $request->attedance_type,
+                            'reasons' => $request->reasons,
+                            'attedance_date' => $request->attedance_date,
+                            'surat_sakit' => $imagePath,
+                            'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                            'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+
+                        ]);
+
+                        if ($attendance) {
+                            session()->flash('message_success', 'Data Berhasil disimpan!');
+                            return redirect()->route('master_employee_attedance.index');
+                        }
+                    } else {
+                        EmployeeAttedanceModel::create([
+                            'employee_id' => $request->employee_id,
+                            'attedance_type' => 'hadir',
+                            'reasons' => $request->reasons,
+                            'attedance_date' => $attendance_date,
+                            'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                            'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+
+                        ]);
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => 'Berhasil melakukan presensi!'
+                        ]);
+                    }
                     return response()->json([
                         'status' => 'success',
                         'message' => 'Berhasil melakukan presensi!'
@@ -645,22 +536,58 @@ class EmployeeAttedance extends Controller
      */
     public function update(Request $request)
     {
+
+        date_default_timezone_set('Asia/Jakarta');
+        $insertTime = (int) date('H');
+
         $request->validate([
-            'attedance_date' => 'required',
-            'attedance_type' => 'required'
+            'surat_sakit' => 'image|mimes:jpeg,png,jpg,gif|max:4048'
         ]);
 
-        DB::table('employee_attedance')->where('id', $request->id)->update([
-            'employee_id' => $request->employee_id,
-            'attedance_type' => $request->attedance_type,
-            'reasons' => $request->reasons,
-            'attedance_date' => $request->attedance_date,
-            'fotos' => $request->fotos,
-            'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-            'updated_at' => now()
-        ]);
-        session()->flash('message_success', 'Data Berhasil disimpan!');
-        return redirect()->route('master_employee_attedance.index');
+
+        if ($insertTime >= 8 && $insertTime <= 18) {
+            if ($insertTime >= 8  && $insertTime <= 10) {
+
+                if ($request->hasFile('surat_sakit')) {
+                    $letter = $request->file('surat_sakit');
+                    $folderPath = 'surat_sakit/' . $request->employee_id;
+                    $imagePath = $letter->storeAs($folderPath, uniqid() . '.' . $letter->getClientOriginalExtension(), 'public');
+
+
+                    DB::table('employee_attedance')->where('id', $request->id)->update([
+                        'employee_id' => $request->employee_id,
+                        'attedance_type' => $request->attedance_type,
+                        'reasons' => $request->reasons,
+                        'attedance_date' => $request->attedance_date,
+                        'surat_sakit' => $imagePath,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_at' => now()
+                    ]);
+                } else {
+
+                    DB::table('employee_attedance')->where('id', $request->id)->update([
+                        'employee_id' => $request->employee_id,
+                        'attedance_type' => $request->attedance_type,
+                        'reasons' => $request->reasons,
+                        'attedance_date' => $request->attedance_date,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_at' => now()
+                    ]);
+                }
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_employee_attedance.index');
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Presensi sudah lewat!, Presensi dilakukan jam 08.00 s/d 10.00 WIB.'
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Presensi belum pada jadwalnya!, Presensi dilakukan jam 08.00 WIB.'
+            ]);
+        }
     }
 
     /**

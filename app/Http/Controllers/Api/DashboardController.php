@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\MasterMainMenuController;
 use App\Models\WebVisitor;
 use App\Models\TestimonialModel;
 
+
 class DashboardController extends Controller
 {
 
@@ -29,7 +30,7 @@ class DashboardController extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'] ?? [];
 
         $employee_total = DB::table('employee')->where('is_active', 'Y')->count();
-        $vehicle_total = DB::table('vehicle')->where('status_vehicle_id', '<>', '2')->count();
+        $vehicle_total = DB::table('vehicle')->where('status_vehicle_id', '<>', 'Information Technology')->count();
         $vehicle_ads = DB::table('vehicle_advertisement')->where('is_active', 'Y')->count();
         $users_online = DB::table('users')->whereNotNull('last_seen')->count();
 
@@ -46,184 +47,51 @@ class DashboardController extends Controller
         $kurnia_abadi_motor = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name == 'KURNIA ABADI MOTOR';
         $mega_abadi_motor = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name == 'MEGA ABADI MOTOR';
 
-        if ($plaza_auto) {
-            if ($it_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Finance', 'Marketing', 'Business Development', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'PLAZA AUTO')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Information Technology', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($finance_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Marketing', 'Business Development', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'PLAZA AUTO')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Finance', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($marketing_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Finance', 'Business Development', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'PLAZA AUTO')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Marketing', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($business_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Finance', 'Marketing', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'PLAZA AUTO')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Business Development', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($human_resource_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Finance', 'Business Development', 'Marketing'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'PLAZA AUTO')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Human Resource', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } else {
-                $agenda = DB::table('agenda')->get();
-            }
-        } elseif ($permata_abadi_motor) {
-            if ($it_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Finance', 'Marketing', 'Business Development', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'PERMATA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Information Technology', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($finance_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Marketing', 'Business Development', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'PERMATA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Finance', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($marketing_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Finance', 'Business Development', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'PERMATA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Marketing', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($business_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Finance', 'Marketing', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'PERMATA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Business Development', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($human_resource_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Finance', 'Business Development', 'Marketing'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'PERMATA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Human Resource', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } else {
-                $agenda = DB::table('agenda')->get();
-            }
-        } elseif ($kurnia_abadi_motor) {
-            if ($it_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Finance', 'Marketing', 'Business Development', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'KURNIA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Information Technology', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($finance_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Marketing', 'Business Development', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'KURNIA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Finance', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($marketing_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Finance', 'Business Development', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'KURNIA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Marketing', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($business_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Finance', 'Marketing', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'KURNIA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Business Development', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($human_resource_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Finance', 'Business Development', 'Marketing'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'KURNIA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Human Resource', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } else {
-                $agenda = DB::table('agenda')->get();
-            }
-        } elseif ($mega_abadi_motor) {
-            if ($it_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Finance', 'Marketing', 'Business Development', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'MEGA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Information Technology', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($finance_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Marketing', 'Business Development', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'MEGA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Finance', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($marketing_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Finance', 'Business Development', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'MEGA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Marketing', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($business_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Finance', 'Marketing', 'Human Resource'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'MEGA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Business Development', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } elseif ($human_resource_department) {
-                $agenda = DB::table('agenda')->whereNotIn('department', ['Information Technology', 'Finance', 'Business Development', 'Marketing'])
-                    ->where(function ($query) {
-                        $query->where('branch', 'MEGA ABADI MOTOR')->orWhere('branch', 'Semua Kantor')
-                            ->whereIn('department', ['Human Resource', 'Semua Department']);
-                    })
-                    ->whereDate('agenda_date', '=', now()->toDateString())
-                    ->get();
-            } else {
-                $agenda = DB::table('agenda')->get();
-            }
-        }
 
+        if ($it_department) {
+
+            $agenda = DB::table('v_agenda')->whereNotIn('department_name', ['Finance', 'Marketing', 'Business Development', 'Human Resource', 'Lainnya'])
+                ->where(function ($query) {
+                    $query->where('branch', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)->orWhere('branch', null)
+                        ->whereIn('department_name', ['Information Technology', null]);
+                })
+                ->whereDate('agenda_date', '=', now()->toDateString())
+                ->get();
+        } elseif ($finance_department) {
+            $agenda = DB::table('v_agenda')->whereNotIn('department_name', ['Information Technology', 'Marketing', 'Business Development', 'Human Resource', 'Lainnya'])
+                ->where(function ($query) {
+                    $query->where('branch', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)->orWhere('branch', null)
+                        ->whereIn('department_name', ['Finance', null]);
+                })
+                ->whereDate('agenda_date', '=', now()->toDateString())
+                ->get();
+        } elseif ($marketing_department) {
+            $agenda = DB::table('v_agenda')->whereNotIn('department_name', ['Finance', 'Information Technology', 'Business Development', 'Human Resource', 'Lainnya'])
+                ->where(function ($query) {
+                    $query->where('branch', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)->orWhere('branch', null)
+                        ->whereIn('department_name', ['Marketing', null]);
+                })
+                ->whereDate('agenda_date', '=', now()->toDateString())
+                ->get();
+        } elseif ($business_department) {
+            $agenda = DB::table('v_agenda')->whereNotIn('department_name', ['Finance', 'Information Technology', 'Marketing', 'Human Resource', 'Lainnya'])
+                ->where(function ($query) {
+                    $query->where('branch', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)->orWhere('branch', null)
+                        ->whereIn('department_name', ['Business Development', null]);
+                })
+                ->whereDate('agenda_date', '=', now()->toDateString())
+                ->get();
+        } elseif ($human_resource_department) {
+            $agenda = DB::table('v_agenda')->whereNotIn('department_name', ['Finance', 'Information Technology', 'Marketing', 'Business Development', 'Lainnya'])
+                ->where(function ($query) {
+                    $query->where('branch', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)->orWhere('branch', null)
+                        ->whereIn('department_name', ['Human Resource', null]);
+                })
+                ->whereDate('agenda_date', '=', now()->toDateString())
+                ->get();
+        } else {
+            $agenda = DB::table('v_agenda')->get();
+        }
 
         $testimonial_total = TestimonialModel::count();
 

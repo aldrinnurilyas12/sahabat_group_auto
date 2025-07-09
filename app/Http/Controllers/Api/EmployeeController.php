@@ -123,13 +123,14 @@ class EmployeeController extends Controller
         $employee = DB::table('v_employee')->get();
         $main_menu = DB::table('v_main_menu')->get();
         $job_position = JobPositionModel::all();
+        $job_level_position = DB::table('job_level_position')->get();
         $branch = DB::table('branch')->get();
         $banks = DB::table('bank')->get();
 
 
 
 
-        return view('layouts.admin_views.employee.create.add_employee', compact('employee', 'banks', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu'));
+        return view('layouts.admin_views.employee.create.add_employee', compact('employee', 'banks', 'branch', 'job_position', 'job_level_position', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
 
@@ -194,6 +195,7 @@ class EmployeeController extends Controller
                     'phone_number' => "+62 " . $request->phone_number,
                     'email' => $request->email,
                     'job_position' => $request->job_position,
+                    'job_level_position' => $request->job_level_position,
                     'branch_id' => $request->branch_id,
                     'is_active' => 'Y',
                     'birth_date' => $request->birth_date,
@@ -239,6 +241,7 @@ class EmployeeController extends Controller
                 'phone_number' => "+62 " . $request->phone_number,
                 'email' => $request->email,
                 'job_position' => $request->job_position,
+                'job_level_position' => $request->job_level_position,
                 'branch_id' => $request->branch_id,
                 'is_active' => 'Y',
                 'birth_date' => $request->birth_date,
@@ -356,10 +359,11 @@ class EmployeeController extends Controller
         $employee = DB::table('v_employee')->where('id', $request->id)->get();
         $main_menu = DB::table('v_main_menu')->get();
         $job_position = DB::table('job_position')->get();
+        $job_level_position = DB::table('job_level_position')->get();
         $branch = DB::table('branch')->get();
         $banks = DB::table('bank')->get();
 
-        return view('layouts.admin_views.employee.edit.edit_employee', compact('employee', 'banks', 'start_date', 'end_date', 'birth_date', 'resign_date', 'branch', 'job_position', 'main_menu', 'grouped_sub_menu', 'sidebar_menu'));
+        return view('layouts.admin_views.employee.edit.edit_employee', compact('employee', 'banks', 'start_date', 'end_date', 'birth_date', 'resign_date', 'branch', 'job_position', 'job_level_position', 'main_menu', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
 
@@ -367,13 +371,15 @@ class EmployeeController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'nik' => 'max:16'
+            'nik' => 'max:16',
+            'job_level_position' => 'required'
         ]);
 
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
         $checkingBankAccount = DB::table('employee_bank_account')->where('nik', $request->nik)->first();
         $checkingAvailableEmployeeJobPosition = DB::table('employee_type_position')->select('type_of_employee')->where('employee_id', $request->id)->first();
+        $checkingAvailableEmployeeJobLevel = DB::table('employee')->select('job_level_position')->where('id', $request->id)->first();
         $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
         // dd($checkingAvailableEmployeeJobPosition);
@@ -387,6 +393,7 @@ class EmployeeController extends Controller
                     'phone_number' => "+62 " . $request->phone_number,
                     'email' => $request->email,
                     'job_position' => $request->job_position,
+                    'job_level_position' => $request->job_level_position,
                     'branch_id' => $request->branch_id,
                     'is_active' => $request->is_active,
                     'birth_date' => $request->birth_date,
@@ -411,6 +418,19 @@ class EmployeeController extends Controller
                     ]);
                 }
 
+                if ($checkingAvailableEmployeeJobLevel == null) {
+                    EmployeeModel::create([
+                        'job_level_position' => $request->job_level_position,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_at' => now()
+                    ]);
+                } else {
+                    EmployeeModel::where('id', $request->id)->update([
+                        'job_level_position' => $request->job_level_position,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_at' => now()
+                    ]);
+                }
 
                 if ($checkingBankAccount === null) {
                     EmployeeBankAccount::create([
@@ -445,6 +465,7 @@ class EmployeeController extends Controller
                 'phone_number' => "+62 " . $request->phone_number,
                 'email' => $request->email,
                 'job_position' => $request->job_position,
+                'job_level_position' => $request->job_level_position,
                 'branch_id' => $request->branch_id,
                 'is_active' => $request->is_active,
                 'birth_date' => $request->birth_date,
@@ -767,7 +788,8 @@ class EmployeeController extends Controller
 
         $qr_code_employee = DB::table('employee')->select('qr_code_path')->where('nik', auth()->user()->nik)->get();
 
-        return view('layouts.admin_views.employee_profile.edit.edit_profile', compact('employee', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu', 'user', 'start_date', 'end_date', 'birth_date', 'user_picture', 'signature_employee', 'checking_employee_resign_status', 'checking_absences_status', 'qr_code_employee'));
+        $username = DB::table('v_employee')->select(DB::raw('left(name,1) as user_name'))->where('nik', auth()->user()->nik)->get();
+        return view('layouts.admin_views.employee_profile.edit.edit_profile', compact('employee', 'branch', 'job_position', 'grouped_sub_menu', 'sidebar_menu', 'user', 'start_date', 'end_date', 'birth_date', 'user_picture', 'signature_employee', 'checking_employee_resign_status', 'checking_absences_status', 'qr_code_employee', 'username'));
     }
 
 

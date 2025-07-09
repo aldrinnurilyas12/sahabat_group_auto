@@ -141,10 +141,11 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        {{-- <th>Aksi</th> --}}
+                                        <th>Detail</th>
                                         <th>Unit</th>
-                                        <th>Total Biaya</th>
-                                        <TH>Detail</TH>
+                                        <th>Status Unit</th>
+                                        <th>Total Biaya Perbaikan</th>
+
                                     </tr>
                                 </thead>
 
@@ -152,17 +153,15 @@
                                     <?php $no = 1; ?>
                                     @foreach ($maintenance_data as $maintenance)
                                         <tr style="width: 200px;">
+
                                             <td><?php echo $no++; ?></td>
-                                            {{-- <td><div style="display:flex; justify-content:center;gap:8px; " class="action">
-                                                <a href="{{route('maintenance_unit_edit', $maintenance->id)}}"><i class="fas fa-edit"></i></a>
-                                                {{-- <a style="size: 12px;" href="#" data-toggle="modal" data-target="#deleteUnit{{$maintenance->id}}"><i class="fas fa-trash"></i></a> --}}
-                                            {{-- </td> --}}
-                                            <td>{{ $maintenance->unit }}</td>
-                                            <td>{{ 'Rp' . number_format($maintenance->total_cost) }}</td>
                                             <td>
                                                 <a class="btn btn-success"
                                                     href="{{ route('cashbon_detail', $maintenance->vehicle_id) }}">lihat</a>
                                             </td>
+                                            <td>{{ $maintenance->unit }}</td>
+                                            <td>{{ $maintenance->status_vehicle }}</td>
+                                            <td>{{ 'Rp' . number_format($maintenance->total_cost) }}</td>
                                         </tr>
                                     @endforeach
 

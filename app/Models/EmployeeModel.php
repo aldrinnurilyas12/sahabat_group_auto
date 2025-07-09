@@ -17,6 +17,7 @@ class EmployeeModel extends Model
         'phone_number',
         'email',
         'job_position',
+        'job_level_position',
         'branch_id',
         'is_active',
         'birth_date',

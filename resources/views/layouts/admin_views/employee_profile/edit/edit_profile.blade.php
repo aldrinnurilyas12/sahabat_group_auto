@@ -38,7 +38,10 @@
                                         src="{{ asset('storage/' . $user_picture->first()->users_foto) }}"
                                         width="200" height="200" title="Foto Profil">
                                 @else
-                                    <strong class="text-danger">*Belum Upload Foto</strong>
+                                    <div style="width: 100px; height:100px; background:rgb(152, 135, 214);border-radius:50%;color:rgb(255, 255, 255);display:flex; justify-content:center; align-items:center;"
+                                        class="cirlce-username">
+                                        <h3>{{ $username->first()->user_name }}</h3>
+                                    </div>
                                 @endif
                             </div>
                             <br>
