@@ -280,7 +280,7 @@
                                             Jadwalkan Test Drive
                                         </a>
 
-                                        <a href="https://wa.me/{{ $contact->first()->phone_number }}"
+                                        <a href="https://wa.me/{{ $sales_contact->first()->phone_number }}"
                                             style="width:max-content;margin-top:20px;color:black;">
                                             Hubungi Sales
                                         </a>
@@ -341,7 +341,7 @@
                         <hr>
 
                         <div style="display: block;" class="contact-person">
-                            @foreach ($contact as $cp)
+                            @foreach ($sales_contact as $cp)
                                 <div style="display: flex; gap:12px;" class="dflex-contact">
                                     <p>{{ $cp->name }}</p>
                                     <a href="https://wa.me/{{ $cp->phone_number }}">{{ $cp->phone_number }}</a>

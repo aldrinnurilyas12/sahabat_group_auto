@@ -7,48 +7,43 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\UnderDevelopmentSetting;
+use App\Http\Controllers\Api\LoginAdminController;
 
 class CheckMaintenanceMode
 {
-    /**
-     * Handle an incoming request.
-     */
     public function handle(Request $request, Closure $next): Response
     {
         $maintenance = UnderDevelopmentSetting::first();
+        $isUnderDev = $maintenance && $maintenance->under_development == 'Ya';
 
-        // Route yang boleh diakses walau maintenance aktif
-        $allowedRoutes = ['login_admin_sahabat_group'];
+        $allowedRoutes = ['login_admin_sahabat_group', 'login_execute'];
 
-        // Always allow whitelisted routes
-        if (in_array($request->route()->getName(), $allowedRoutes)) {
-            return $next($request);
-        }
-
-        if ($maintenance && $maintenance->under_development === 'Ya') {
-            $user = Auth::user();
-
-            if ($user) {
-                $allowedPositions = [
-                    'Senior IT Application Developer',
-                    'IT Application Developer Staff',
-                    'IT Staff',
-                ];
-
-                if (in_array($user->position_name, $allowedPositions)) {
-                    // Akses penuh termasuk ke route admin pengaturan maintenance
-                    return $next($request);
-                }
-
-                // Tidak termasuk posisi yang diizinkan
+        if ($isUnderDev) {
+            // Izinkan akses ke route yang diizinkan
+            if (in_array($request->route()->getName(), $allowedRoutes)) {
                 return $next($request);
             }
 
-            // Belum login dan bukan di route yang diizinkan
+            // Ambil data user sekali saja
+            $userController = app(LoginAdminController::class);
+            $user = $userController->getUsers();
+
+            // Cek posisi user
+            $allowedPositions = [
+                'Senior IT Appllication Developer',
+                'IT Developer Staff',
+                'IT Staff',
+            ];
+
+            if ($user && in_array($user->position_name, $allowedPositions)) {
+                return $next($request);
+            }
+
+            // Jika bukan user yang diizinkan
             return response()->view('layouts.admin_views.under_dev_page');
         }
 
-        // Maintenance nonaktif → izinkan semua akses
+        // Jika tidak dalam mode pengembangan
         return $next($request);
     }
 }

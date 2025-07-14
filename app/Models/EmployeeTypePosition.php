@@ -11,7 +11,7 @@ class EmployeeTypePosition extends Model
     protected $table = 'employee_type_position';
 
     protected $fillable = [
-        'employee_id',
+        'nik',
         'type_of_employee',
         'start_date',
         'end_date'

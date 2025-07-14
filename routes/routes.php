@@ -105,7 +105,7 @@ Route::middleware('guest')->group(function () {
 });
 
 
-Route::middleware('check_maintenance')->group(function () {
+Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 
@@ -170,8 +170,8 @@ Route::middleware('check_maintenance')->group(function () {
     // EMPLOYEE ROUTES
     Route::apiResource('master_employee', App\Http\Controllers\Api\EmployeeController::class);
     Route::get('add_employee', [EmployeeController::class, 'add_employee_layout'])->name('add_employee');
-    Route::get('edit_employee/{id}', [EmployeeController::class, 'edit_employee_layout'])->name('edit_employee');
-    Route::put('edit_employee/{id}', [EmployeeController::class, 'update'])->name('edit_employee.update');
+    Route::get('edit_employee/{nik}', [EmployeeController::class, 'edit_employee_layout'])->name('edit_employee');
+    Route::put('edit_employee/{nik}', [EmployeeController::class, 'update'])->name('edit_employee.update');
     Route::get('employee_export', [EmployeeController::class, 'employee_export'])->name('employee_export');
     Route::get('employee_profile', [EmployeeController::class, 'employee_profile_layout'])->name('employee_profile');
     Route::get('filter_employee', [EmployeeController::class, 'filter_employee'])->name('filter_employee');

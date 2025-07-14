@@ -445,6 +445,13 @@
                                         </div>
 
                                         <div class="form-group">
+                                            <label>Level Posisi</label>
+                                            <input type="text" class="form-control"
+                                                value="{{ $emp->level_position_name ?: 'belum pilih level posisi' }}"
+                                                autocomplete="off" readonly>
+                                        </div>
+
+                                        <div class="form-group">
                                             <label>Tipe Pekerjaan Karyawan</label>
                                             <input type="text" class="form-control"
                                                 value="{{ $emp->type_of_employee == 'contract'
@@ -508,7 +515,7 @@
                                         @if ($emp->is_active == 'Ya')
                                             <span class="text-secondary">*Jika anda ingin merubah seluruh data, maka
                                                 lakukan perubahan di <a style="text-decoration: underline;"
-                                                    href="{{ route('edit_employee', $emp->id) }}"> Data Master
+                                                    href="{{ route('edit_employee', $emp->nik) }}"> Data Master
                                                     Karyawan</a></span>
                                             <br>
                                             <br>

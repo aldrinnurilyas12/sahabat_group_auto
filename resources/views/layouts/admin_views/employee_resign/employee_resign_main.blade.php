@@ -461,32 +461,32 @@
     });
 
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Select all tab links
-        const tabLinks = document.querySelectorAll('.nav-link');
+    // document.addEventListener('DOMContentLoaded', function() {
+    //     // Select all tab links
+    //     const tabLinks = document.querySelectorAll('.nav-link');
 
-        // Add click event to each tab link
-        tabLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault(); // Prevent default anchor behavior
+    //     // Add click event to each tab link
+    //     tabLinks.forEach(link => {
+    //         link.addEventListener('click', function(e) {
+    //             e.preventDefault(); // Prevent default anchor behavior
 
-                // Remove active class from all links and hide all tab content
-                tabLinks.forEach(item => {
-                    item.classList.remove('active');
-                    item.setAttribute('aria-selected', 'false');
-                });
-                document.querySelectorAll('.tab-pane').forEach(content => {
-                    content.classList.remove('show', 'active');
-                });
+    //             // Remove active class from all links and hide all tab content
+    //             tabLinks.forEach(item => {
+    //                 item.classList.remove('active');
+    //                 item.setAttribute('aria-selected', 'false');
+    //             });
+    //             document.querySelectorAll('.tab-pane').forEach(content => {
+    //                 content.classList.remove('show', 'active');
+    //             });
 
-                // Add active class to the clicked link and show corresponding tab content
-                this.classList.add('active');
-                this.setAttribute('aria-selected', 'true');
-                const target = this.getAttribute('href');
-                document.querySelector(target).classList.add('show', 'active');
-            });
-        });
-    });
+    //             // Add active class to the clicked link and show corresponding tab content
+    //             this.classList.add('active');
+    //             this.setAttribute('aria-selected', 'true');
+    //             const target = this.getAttribute('href');
+    //             document.querySelector(target).classList.add('show', 'active');
+    //         });
+    //     });
+    // });
 </script>
 
 </html>

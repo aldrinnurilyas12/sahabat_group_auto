@@ -133,30 +133,30 @@ class LandingPageController extends Controller
         $credit_simulation = DB::table('v_credit_simulation')->where('slug', $request->slug)->get();
 
         $vehicle_fotos = DB::table('vehicle_fotos as vf')
-            ->select('vf.images', DB::raw("LOWER(CONCAT(REPLACE(vb.brand_name, ' ', '-'), '-', v.vehicle_type, '-', v.manufacture_year)) as slug"))
+            ->select('vf.images', DB::raw("LOWER(CONCAT(REPLACE(vb.brand_name, ' ', ''), '-', REPLACE(v.vehicle_type, ' ', ''), '-', v.manufacture_year)) as slug"))
             ->leftJoin('vehicle as v', 'vf.vehicle_id', '=', 'v.id')
             ->leftJoin('vehicle_brand as vb', 'v.brand', '=', 'vb.id')
             ->whereRaw(
-                "LOWER(CONCAT(REPLACE(vb.brand_name, ' ', '-'), '-', v.vehicle_type, '-', v.manufacture_year)) = ?",
+                "LOWER(CONCAT(REPLACE(vb.brand_name, ' ', ''), '-', REPLACE(v.vehicle_type, ' ', ''), '-', v.manufacture_year)) = ?",
                 [$request->slug]  // Menggunakan nilai slug yang diterima dari request
             )
             ->get();
         $media_video = DB::table('v_vehicle_media_player')->where('media_type', 'video')->where('slug', $request->slug)->get();
         $engine_sound = DB::table('v_vehicle_media_player')->where('media_type', 'engine sound')->where('slug', $request->slug)->get();
 
-        $contact = DB::table('employee as e')
+        $sales_contact = DB::table('employee as e')
             ->select('e.name', DB::raw("REPLACE(e.phone_number, ' ', '') AS phone_number"), 'location_name')
             ->leftJoin('branch as b', 'e.branch_id', '=', 'b.id')
             ->leftJoin('vehicle as v', 'b.id', '=', 'v.location_branch_vehicle')
             ->leftJoin('vehicle_brand as vb', 'v.brand', '=', 'vb.id')
             ->whereRaw(
-                "LOWER(CONCAT(REPLACE(vb.brand_name, ' ', '-'), '-', v.vehicle_type, '-', v.manufacture_year)) = ?",
+                "LOWER(CONCAT(REPLACE(vb.brand_name, ' ', ''), '-', REPLACE(v.vehicle_type, ' ', ''), '-', v.manufacture_year)) = ?",
                 [$request->slug]  // Menggunakan nilai slug yang diterima dari request
             )
             ->whereIn('e.job_position', ['6', '9'])
             ->get();
 
-        return view('layouts.landing_page.main_page.vehicle_detail', compact('vehicle_data', 'vehicle_fotos', 'credit_simulation', 'contact', 'media_video', 'engine_sound'));
+        return view('layouts.landing_page.main_page.vehicle_detail', compact('vehicle_data', 'vehicle_fotos', 'credit_simulation', 'sales_contact', 'media_video', 'engine_sound'));
     }
 
 

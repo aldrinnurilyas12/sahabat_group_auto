@@ -217,7 +217,7 @@
                                                             <td>
                                                                 <div style="display:flex; justify-content:center;gap:8px; "
                                                                     class="action">
-                                                                    <a href="{{ route('edit_employee', $emp->id) }}"><i
+                                                                    <a href="{{ route('edit_employee', $emp->nik) }}"><i
                                                                             class="fas fa-edit"></i></a>
                                                                     <a style="size: 12px;" href="#"
                                                                         data-toggle="modal"

@@ -26,6 +26,7 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\UserActivity::class,
             'check_maintenance' => \App\Http\Middleware\CheckMaintenanceMode::class,
         ],
+
     ];
 
     protected $command = [

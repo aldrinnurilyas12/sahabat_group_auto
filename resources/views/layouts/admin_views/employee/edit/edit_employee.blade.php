@@ -25,6 +25,8 @@
                         <form class="form_input" method="POST" action="{{ route('edit_employee.update', $emp->id) }}">
                             @csrf
                             @method('PUT')
+
+
                             <div class="form-group">
                                 <label>NIK <span style="color: red">*</span></label>
                                 <input type="text" class="form-control" name="nik" value="{{ $emp->nik }}"
@@ -121,7 +123,6 @@
                                     <option value="internship">Karyawan Magang</option>
                                 </select>
                             </div>
-
 
                             <div class="form-group">
                                 <label for="">Level Posisi saat ini</label>

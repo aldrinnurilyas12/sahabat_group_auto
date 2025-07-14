@@ -61,29 +61,29 @@ class EmployeeController extends Controller
         return view('layouts.admin_views.employee.employee_data', compact('employee', 'employee_resign', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'department', 'departments'));
     }
 
-    public function getEmployee($id = null)
-    {
-        if ($id) {
-            $employee = DB::table('v_employee')->where('id', $id)->first();
+    // public function getEmployee($id = null)
+    // {
+    //     if ($id) {
+    //         $employee = DB::table('v_employee')->where('id', $id)->first();
 
-            if (!$employee) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Data tidak tesedia'
-                ], 404);
-            }
-        } else {
-            $employee = DB::table('v_employee')->get();
-            if (!$employee) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Data tidak tesedia'
-                ], 404);
-            }
-        }
+    //         if (!$employee) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Data tidak tesedia'
+    //             ], 404);
+    //         }
+    //     } else {
+    //         $employee = DB::table('v_employee')->get();
+    //         if (!$employee) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Data tidak tesedia'
+    //             ], 404);
+    //         }
+    //     }
 
-        return new EmployeeResource(true, 'Data Karyawan', $employee);
-    }
+    //     return new EmployeeResource(true, 'Data Karyawan', $employee);
+    // }
 
     public function show($id)
     {
@@ -340,28 +340,43 @@ class EmployeeController extends Controller
 
 
 
-    public function edit_employee_layout(Request $request, String $id): View
+    public function edit_employee_layout(Request $request, String $nik)
     {
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        $emp = EmployeeModel::find($id);
+        $user = app('App\Http\Controllers\Api\LoginAdminController')->getUsers();
+
+        $allowed_positions = ['Human Resource Staff', 'Head of Human Resource'];
+        $HR_SESSION = in_array($user->position_name, $allowed_positions);
+        $USER_LOGIN = $user->nik;
+        $EMPLOYEE_LOGIN = auth()->user()->nik;
+
+        if (!$HR_SESSION && $nik !== $EMPLOYEE_LOGIN) {
+            session()->flash('failed_insert', 'Akses ditolak!');
+            return redirect()->back();
+        }
+
+        $emp = DB::table('v_employee')->where('nik', $nik)->first();
         if ($emp == null) {
             abort(404, 'Data Not Found');
         }
+
         $start_date = Carbon::parse($emp->start_date);
         $resign_date = Carbon::parse($emp->resign_date);
         $birth_date  = Carbon::parse($emp->birth_date);
         $end_date = Carbon::parse($emp->end_date);
 
-        $employee = DB::table('v_employee')->where('id', $request->id)->get();
+        $employee = DB::table('v_employee')->where('nik', $request->nik)->get();
         $main_menu = DB::table('v_main_menu')->get();
         $job_position = DB::table('job_position')->get();
         $job_level_position = DB::table('job_level_position')->get();
         $branch = DB::table('branch')->get();
         $banks = DB::table('bank')->get();
+
+
 
         return view('layouts.admin_views.employee.edit.edit_employee', compact('employee', 'banks', 'start_date', 'end_date', 'birth_date', 'resign_date', 'branch', 'job_position', 'job_level_position', 'main_menu', 'grouped_sub_menu', 'sidebar_menu'));
     }
@@ -378,15 +393,102 @@ class EmployeeController extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
         $checkingBankAccount = DB::table('employee_bank_account')->where('nik', $request->nik)->first();
-        $checkingAvailableEmployeeJobPosition = DB::table('employee_type_position')->select('type_of_employee')->where('employee_id', $request->id)->first();
+        $checkingAvailableEmployeeJobPosition = DB::table('employee_type_position')->select('type_of_employee')->where('nik', $request->nik)->first();
         $checkingAvailableEmployeeJobLevel = DB::table('employee')->select('job_level_position')->where('id', $request->id)->first();
         $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
-        // dd($checkingAvailableEmployeeJobPosition);
+        $user = app('App\Http\Controllers\Api\LoginAdminController')->getUsers();
+
+
+        $HR_SESSION = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name, ['Human Resource Staff', 'Head of Human Resource']);
+        $EMPLOYEE_LOGIN = auth()->user()->nik;
+        // dd($EMPLOYEE_LOGIN);
 
         if ($SETTING_TIME->open_schedule_time == 'on') {
             if ($insertTime >= 7 && $insertTime <= 18) {
-                DB::table('employee')->where('id', $request->id)->update([
+                if ($HR_SESSION || $EMPLOYEE_LOGIN) {
+                    DB::table('employee')->where('nik', $request->nik)->update([
+                        'nik' => $request->nik,
+                        'name' => $request->name,
+                        'address' => $request->address,
+                        'phone_number' => "+62 " . $request->phone_number,
+                        'email' => $request->email,
+                        'job_position' => $request->job_position,
+                        'job_level_position' => $request->job_level_position,
+                        'branch_id' => $request->branch_id,
+                        'is_active' => $request->is_active,
+                        'birth_date' => $request->birth_date,
+                        'start_date' => $request->start_date,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_at' => now()
+                    ]);
+
+                    if ($checkingAvailableEmployeeJobPosition === null) {
+                        EmployeeTypePosition::create([
+                            'nik' => $request->nik,
+                            'type_of_employee' => $request->type_of_employee,
+                            'start_date' => $request->start_date,
+                            'end_date' => $request->end_date
+                        ]);
+                    } else {
+                        if ($request->type_of_employee === null) {
+                            $request->type_of_employee = $checkingAvailableEmployeeJobPosition->type_of_employee;
+                        } else {
+                            EmployeeTypePosition::where('nik', $request->nik)->update([
+                                'nik' => $request->nik,
+                                'type_of_employee' => $request->type_of_employee,
+                                'start_date' => $request->start_date,
+                                'end_date' => $request->end_date
+                            ]);
+                        }
+                    }
+
+                    if ($checkingAvailableEmployeeJobLevel == null) {
+                        EmployeeModel::create([
+                            'job_level_position' => $request->job_level_position,
+                            'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                            'updated_at' => now()
+                        ]);
+                    } else {
+                        EmployeeModel::where('nik', $request->nik)->update([
+                            'job_level_position' => $request->job_level_position,
+                            'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                            'updated_at' => now()
+                        ]);
+                    }
+
+                    if ($checkingBankAccount === null) {
+                        EmployeeBankAccount::create([
+                            'nik' => $request->nik,
+                            'bank_id' => $request->bank_id,
+                            'bank_account' => $request->bank_account,
+                            'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                            'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                        ]);
+                    } else {
+                        DB::table('employee_bank_account')->where('nik', $request->nik)->update([
+                            'bank_id' => $request->bank_id,
+                            'bank_account' => $request->bank_account,
+                            'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                            'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+
+                        ]);
+                    }
+
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('message_success', 'Data Berhasil disimpan!');
+                    return redirect()->route('master_employee.index');
+                } else {
+                    session()->flash('failed_insert', 'Tidak dapat mengubah data!');
+                    return redirect()->route('master_employee.index');
+                }
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 wib - 18.00 wib');
+                return redirect()->route('master_employee.index');
+            }
+        } else {
+            if ($HR_SESSION || $EMPLOYEE_LOGIN) {
+                DB::table('employee')->where('nik', $request->nik)->update([
                     'nik' => $request->nik,
                     'name' => $request->name,
                     'address' => $request->address,
@@ -404,32 +506,22 @@ class EmployeeController extends Controller
 
                 if ($checkingAvailableEmployeeJobPosition === null) {
                     EmployeeTypePosition::create([
-                        'employee_id' => $request->id,
+                        'nik' => $request->nik,
                         'type_of_employee' => $request->type_of_employee,
                         'start_date' => $request->start_date,
                         'end_date' => $request->end_date
                     ]);
                 } else {
-                    EmployeeTypePosition::where('employee_id', $request->id)->update([
-                        'employee_id' => $request->id,
-                        'type_of_employee' => $request->type_of_employee,
-                        'start_date' => $request->start_date,
-                        'end_date' => $request->end_date
-                    ]);
-                }
-
-                if ($checkingAvailableEmployeeJobLevel == null) {
-                    EmployeeModel::create([
-                        'job_level_position' => $request->job_level_position,
-                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                        'updated_at' => now()
-                    ]);
-                } else {
-                    EmployeeModel::where('id', $request->id)->update([
-                        'job_level_position' => $request->job_level_position,
-                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                        'updated_at' => now()
-                    ]);
+                    if ($request->type_of_employee === null) {
+                        $request->type_of_employee = $checkingAvailableEmployeeJobPosition->type_of_employee;
+                    } else {
+                        EmployeeTypePosition::where('nik', $request->nik)->update([
+                            'nik' => $request->nik,
+                            'type_of_employee' => $request->type_of_employee,
+                            'start_date' => $request->start_date,
+                            'end_date' => $request->end_date
+                        ]);
+                    }
                 }
 
                 if ($checkingBankAccount === null) {
@@ -454,63 +546,9 @@ class EmployeeController extends Controller
                 session()->flash('message_success', 'Data Berhasil disimpan!');
                 return redirect()->route('master_employee.index');
             } else {
-                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional : 08.00 wib - 18.00 wib');
+                session()->flash('failed_insert', 'Tidak dapat mengubah data!');
                 return redirect()->route('master_employee.index');
             }
-        } else {
-            DB::table('employee')->where('id', $request->id)->update([
-                'nik' => $request->nik,
-                'name' => $request->name,
-                'address' => $request->address,
-                'phone_number' => "+62 " . $request->phone_number,
-                'email' => $request->email,
-                'job_position' => $request->job_position,
-                'job_level_position' => $request->job_level_position,
-                'branch_id' => $request->branch_id,
-                'is_active' => $request->is_active,
-                'birth_date' => $request->birth_date,
-                'start_date' => $request->start_date,
-                'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                'updated_at' => now()
-            ]);
-
-            if ($checkingAvailableEmployeeJobPosition === null) {
-                EmployeeTypePosition::create([
-                    'employee_id' => $request->id,
-                    'type_of_employee' => $request->type_of_employee,
-                    'start_date' => $request->start_date,
-                    'end_date' => $request->end_date
-                ]);
-            } else {
-                EmployeeTypePosition::where('employee_id', $request->id)->update([
-                    'employee_id' => $request->id,
-                    'type_of_employee' => $request->type_of_employee,
-                    'start_date' => $request->start_date,
-                    'end_date' => $request->end_date
-                ]);
-            }
-
-            if ($checkingBankAccount === null) {
-                EmployeeBankAccount::create([
-                    'nik' => $request->nik,
-                    'bank_id' => $request->bank_id,
-                    'bank_account' => $request->bank_account,
-                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-                ]);
-            } else {
-                DB::table('employee_bank_account')->where('nik', $request->nik)->update([
-                    'bank_id' => $request->bank_id,
-                    'bank_account' => $request->bank_account,
-                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
-
-                ]);
-            }
-
-            $this->insertLogActivityUsers(__METHOD__);
-            session()->flash('message_success', 'Data Berhasil disimpan!');
-            return redirect()->route('master_employee.index');
         }
     }
 
@@ -723,12 +761,21 @@ class EmployeeController extends Controller
         $insertTime = (int) date('H');
         $SETTING_TIME = DB::table('settings_schedule_time')->first();
 
+        $user = app('App\Http\Controllers\Api\LoginAdminController')->getUsers();
+        $allowed_positions = ['Human Resource Staff', 'Head of Human Resource'];
+        $HR_SESSION = in_array($user->position_name, $allowed_positions);
+
         if ($SETTING_TIME->open_schedule_time == 'on') {
             if ($insertTime >= 7 && $insertTime <= 18) {
-                if ($employee_model) {
-                    $employee_model->delete();
-                    $this->insertLogActivityUsers(__METHOD__);
-                    session()->flash('delete_success', 'Berhasil hapus data!');
+                if ($HR_SESSION) {
+                    if ($employee_model) {
+                        $employee_model->delete();
+                        $this->insertLogActivityUsers(__METHOD__);
+                        session()->flash('delete_success', 'Berhasil hapus data!');
+                        return redirect()->back();
+                    }
+                } else {
+                    session()->flash('failed_insert', 'Tidak dapat menghapus data!');
                     return redirect()->back();
                 }
             } else {
@@ -736,10 +783,15 @@ class EmployeeController extends Controller
                 return redirect()->route('master_employee.index');
             }
         } else {
-            if ($employee_model) {
-                $employee_model->delete();
-                $this->insertLogActivityUsers(__METHOD__);
-                session()->flash('delete_success', 'Berhasil hapus data!');
+            if ($HR_SESSION) {
+                if ($employee_model) {
+                    $employee_model->delete();
+                    $this->insertLogActivityUsers(__METHOD__);
+                    session()->flash('delete_success', 'Berhasil hapus data!');
+                    return redirect()->back();
+                }
+            } else {
+                session()->flash('failed_insert', 'Tidak dapat menghapus data!');
                 return redirect()->back();
             }
         }
@@ -756,7 +808,7 @@ class EmployeeController extends Controller
         }
 
         $employee = DB::table('v_employee')->where('nik', auth()->user()->nik)->get();
-        $employee_type_position = DB::table('employee_type_position')->where('employee_id', $employee_id)->get();
+        $employee_type_position = DB::table('employee_type_position')->where('NIK', $request->nik)->get();
         if ($employee->isEmpty()) {
             abort(403, 'Ooops unauthorized nik');
         }
