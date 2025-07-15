@@ -18,14 +18,14 @@
         rel="stylesheet">
 
     <!-- Custom styles for this template-->
-    <link href="{{ asset('assets/css/sb-admin-2.min.css')}}" rel="stylesheet">
-    <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
-    <link rel="stylesheet" href="{{asset('assets/css/form.css')}}">
+    <link href="{{ asset('assets/css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/css/form.css') }}">
     <link href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Inter:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-    <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css')}}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -42,92 +42,114 @@
             <!-- Main Content -->
             <div id="content">
                 @include('layouts.admin_views.header')
-    
+
                 <div id="content">
-                    
-                    <h4 style="text-align:center;color:black;font-weight:bold;">Tambah Iklan Kendaraan</h4>
-                    
+
+
+
                     <div style="display: flex; gap:50px;flex-wrap:wrap;" class="form-group-content">
-                        @if($vehicle_data->first()->foto)
-                        <div style="display: block;" class="d-block-image">
-                            <label for="">Foto iklan saat ini</label>
-                            <div style="display: flex;flex-wrap:wrap;margin-top:10px;" class="img-display">
-                                <img height="100" width="100" src="{{ asset('storage/' . $vehicle_data->first()->foto) }}">
-                            </div>
-                            <br>
-                            <br>
-                            <label for="">Pilih foto terbaru</label>
 
-                            <form class="form-input" action="{{route('update_foto', $vehicle_data->first()->vehicle_id)}}" method="POST">
-                                @csrf
-                                @method('PUT')
-                                <div style="display: flex; flex-wrap:wrap; gap:10px;" class="dflex-images">
-                                    @foreach ($vehicle_images as $galery)
-                                        <div style="display: block;" class="d-block-image">
-                                            <div style="display: flex;flex-wrap:wrap;margin-top:10px;" class="img-display">
-                                                <img height="200" width="200" src="{{ asset('storage/' . $galery->images) }}">
-                                            </div>
-                                            <br>
-                                            <input style="height:20px;width:20px;" type="radio" value="{{$galery->images}}" name="foto">
-                                        </div>
-                                    @endforeach
+                        @if ($vehicle_data->first()->foto)
+
+                            <div style="display: block;" class="d-block-image">
+                                <h4 style="text-align:center;color:black;font-weight:bold;">Ubah Foto tampilan Iklan
+                                    Kendaraan</h4>
+                                <br>
+                                <label for="">Foto iklan saat ini</label>
+                                <div style="display: flex;flex-wrap:wrap;margin-top:10px;" class="img-display">
+                                    <img height="100" width="100"
+                                        src="{{ asset('storage/' . $vehicle_data->first()->foto) }}">
                                 </div>
                                 <br>
-                                <button type="submit" class="btn btn-primary">Perbarui Foto</button>
-                            </form>
-                            
-                        </div>
-                        @else
-                        @foreach ($vehicle_data as $vhcl)
-                        <form class="form_input" method="POST" action="{{ route('master_vehicle_advertisement.store')}}">
-                            @csrf   
-                            
-                            <div class="form-group">
-                                <label >Unit</label>
-                                <input type="text" class="form-control" value="{{$vhcl->vehicle_id}}" name="vehicle_id" hidden autocomplete="off" readonly>
-                                <input  type="text" class="form-control" value="{{$vhcl->unit}}" autocomplete="off" readonly>
-                            </div>
-
-                            <div class="form-group">
-                                <label >Harga Unit</label>
-                                <input  type="text" class="form-control" value="{{"Rp " . number_format($vhcl->price)}}" autocomplete="off" readonly>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="">Pilih foto untuk tampilan depan</label>
-                                <small style="font-style: italic; color:gray;">*hanya 1 foto</small>
                                 <br>
-                                <div style="display: flex; flex-wrap:wrap;gap:5px;" class="container-image">
-                                    @if ($vehicle_images->isEmpty())
-                                    <p>Tidak ada foto tersedia, <span style="color: blue;text-decoration:underline;"><a href="{{route('detail_vehicle', $vhcl->vehicle_id )}}">Upload foto dahulu.</a><i class="fa fa-share"></i></span></p>
-                                        
-                                    @elseif($vehicle_data->first()->foto == null)
+                                <label for="">Pilih foto terbaru</label>
+
+                                <form class="form-input"
+                                    action="{{ route('update_foto', $vehicle_data->first()->vehicle_id) }}"
+                                    method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <div style="display: flex; flex-wrap:wrap; gap:10px;" class="dflex-images">
                                         @foreach ($vehicle_images as $galery)
-                                        <div style="display: block;" class="d-block-image">
-                                            <div style="display: flex;flex-wrap:wrap;margin-top:10px;" class="img-display">
-                                                <img height="200" width="200" src="{{ asset('storage/' . $galery->images) }}">
+                                            <div style="display: block;" class="d-block-image">
+                                                <div style="display: flex;flex-wrap:wrap;margin-top:10px;"
+                                                    class="img-display">
+                                                    <img height="200" width="200"
+                                                        src="{{ asset('storage/' . $galery->images) }}">
+                                                </div>
+                                                <br>
+                                                <input style="height:20px;width:20px;" type="radio"
+                                                    value="{{ $galery->images }}" name="foto">
                                             </div>
-                                            <br>
-                                            <input style="height:20px;width:20px;" type="radio" value="{{$galery->images}}" name="foto">
-                                            
-                                        </div>
                                         @endforeach
+                                    </div>
+                                    <br>
+                                    <button type="submit" class="btn btn-primary">Perbarui Foto</button>
+                                </form>
+
+                            </div>
+                        @else
+                            <h4 style="text-align:center;color:black;font-weight:bold;">Tambah Iklan Kendaraan</h4>
+                            @foreach ($vehicle_data as $vhcl)
+                                <form class="form_input" method="POST"
+                                    action="{{ route('master_vehicle_advertisement.store') }}">
+                                    @csrf
+
+                                    <div class="form-group">
+                                        <label>Unit</label>
+                                        <input type="text" class="form-control" value="{{ $vhcl->vehicle_id }}"
+                                            name="vehicle_id" hidden autocomplete="off" readonly>
+                                        <input type="text" class="form-control" value="{{ $vhcl->unit }}"
+                                            autocomplete="off" readonly>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Harga Unit</label>
+                                        <input type="text" class="form-control"
+                                            value="{{ 'Rp ' . number_format($vhcl->price) }}" autocomplete="off"
+                                            readonly>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="">Pilih foto untuk tampilan depan</label>
+                                        <small style="font-style: italic; color:gray;">*hanya 1 foto</small>
+                                        <br>
+                                        <div style="display: flex; flex-wrap:wrap;gap:5px;" class="container-image">
+                                            @if ($vehicle_images->isEmpty())
+                                                <p>Tidak ada foto tersedia, <span
+                                                        style="color: blue;text-decoration:underline;"><a
+                                                            href="{{ route('detail_vehicle', $vhcl->vehicle_id) }}">Upload
+                                                            foto dahulu.</a><i class="fa fa-share"></i></span></p>
+                                            @elseif($vehicle_data->first()->foto == null)
+                                                @foreach ($vehicle_images as $galery)
+                                                    <div style="display: block;" class="d-block-image">
+                                                        <div style="display: flex;flex-wrap:wrap;margin-top:10px;"
+                                                            class="img-display">
+                                                            <img height="200" width="200"
+                                                                src="{{ asset('storage/' . $galery->images) }}">
+                                                        </div>
+                                                        <br>
+                                                        <input style="height:20px;width:20px;" type="radio"
+                                                            value="{{ $galery->images }}" name="foto">
+
+                                                    </div>
+                                                @endforeach
+                                            @else
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input hidden type="text" name="is_active" value="Y">
+                                    </div>
+
+                                    @if ($vehicle_images->isEmpty())
+                                        <button type="button" class="btn btn-secondary">Simpan Iklan</button>
                                     @else
+                                        <button type="submit" class="btn btn-primary">Simpan Iklan</button>
                                     @endif
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <input hidden type="text" name="is_active" value="Y">
-                            </div>
-
-                            @if ($vehicle_images->isEmpty())
-                            <button type="button" class="btn btn-secondary">Simpan Iklan</button>
-                            @else
-                            <button type="submit" class="btn btn-primary">Simpan Iklan</button>
-                            @endif
-                        </form>  
-                        @endforeach
+                                </form>
+                            @endforeach
                         @endif
 
 
@@ -148,13 +170,13 @@
                         </div> --}}
                     </div>
 
-                    
+
                 </div>
 
-                
-    
+
+
             </div>
-           
+
             @include('layouts.admin_views.footer')
 
         </div>
@@ -175,65 +197,70 @@
     <div id="loadingSpinnerWrapper">
         <div class="spinner-border" role="status">
         </div>
-      </div>
-      
-      <style>
+    </div>
+
+    <style>
         #loadingSpinnerWrapper {
-        position: fixed; /* Fix posisi spinner */
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: none; /* Spinner disembunyikan saat halaman dimuat */
-        justify-content: center; /* Horizontal center */
-        align-items: center; /* Vertical center */
-        background-color: rgba(0, 0, 0, 0.517); /* Background semi-transparan */
-        z-index: 9999; /* Pastikan spinner berada di atas konten lainnya */
-      }
-      
-      .spinner-border {
-        color: yellow;
-        width: 3rem;
-        height: 3rem; /* Pastikan tinggi spinner diatur */
-      }
-      
-      </style>
+            position: fixed;
+            /* Fix posisi spinner */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            /* Spinner disembunyikan saat halaman dimuat */
+            justify-content: center;
+            /* Horizontal center */
+            align-items: center;
+            /* Vertical center */
+            background-color: rgba(0, 0, 0, 0.517);
+            /* Background semi-transparan */
+            z-index: 9999;
+            /* Pastikan spinner berada di atas konten lainnya */
+        }
+
+        .spinner-border {
+            color: yellow;
+            width: 3rem;
+            height: 3rem;
+            /* Pastikan tinggi spinner diatur */
+        }
+    </style>
 </body>
 
 @if (Session::has('message_success'))
-<script>
-    Swal.fire({
-        title: 'Berhasil',
-        text: "{{ Session::get('message_success') }}",
-        icon: 'success',
-        timer:2000,
-        confirmButtonText: 'OK'
-    });
-</script>
-    
+    <script>
+        Swal.fire({
+            title: 'Berhasil',
+            text: "{{ Session::get('message_success') }}",
+            icon: 'success',
+            timer: 2000,
+            confirmButtonText: 'OK'
+        });
+    </script>
 @endif
-    
+
 <script>
     window.addEventListener('load', function() {
-       var loadingSpinnerWrapper = document.getElementById('loadingSpinnerWrapper');
-   
-       // Log elemen untuk memastikan spinner ditemukan
-         // Cek apakah elemen ditemukan
-   
-       if (loadingSpinnerWrapper) {
-           // Menampilkan spinner saat halaman dimuat
-           loadingSpinnerWrapper.style.display = 'flex';
-          
-   
-           // Menyembunyikan spinner setelah 2 detik (2000ms)
-           setTimeout(function() {
-               
-               loadingSpinnerWrapper.style.display = 'none';  // Sembunyikan spinner setelah 2 detik
-           }, 1000);  // 2000ms = 2 detik
-       } else {
-           console.log("Elemen spinner tidak ditemukan!");
-       }
-   });
-   </script>
+        var loadingSpinnerWrapper = document.getElementById('loadingSpinnerWrapper');
+
+        // Log elemen untuk memastikan spinner ditemukan
+        // Cek apakah elemen ditemukan
+
+        if (loadingSpinnerWrapper) {
+            // Menampilkan spinner saat halaman dimuat
+            loadingSpinnerWrapper.style.display = 'flex';
+
+
+            // Menyembunyikan spinner setelah 2 detik (2000ms)
+            setTimeout(function() {
+
+                loadingSpinnerWrapper.style.display = 'none'; // Sembunyikan spinner setelah 2 detik
+            }, 1000); // 2000ms = 2 detik
+        } else {
+            console.log("Elemen spinner tidak ditemukan!");
+        }
+    });
+</script>
 
 </html>

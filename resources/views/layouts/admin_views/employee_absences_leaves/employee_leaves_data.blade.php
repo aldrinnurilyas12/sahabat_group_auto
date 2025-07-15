@@ -219,32 +219,43 @@
                                                 </td>
                                                 <td>{{ $emp->duration_of_leaves . ' Hari' }}</td>
                                                 <td>{{ $emp->reason }}</td>
-                                                @if ($emp->status == 'sudah konfirmasi')
-                                                    <td> <button class="btn btn-outline-info"
-                                                            disabled>{{ $emp->status }}</button></td>
-                                                @else
-                                                    <td> <button class="btn btn-outline-secondary"
-                                                            disabled>{{ $emp->status }}</button></td>
-                                                @endif
+
+                                                <td style="font-size:18px;">
+                                                    @if ($emp->status == 'sudah konfirmasi')
+                                                        <span class="badge badge-success">
+                                                            Sudah Konfirmasi</span>
+                                                    @elseif($emp->status == 'belum konfirmasi')
+                                                        <span class="badge badge-info">
+                                                            Belum Konfirmasi</span>
+                                                    @else
+                                                        <span class="badge badge-danger">
+                                                            Ditolak</span>
+                                                    @endif
+                                                </td>
 
                                                 @if ($emp->approval_by_branch_head == 'confirmed')
                                                     <td>
-                                                        <button class="btn btn-outline-success"
-                                                            disabled>{{ $emp->approval_by_branch_head }}</button>
+                                                        <span class="badge badge-success">
+                                                            Sudah Konfirmasi</span>
                                                     </td>
+                                                @elseif($emp->approval_by_branch_head == 'pending')
+                                                    <td><span class="badge badge-info">
+                                                            Menunggu Konfirmasi</span></td>
                                                 @else
-                                                    <td> <button class="btn btn-outline-danger"
-                                                            disabled>{{ $emp->approval_by_hr_head }}</button></td>
+                                                    <td><span class="badge badge-danger">
+                                                            Ditolak</span></td>
                                                 @endif
 
                                                 @if ($emp->approval_by_hr_head == 'confirmed')
-                                                    <td>
-                                                        <button class="btn btn-outline-success"
-                                                            disabled>{{ $emp->approval_by_hr_head }}</button>
+                                                    <td><span class="badge badge-success">
+                                                            Sudah Konfirmasi</span></td>
                                                     </td>
+                                                @elseif($emp->approval_by_hr_head == 'pending')
+                                                    <td><span class="badge badge-info">
+                                                            Menunggu Konfirmasi</span></td>
                                                 @else
-                                                    <td> <button class="btn btn-outline-danger"
-                                                            disabled>{{ $emp->approval_by_hr_head }}</button></td>
+                                                    <td><span class="badge badge-danger">
+                                                            Ditolak</span></td>
                                                 @endif
                                                 <td>{{ $emp->created_at }}</td>
                                             </tr>

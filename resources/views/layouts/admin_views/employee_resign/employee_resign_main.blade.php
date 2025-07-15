@@ -150,6 +150,7 @@
                                             @else
                                             @endif
                                             <th>Attachment</th>
+                                            <th>Status Resign</th>
                                             <th>NIK</th>
                                             <th>Nama</th>
                                             <th>Cabang</th>
@@ -159,7 +160,6 @@
                                             <th>Tanggal Resign</th>
                                             <th>Approval by Branch</th>
                                             <th>Approval by HR</th>
-                                            <th>Status Resign</th>
                                             <th>Tanggal terakhir kerja</th>
                                             <th>Barang perusahaan yang dikembalikan</th>
                                             <th>Tanggal dibuat</th>
@@ -200,6 +200,7 @@
                                                     </td>
                                                 @else
                                                 @endif
+
                                                 <td>
                                                     @if ($emp->resign_attachment)
                                                         <a style="color: black;" class="btn btn-warning" href="#"
@@ -211,6 +212,20 @@
                                                         <span class="text-danger">Belum upload</span>
                                                     @endif
                                                 </td>
+
+                                                <td style="font-size: 16px;">
+                                                    @if ($emp->resign_status == 'sudah konfirmasi')
+                                                        <span class="badge badge-success">
+                                                            Sudah Konfirmasi</span>
+                                                    @elseif ($emp->resign_status == 'belum konfirmasi')
+                                                        <span class="badge badge-info">
+                                                            Menunggu Konfirmasi</span>
+                                                    @else
+                                                        <span class="badge badge-danger">
+                                                            Ditolak</span>
+                                                    @endif
+
+                                                </td>
                                                 <td>{{ $emp->nik }}</td>
                                                 <td>{{ Str::upper($emp->name) }}</td>
                                                 <td>{{ $emp->location_name }}</td>
@@ -219,25 +234,30 @@
                                                 <td>{{ $emp->resign_reasons }}</td>
                                                 <td>{{ \Carbon\Carbon::parse($emp->resign_date)->translatedFormat('d F Y') }}
                                                 </td>
-                                                @if ($emp->approval_by_branch_head == 'confirmed')
-                                                    <td class="text-success">
-                                                        {{ $emp->approval_by_branch_head }}</td>
-                                                @else
-                                                    <td class="text-secondary">
-                                                        {{ $emp->approval_by_branch_head }}</td>
-                                                @endif
-                                                @if ($emp->approval_by_hr_head == 'confirmed')
-                                                    <td class="text-success">
-                                                        {{ $emp->approval_by_hr_head }}</td>
-                                                @else
-                                                    <td class="text-secondary">
-                                                        {{ $emp->approval_by_hr_head }}</td>
-                                                @endif
-                                                @if ($emp->resign_status == 'sudah konfirmasi')
-                                                    <td class="text-success">{{ $emp->resign_status }}</td>
-                                                @else
-                                                    <td class="text-danger">{{ $emp->resign_status }}</td>
-                                                @endif
+
+                                                <td>
+                                                    @if ($emp->approval_by_branch_head == 'confirmed')
+                                                        <span class="badge badge-success">
+                                                            Sudah Konfirmasi</span>
+                                                    @else
+                                                        <span class="badge badge-info">
+                                                            Menunggu Konfirmasi</span>
+                                                    @endif
+
+                                                </td>
+
+                                                <td>
+                                                    @if ($emp->approval_by_hr_head == 'confirmed')
+                                                        <span class="badge badge-success">
+                                                            Sudah Konfirmasi</span>
+                                                    @else
+                                                        <span class="badge badge-info">
+                                                            Menunggu Konfirmasi</span>
+                                                    @endif
+
+                                                </td>
+
+
                                                 <td>{{ $emp->last_day_of_work }}</td>
                                                 <td>{{ $emp->return_company_property }}</td>
                                                 <td>{{ $emp->created_at }}</td>

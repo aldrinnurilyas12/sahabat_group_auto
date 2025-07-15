@@ -11,10 +11,13 @@ class UnderDevelopmentSetting extends Model
 
     protected $table = 'under_development_setting';
     protected $fillable = [
-        'under_development',
-        'description',
         'admin_web',
         'landing_page_web',
-        'updated_by'
+        'description',
+        'start_date_maintenance',
+        'time_start_date_maintenance',
+        'end_date_maintenance',
+        'time_end_date_maintenance',
+        'created_by'
     ];
 }

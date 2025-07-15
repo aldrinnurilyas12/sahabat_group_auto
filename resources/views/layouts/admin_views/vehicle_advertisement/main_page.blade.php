@@ -180,21 +180,21 @@
                                                     </div>
                                                 @endif
                                             </td>
-                                            <td>
+                                            <td style="font-size: 16px;">
                                                 <div style="display:flex; justify-content:center;gap:8px; "
                                                     class="action">
                                                     @if ($vhcl->is_active == 'Ya')
-                                                        <a class="btn btn-success">Terpasang</a>
+                                                        <span class="badge badge-success">Terpasang</span>
                                                     @else
-                                                        <p class="text-danger">belum terpasang</p>
+                                                        <span class="badge badge-secondary">Belum Terpasang</span>
                                                     @endif
                                             </td>
                                             <td>
                                                 @if ($vhcl->is_active == 'Ya')
-                                                    <a
+                                                    <a class="btn btn-primary"
                                                         href="{{ route('add_vehicle_advertisement', $vhcl->vehicle_id) }}">Ubah</a>
                                                 @else
-                                                    <p class="text-danger">iklan belum terpasang</p>
+                                                    <span class="badge badge-secondary">Belum Terpasang</span>
                                                 @endif
                                             </td>
                                             <td>

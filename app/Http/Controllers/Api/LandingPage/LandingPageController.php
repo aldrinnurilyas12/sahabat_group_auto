@@ -33,7 +33,7 @@ class LandingPageController extends Controller
         //     return view('layouts.admin_views.under_dev_page');
         // }
 
-        $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->orderBy('updated_posted_date', 'DESC')->limit(10)->get();
+        $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->orderBy('updated_posted_date', 'DESC')->limit(8)->get();
         $blog_data = DB::table('blog')->get();
         $brand      = DB::table('vehicle_brand')->get();
         $branch = DB::table('v_branch')->get();
@@ -67,7 +67,7 @@ class LandingPageController extends Controller
         $lowerprice = $request->lower_price;
         $highprice = $request->high_price;
         $brand = DB::table('vehicle_brand')->where('brand_name', '<>', 'Maserati')->get();
-        $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->orderBy('updated_posted_date', 'DESC')->paginate(12);
+        $vehicle_ads = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->orderBy('updated_posted_date', 'DESC')->paginate(10);
         $search = $request->input('search');
         return view('layouts.landing_page.main_page.all_vehicle', compact('vehicle_ads', 'brand', 'lowerprice', 'highprice', 'search'));
     }

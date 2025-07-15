@@ -93,7 +93,7 @@ class LoginAdminController extends Controller
             ->leftJoin('users_picture as up', 'employee.id', '=', 'up.user_id')
             ->join('job_position as jp', 'employee.job_position', '=', 'jp.id')
             ->leftJoin('department as d', 'jp.department_id', '=', 'd.id')
-            ->where('users.id', $user->id)
+            ->where('users.id', $user?->id)
             ->first();
 
 

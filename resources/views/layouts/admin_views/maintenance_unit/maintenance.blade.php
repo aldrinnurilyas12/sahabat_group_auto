@@ -160,7 +160,17 @@
                                                     href="{{ route('cashbon_detail', $maintenance->vehicle_id) }}">lihat</a>
                                             </td>
                                             <td>{{ $maintenance->unit }}</td>
-                                            <td>{{ $maintenance->status_vehicle }}</td>
+                                            <td style="font-size: 16px;">
+                                                @if ($maintenance->status_vehicle == 'Unit Ready')
+                                                    <span class="badge badge-success">Unit Ready</span>
+                                                @elseif($maintenance->status_vehicle == 'Unit Booked')
+                                                    <span class="badge badge-info">Unit Not Ready</span>
+                                                @elseif($maintenance->status_vehicle == 'Unit Terjual')
+                                                    <span class="badge badge-danger">Unit Terjual</span>
+                                                @else
+                                                    <span class="badge badge-warning">Unit Dalam Perbaikan</span>
+                                                @endif
+                                            </td>
                                             <td>{{ 'Rp' . number_format($maintenance->total_cost) }}</td>
                                         </tr>
                                     @endforeach

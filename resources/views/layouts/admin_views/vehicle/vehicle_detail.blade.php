@@ -112,15 +112,28 @@
                                             class="status">
                                             <p>Status Unit:</p>
                                             @if ($vehicle->first()->status_vehicle == 'Unit Terjual')
-                                                <h5 class="btn-active-status-sold">
-                                                    {{ $vehicle->first()->status_vehicle }}</h5>
+                                                <span style="height: max-content;font-size:16px;"
+                                                    class="badge badge-danger">
+                                                    Unit Terjual</span>
+                                            @elseif($vehicle->first()->status_vehicle == 'Unit Booked')
+                                                <span style="height: max-content;font-size:16px;"
+                                                    class="badge badge-info">
+                                                    Unit diBooking</span>
+                                            @elseif($vehicle->first()->status_vehicle == 'Unit Ready')
+                                                <span style="height: max-content;font-size:16px;"
+                                                    class="badge badge-success">
+                                                    Unit Ready</span>
+                                            @elseif($vehicle->first()->status_vehicle == 'Unit Dalam Perbaikan')
+                                                <span style="height: max-content;font-size:16px;"
+                                                    class="badge badge-warning">
+                                                    Unit dalam Perbaikan</span>
                                             @else
-                                                <h5 class="btn-active-status">{{ $vehicle->first()->status_vehicle }}
-                                                </h5>
-                                                <a style="font-size:12px; text-decoration:underline;" href="#"
-                                                    data-toggle="modal" data-target="#changeStatusModal">Ubah Status <i
-                                                        class="fas fa-share-square"></i></a>
                                             @endif
+
+                                            <a style="font-size:12px; text-decoration:underline;" href="#"
+                                                data-toggle="modal" data-target="#changeStatusModal">Ubah Status <i
+                                                    class="fas fa-share-square"></i></a>
+
                                         </div>
                                     </div>
 
@@ -140,20 +153,27 @@
                                         @endif
                                     </div>
 
-                                    <div style="display: flex;flex-wrap:wrap;" class="active-status-vehicle">
-                                        <p>Status iklan :</p>
-                                        @if ($check_ads == null)
-                                            <p class="text-danger">Belum terpasang
-                                            <p>
-                                                <a style="font-size:12px; text-decoration:underline;"
-                                                    href="{{ route('add_vehicle_advertisement', $vehicle->first()->id) }}">Pasang
-                                                    Iklan <i class="fas fa-share-square"></i></a>
-                                            @else
-                                            <p class="text-success"><i style="color: green;"
-                                                    class="fa fa-check-circle"></i> Sudah terpasang</p>
-                                        @endif
+                                    @if ($vehicle->first()->status_vehicle == 'Unit Ready')
+                                        <div style="display: flex;flex-wrap:wrap;" class="active-status-vehicle">
+                                            <p>Status iklan :</p>
+                                            @if ($check_ads == null)
+                                                <p class="text-danger">Belum terpasang
+                                                <p>
+                                                    <a style="font-size:12px; text-decoration:underline;"
+                                                        href="{{ route('add_vehicle_advertisement', $vehicle->first()->id) }}">Pasang
+                                                        Iklan <i class="fas fa-share-square"></i></a>
+                                                @else
+                                                <p class="text-success"><i style="color: green;"
+                                                        class="fa fa-check-circle"></i> Sudah terpasang</p>
+                                            @endif
 
-                                    </div>
+                                        </div>
+                                    @else
+                                        <div style="display: flex;flex-wrap:wrap;" class="active-status-vehicle">
+                                            <p>Status iklan :</p>
+                                            <p class="text-danger">Tidak bisa pasang iklan, unit tidak ready</p>
+                                        </div>
+                                    @endif
 
 
                                 </div>

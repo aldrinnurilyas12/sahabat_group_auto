@@ -97,11 +97,15 @@
                                             <td>{{ $user->name }}</td>
                                             <td>{{ $user->role_name }}</td>
                                             <td>{{ $user->is_active }}</td>
-                                            @if ($user->email_verified_at)
-                                                <td class="text-success">Sudah</td>
-                                            @else
-                                                <td class="text-secondary">Belum Verifikasi</td>
-                                            @endif
+                                            <td style="font-size: 16px;">
+                                                @if ($user->email_verified_at)
+                                                    <span class="badge badge-success">
+                                                        Sudah Verifikasi</span>
+                                                @else
+                                                    <span class="badge badge-secondary">
+                                                        Belum Verifikasi</span>
+                                                @endif
+                                            </td>
                                             <td>{{ $user->created_at }}</td>
                                             <td>{{ $user->updated_by }}</td>
                                             <td>{{ $user->updated_at }}</td>

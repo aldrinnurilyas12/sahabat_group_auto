@@ -11,39 +11,37 @@ use App\Http\Controllers\Api\LoginAdminController;
 
 class CheckMaintenanceMode
 {
+
     public function handle(Request $request, Closure $next): Response
     {
         $maintenance = UnderDevelopmentSetting::first();
-        $isUnderDev = $maintenance && $maintenance->under_development == 'Ya';
+
+        $adminWebIsUnderDev = $maintenance && $maintenance->admin_web === 'Ya';
+        $landingPageWebIsUnderDev = $maintenance && $maintenance->landing_page_web === 'Ya';
+
+        $isUnderDev = $adminWebIsUnderDev && $landingPageWebIsUnderDev;
 
         $allowedRoutes = ['login_admin_sahabat_group', 'login_execute'];
+        $allowedPositions = [
+            'Senior IT Application Developer',
+            'IT Developer Staff',
+            'IT Staff',
+        ];
 
-        if ($isUnderDev) {
-            // Izinkan akses ke route yang diizinkan
-            if (in_array($request->route()->getName(), $allowedRoutes)) {
-                return $next($request);
-            }
-
-            // Ambil data user sekali saja
-            $userController = app(LoginAdminController::class);
-            $user = $userController->getUsers();
-
-            // Cek posisi user
-            $allowedPositions = [
-                'Senior IT Appllication Developer',
-                'IT Developer Staff',
-                'IT Staff',
-            ];
-
-            if ($user && in_array($user->position_name, $allowedPositions)) {
-                return $next($request);
-            }
-
-            // Jika bukan user yang diizinkan
-            return response()->view('layouts.admin_views.under_dev_page');
+        $routeName = $request->route()?->getName();
+        if (in_array($routeName, $allowedRoutes)) {
+            return $next($request);
         }
 
-        // Jika tidak dalam mode pengembangan
+        $userController = app(LoginAdminController::class);
+        $user = $userController->getUsers();
+
+        if ($isUnderDev) {
+            if (!$user || !in_array($user->position_name, $allowedPositions)) {
+                return response()->view('layouts.admin_views.under_dev_page');
+            }
+        }
+
         return $next($request);
     }
 }

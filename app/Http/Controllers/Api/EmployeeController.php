@@ -376,8 +376,6 @@ class EmployeeController extends Controller
         $branch = DB::table('branch')->get();
         $banks = DB::table('bank')->get();
 
-
-
         return view('layouts.admin_views.employee.edit.edit_employee', compact('employee', 'banks', 'start_date', 'end_date', 'birth_date', 'resign_date', 'branch', 'job_position', 'job_level_position', 'main_menu', 'grouped_sub_menu', 'sidebar_menu'));
     }
 

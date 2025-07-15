@@ -161,7 +161,7 @@
                                     @foreach ($appointment_data as $appointment)
                                         <tr style="width: 200px;">
                                             <td><?php echo $no++; ?></td>
-                                            <td>
+                                            <td style="font-size:16px;">
                                                 <div style="display:flex; justify-content:center;gap:8px; "
                                                     class="action">
                                                     @if ($appointment->appointment_status == null)
@@ -169,7 +169,8 @@
                                                             href="#" data-toggle="modal"
                                                             data-target="#changeStatus{{ $appointment->id }}">Ubah</i></a>
                                                     @else
-                                                        <a style="font-size: 14px;" class="btn btn-dark">Sudah</i></a>
+                                                        <span class="badge badge-secondary">
+                                                            sudah</span>
                                                     @endif
                                             </td>
                                             <td>{{ $appointment->unit }}</td>
@@ -177,15 +178,16 @@
                                             <td>{{ $appointment->name }}</td>
                                             <td>{{ $appointment->phone_number }}</td>
                                             <td>{{ $appointment->email }}</td>
-                                            <td>
+                                            <td style="font-size:16px;">
                                                 @if ($appointment->appointment_status == 'hadir')
-                                                    <span
-                                                        class="text-success">{{ $appointment->appointment_status }}</span>
+                                                    <span class="badge badge-success">
+                                                        Hadir</span>
                                                 @elseif($appointment->appointment_status == 'tidak datang')
-                                                    <span
-                                                        class="text-danger">{{ $appointment->appointment_status }}</span>
+                                                    <span class="badge badge-danger">
+                                                        Tidak Datang</span>
                                                 @elseif($appointment->appointment_status == null)
-                                                    <span class="text-secondary">Belum datang</span>
+                                                    <span class="badge badge-info">
+                                                        Belum Hadir</span>
                                                 @endif
                                             </td>
                                             <td>{{ date('d F Y', strtotime($appointment->date)) }}</td>

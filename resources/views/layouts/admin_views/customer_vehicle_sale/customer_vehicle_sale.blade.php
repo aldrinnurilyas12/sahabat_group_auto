@@ -168,7 +168,7 @@
                                             <td><?php echo $no++; ?></td>
                                             <td>
                                                 <div class="dflex">
-                                                    @if ($customer_request->sending_email)
+                                                    @if ($customer_request->status == 'canceled')
                                                         <a href="#" class="btn btn-dark">Sudah</a>
                                                     @else
                                                         <a href="{{ route('customer_vehicle_sale_mail', $customer_request->id) }}"
@@ -187,14 +187,33 @@
                                             <td>{{ $customer_request->vehicle_year }}</td>
                                             <td>{{ $customer_request->vehicle_color }}</td>
                                             <td>{{ $customer_request->current_km }}</td>
-                                            <td>
+                                            <td style="font-size: 16px;">
+
                                                 @if ($customer_request->sending_email == 'Ya')
-                                                    <span class="text-success">Sudah</span>
+                                                    <span class="badge badge-success">
+                                                        sudah</span>
                                                 @else
-                                                    <span class="text-danger">Belum</span>
+                                                    <span class="badge badge-secondary">
+                                                        belum</span>
+                                                @endif
+
+                                            </td>
+
+                                            <td style="font-size: 16px;">
+                                                @if ($customer_request->status == 'pending')
+                                                    <span class="badge badge-secondary">
+                                                        pending</span>
+                                                @elseif ($customer_request->status == 'reviewed')
+                                                    <span class="badge badge-info">
+                                                        sedang ditinjau</span>
+                                                @elseif ($customer_request->status == 'confirmed')
+                                                    <span class="badge badge-success">
+                                                        dikonfirmasi</span>
+                                                @elseif ($customer_request->status == 'canceled')
+                                                    <span class="badge badge-danger">
+                                                        ditolak</span>
                                                 @endif
                                             </td>
-                                            <td>{{ $customer_request->status }}</td>
                                             <td>
                                                 <textarea readonly name="" id="" style="height: 90px;">
                                                 {{ $customer_request->description }}

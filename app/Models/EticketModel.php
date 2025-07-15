@@ -11,6 +11,7 @@ class EticketModel extends Model
     protected $table = 'eticket';
 
     protected $fillable = [
+        'eticket_code',
         'employee_id',
         'eticket_category',
         'title',

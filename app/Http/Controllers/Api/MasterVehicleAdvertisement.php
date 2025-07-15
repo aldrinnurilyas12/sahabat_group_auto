@@ -235,7 +235,7 @@ class MasterVehicleAdvertisement extends Controller
 
         $this->insertLogActivityUsers(__METHOD__);
         session()->flash('message_success', 'Foto Iklan Berhasil diperbarui!');
-        return redirect()->back();
+        return redirect()->route('master_vehicle_advertisement.index');
     }
 
     /**

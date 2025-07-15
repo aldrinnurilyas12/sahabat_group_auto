@@ -180,11 +180,16 @@
                                                                 <p class="text-secondary">SPK belum dikonfirmasi</p>
                                                             @endif
                                                     </td>
-                                                    @if ($spk->spk_status == 'Belum Konfirmasi')
-                                                        <td class="text-secondary">{{ $spk->spk_status }}</td>
-                                                    @else
-                                                        <td class="text-success">{{ $spk->spk_status }}</td>
-                                                    @endif
+
+                                                    <td style="font-size:16px;">
+                                                        @if ($spk->spk_status == 'Belum Konfirmasi')
+                                                            <span class="badge badge-info">
+                                                                Belum Konfirmasi</span>
+                                                        @else
+                                                            <span class="badge badge-success">
+                                                                Sudah Konfirmasi</span>
+                                                        @endif
+                                                    </td>
                                                     <td>{{ $spk->unit }}</td>
                                                     <td>{{ $spk->location_unit }}</td>
                                                     <td>{{ $spk->payment_method }}</td>
@@ -195,19 +200,23 @@
                                                     <td>{{ $spk->address }}</td>
                                                     <td>{{ $spk->phone_number }}</td>
                                                     <td>{{ $spk->email }}</td>
-                                                    <td>
+                                                    <td style="font-size: 16px;">
                                                         @if ($spk->approval_by_head_branch == 'Belum Konfirmasi')
-                                                            <p class="text-danger">Belum Konfirmasi</p>
+                                                            <span class="badge badge-info">
+                                                                Belum Konfirmasi</span>
                                                         @elseif($spk->approval_by_head_branch == 'Sudah Konfirmasi')
-                                                            <p class="text-success">Sudah Konfirmasi</p>
+                                                            <span class="badge badge-success">
+                                                                Sudah Konfirmasi</span>
                                                         @else
                                                         @endif
                                                     </td>
-                                                    <td>
+                                                    <td style="font-size: 16px;">
                                                         @if ($spk->approval_by_sales_manager == 'Belum Konfirmasi')
-                                                            <p class="text-danger">Belum Konfirmasi</p>
+                                                            <span class="badge badge-info">
+                                                                Belum Konfirmasi</span>
                                                         @elseif($spk->approval_by_sales_manager == 'Sudah Konfirmasi')
-                                                            <p class="text-success">Sudah Konfirmasi</p>
+                                                            <span class="badge badge-success">
+                                                                Sudah Konfirmasi</span>
                                                         @else
                                                         @endif
                                                     </td>
@@ -282,19 +291,23 @@
                                                     <td>{{ $spk_all->address }}</td>
                                                     <td>{{ $spk_all->phone_number }}</td>
                                                     <td>{{ $spk_all->email }}</td>
-                                                    <td>
+                                                    <td style="font-size: 16px;">
                                                         @if ($spk_all->approval_by_head_branch == 'Belum Konfirmasi')
-                                                            <p class="text-danger">Belum Konfirmasi</p>
+                                                            <span class="badge badge-info">
+                                                                Belum Konfirmasi</span>
                                                         @elseif($spk_all->approval_by_head_branch == 'Sudah Konfirmasi')
-                                                            <p class="text-success">Sudah Konfirmasi</p>
+                                                            <span class="badge badge-success">
+                                                                Sudah Konfirmasi</span>
                                                         @else
                                                         @endif
                                                     </td>
-                                                    <td>
+                                                    <td style="font-size: 16px;">
                                                         @if ($spk_all->approval_by_sales_manager == 'Belum Konfirmasi')
-                                                            <p class="text-danger">Belum Konfirmasi</p>
+                                                            <span class="badge badge-info">
+                                                                Belum Konfirmasi</span>
                                                         @elseif($spk_all->approval_by_sales_manager == 'Sudah Konfirmasi')
-                                                            <p class="text-success">Sudah Konfirmasi</p>
+                                                            <span class="badge badge-success">
+                                                                Sudah Konfirmasi</span>
                                                         @else
                                                         @endif
                                                     </td>

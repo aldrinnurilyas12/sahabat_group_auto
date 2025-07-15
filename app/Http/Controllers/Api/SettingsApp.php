@@ -7,8 +7,13 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\MasterMainMenuController;
+use App\Mail\MaintenanceNotification;
 use App\Models\BranchModel;
+use App\Models\UnderDevelopmentSetting;
 use PhpParser\Node\Stmt\Else_;
+use Psy\CodeCleaner\ReturnTypePass;
+use Illuminate\Support\Facades\Mail;
+
 
 class SettingsApp extends Controller
 {
@@ -41,8 +46,12 @@ class SettingsApp extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'] ?? [];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'] ?? [];
 
+        $setting_app = DB::table('under_development_setting')->select('admin_web', 'landing_page_web', 'description')->first();
         $setting_time = DB::table('settings_schedule_time')->first();
-        return view('layouts.admin_views.settings', compact('grouped_sub_menu', 'sidebar_menu', 'setting_time'));
+
+        $settings_data = DB::table('under_development_setting')->get();
+
+        return view('layouts.admin_views.settings', compact('grouped_sub_menu', 'sidebar_menu', 'setting_time', 'setting_app', 'settings_data'));
     }
 
     public function time__settings(Request $request)
@@ -73,22 +82,65 @@ class SettingsApp extends Controller
     {
         $IT_ROLE = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Information Technology';
 
+
+
         if ($IT_ROLE) {
-            DB::table('under_development_setting')->where('id', 1)->update(
+            $maintenance = UnderDevelopmentSetting::find(1);
+
+            $maintenance->update(
                 [
-                    'under_development' => $request->under_development,
-                    'description' => $request->description,
                     'admin_web' => $request->admin_web,
                     'landing_page_web' => $request->landing_page_web,
+                    'description' => $request->description,
+                    'start_date_maintenance' => $request->start_date_maintenance,
+                    'time_start_date_maintenance' => $request->time_start_date_maintenance,
+                    'end_date_maintenance' => $request->end_date_maintenance,
+                    'time_end_date_maintenance' => $request->time_end_date_maintenance,
                     'updated_at' => now(),
-                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+                    'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]
             );
+
+            if ($request->admin_web == 'Ya') {
+                $this->maintenance_notification($maintenance);
+            }
+            $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Pengaturan Berhasil disimpan!');
             return redirect()->back();
         } else {
-            return abort(403, 'You don`t have access for this services');
+            session()->flash('failed_insert', 'Anda tidak bisa akses ke module ini!');
+            return redirect()->back();
         }
+    }
+
+    public function maintenance_notification(UnderDevelopmentSetting $maintenance)
+    {
+
+        $user_email = DB::table('users')->where('is_active', 'Y')->get();
+
+        if ($user_email->isEmpty()) {
+            return response()->json(['error' => 'No Email User Found'], 404);
+        }
+
+        try {
+            foreach ($user_email as $email) {
+                Mail::to($email->email)->send(new MaintenanceNotification($maintenance));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Email send failed : ' . $e->getMessage());
+            return response()->json(['error' => 'Failed sending email'], 500);
+        }
+    }
+
+    public function insertLogActivityUsers($log_activity)
+    {
+        DB::table('log_activity_users')->insert([
+            'user_id' => app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->id,
+            'ip_address' => \Request::ip(),
+            'log_activity' => $log_activity,
+            'created_at' => now(),
+            'created_by'   => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+        ]);
     }
 
     /**

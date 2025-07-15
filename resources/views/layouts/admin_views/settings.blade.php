@@ -77,34 +77,47 @@
                                 <form action="{{ route('setting_development') }}" method="POST">
                                     @method('PUT')
                                     @csrf
-                                    <label style="color:black;" for="">Pilih Pengaturan</label>
-                                    <select class="form-control" name="under_development" id="">
-                                        <option value="#">==== Pilih ====</option>
-                                        <option value="Ya">YA</option>
-                                        <option value="Tidak">TIDAK</option>
-                                    </select>
-                                    <br>
-                                    <label style="color:black;" for="">Deskripsi Development</label>
-                                    <input class="form-control" type="text" name="description">
-                                    <br>
-                                    <div style="display: block;" class="checkbox-area">
+
+                                    <div style="display: block;" class="form-group">
                                         <label style="color:black;" for="">Pilih Web</label>
-                                        <br>
                                         <div style="display: flex;gap:10px;" class="input-group">
-                                            <input type="checkbox" name="admin_web" value="ya">Admin Web
-                                            <input type="checkbox" name="landing_page_web" value="ya">Landing Page
+                                            <input type="checkbox" name="admin_web" value="Ya"
+                                                {{ $setting_app->admin_web == 'Ya' ? 'Checked' : '' }}>Admin Web
+                                            <input type="checkbox" name="landing_page_web" value="Ya"
+                                                {{ $setting_app->landing_page_web == 'Ya' ? 'Checked' : '' }}>Landing
+                                            Page
                                         </div>
                                     </div>
 
+                                    <label style="color:black;" for="">Deskripsi Development</label>
+                                    <div class="form-group">
+                                        <input class="form-control" value="{{ $setting_app->description }}"
+                                            type="text" name="description" placeholder="Masukkan Deskripsi"
+                                            autocomplete="off">
+                                    </div>
 
-                                    <p>
-                                        @if ($setting_time->open_schedule_time == 'on')
-                                            <p>Setting Time : <span class="text-success">Aktif</span></p>
-                                        @else
-                                            <p>Setting Time : <span class="text-secondary">Tidak Aktif</span></p>
-                                        @endif
+                                    <div class="form-group">
+                                        <label for="">Tanggal Mulai Maintenance</label>
+                                        <input class="form-control" value="{{ $setting_app->description }}"
+                                            type="date" name="start_date_maintenance">
                                         <br>
-                                        <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
+                                        <label for="">Jam Mulai Maintenance</label>
+                                        <input class="form-control" value="{{ $setting_app->description }}"
+                                            type="time" name="time_start_date_maintenance">
+                                    </div>
+                                    <br>
+
+                                    <div class="form-group">
+                                        <label for="">Tanggal Akhir Maintenance</label>
+                                        <input class="form-control" value="{{ $setting_app->description }}"
+                                            type="date" name="end_date_maintenance">
+                                        <br>
+                                        <label for="">Jam Akhir Maintenance</label>
+                                        <input class="form-control" value="{{ $setting_app->description }}"
+                                            type="time" name="time_end_date_maintenance">
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
                                 </form>
 
                             </div>
@@ -112,6 +125,73 @@
                     </div>
                 @else
                 @endif
+
+                <div class="card shadow mb-4">
+                    <div style="color:black;" class="card-header py-3">
+                        <h5><strong>Status Maintenance</strong></h5>
+                    </div>
+                    <div style="background: rgb(255, 255, 255);" class="card-body">
+                        <div class="table-responsive">
+                            <table style="font-size: 14px; color:black;" class="table table-bordered" id="dataTable"
+                                width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Web Admin</th>
+                                        <th>Landing Page Web</th>
+                                        <th>Deskripsi</th>
+                                        <th>Tanggal Mulai</th>
+                                        <th>Jam Mulai</th>
+                                        <th>Tanggal Akhir</th>
+                                        <th>Jam Akhir</th>
+                                        <th>Dibuat pada</th>
+                                        <th>Dibuat oleh</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <?php $no = 1; ?>
+                                    @foreach ($settings_data as $setting)
+                                        <tr>
+                                            <td><?php echo $no++; ?></td>
+                                            <td>
+                                                @if ($setting->admin_web == 'Ya')
+                                                    <span style="height: max-content;font-size:14px;"
+                                                        class="badge badge-success">
+                                                        Ya</span>
+                                                @else
+                                                    <span style="height: max-content;font-size:14px;"
+                                                        class="badge badge-danger">
+                                                        Tidak</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($setting->landing_page_web == 'Ya')
+                                                    <span style="height: max-content;font-size:14px;"
+                                                        class="badge badge-success">
+                                                        Ya</span>
+                                                @else
+                                                    <span style="height: max-content;font-size:14px;"
+                                                        class="badge badge-danger">
+                                                        Tidak</span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $setting->description }}</td>
+                                            <td>{{ $setting->start_date_maintenance }}</td>
+                                            <td>{{ $setting->time_start_date_maintenance }}</td>
+                                            <td>{{ $setting->end_date_maintenance }}</td>
+                                            <td>{{ $setting->time_end_date_maintenance }}</td>
+                                            <td>{{ $setting->updated_at }}</td>
+                                            <td>{{ $setting->created_by }}</td>
+
+                                        </tr>
+                                    @endforeach
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
             </div>
 
@@ -259,7 +339,7 @@
                 title: 'Gagal',
                 text: "{{ Session::get('failed_insert') }}",
                 icon: "error",
-                timer: 6000,
+                timer: 2000,
                 confirmButtonText: 'OK'
             });
         </script>

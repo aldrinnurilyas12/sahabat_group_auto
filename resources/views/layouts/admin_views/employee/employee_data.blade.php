@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Data Karyawan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
+    <title>Master Data Karyawan - SAHABAT GROUP AUTO ADMINISTRATOR</title>
 
     <!-- Custom fonts for this template-->
     <link href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
@@ -247,7 +247,19 @@
                                                             <td>-</td>
                                                         @endif
                                                         <td>{{ $emp->department_name }}</td>
-                                                        <td>{{ $emp->type_of_employee }}</td>
+                                                        <td>
+                                                            @if ($emp->type_of_employee == 'permanent')
+                                                                Karyawan Tetap
+                                                            @elseif($emp->type_of_employee == 'contract')
+                                                                Karyawan Kontrak
+                                                            @elseif($emp->type_of_employee == 'internship')
+                                                                Karyawan Magang
+                                                            @elseif($emp->type_of_employee == 'freelance')
+                                                                Karyawan Freelance
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
                                                         <td>{{ $emp->location_name }}</td>
                                                         <td>{{ 'Rp ' . number_format($emp->salary) }}</td>
                                                         <td>{{ 'Rp ' . number_format($emp->tunjangan_transport) }}
@@ -306,7 +318,13 @@
                                                 @foreach ($employee_resign as $emp_rsn)
                                                     <tr>
                                                         <td><?php echo $no++; ?></td>
-                                                        <td class="text-success">{{ $emp_rsn->resign_status }}</td>
+                                                        <td style="font-size: 16px;" class="text-success">
+                                                            @if ($emp_rsn->resign_status == 'sudah konfirmasi')
+                                                                <span class="badge badge-success">
+                                                                    Sudah Konfirmasi</span>
+                                                            @else
+                                                            @endif
+                                                        </td>
                                                         <td>{{ $emp_rsn->nik }}</td>
                                                         <td>{{ Str::upper($emp_rsn->name) }}</td>
                                                         <td>{{ $emp_rsn->position_name }}</td>

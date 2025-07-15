@@ -184,11 +184,13 @@
                                             <td>{{ $customer_request->brand_name }}</td>
                                             <td>{{ $customer_request->year }}</td>
                                             <td>{{ $customer_request->vehicle_color }}</td>
-                                            <td>
+                                            <td style="font-size: 16px;">
                                                 @if ($customer_request->sending_mail == 'Ya')
-                                                    <span class="text-success">Sudah</span>
+                                                    <span class="badge badge-success">
+                                                        sudah</span>
                                                 @else
-                                                    <span class="text-danger">Belum</span>
+                                                    <span class="badge badge-secondary">
+                                                        belum</span>
                                                 @endif
                                             </td>
                                             <td>{{ $customer_request->description }}</td>

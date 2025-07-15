@@ -8,6 +8,7 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\MasterMainMenuController;
 use App\Models\EticketModel;
+use Ramsey\Uuid\Uuid;
 
 class EticketingController extends Controller
 {
@@ -38,7 +39,7 @@ class EticketingController extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        $eticket_data = DB::table('v_eticket')->where('employee_id', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id)->get();
+        $eticket_data = DB::table('v_eticket')->where('employee_id', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id)->orderBy('created_at', 'DESC')->get();
         return view('layouts.admin_views.eticketing.eticket', compact('eticket_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -62,8 +63,8 @@ class EticketingController extends Controller
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
-        $eticket_category = DB::table('eticket_category')->get();
-        $eticket_data = DB::table('eticket')->where('id', $request->id)->get();
+        $eticket_category = DB::table('v_eticket_category')->where('menu_name', '<>', 'IT Monitoring')->get();
+        $eticket_data = DB::table('v_eticket')->where('eticket_code', $request->eticket_code)->get();
         return view('layouts.admin_views.eticketing.edit.eticket_edit', compact('eticket_category', 'eticket_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -89,6 +90,7 @@ class EticketingController extends Controller
                     $attachment_files = $request->file('attachment_files');
                     $attachmentPath = $attachment_files->storeAs('eticket_attachment', uniqid() . '.' . $attachment_files->getClientOriginalExtension(), 'public');
                     EticketModel::create([
+                        'eticket_code' => date('Ymd') . '-' . substr(str_replace('-', '', Uuid::uuid4()->toString()), 0, 12),
                         'employee_id' => app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id,
                         'eticket_category' => $request->eticket_category,
                         'title' => $request->title,
@@ -102,6 +104,7 @@ class EticketingController extends Controller
                     ]);
                 } else {
                     EticketModel::create([
+                        'eticket_code' => date('Ymd') . '-' . substr(str_replace('-', '', Uuid::uuid4()->toString()), 0, 12),
                         'employee_id' => app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id,
                         'eticket_category' => $request->eticket_category,
                         'title' => $request->title,
@@ -125,6 +128,7 @@ class EticketingController extends Controller
                 $attachment_files = $request->file('attachment_files');
                 $attachmentPath = $attachment_files->storeAs('eticket_attachment', uniqid() . '.' . $attachment_files->getClientOriginalExtension(), 'public');
                 EticketModel::create([
+                    'eticket_code' => date('Ymd') . '-' . substr(str_replace('-', '', Uuid::uuid4()->toString()), 0, 12),
                     'employee_id' => app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id,
                     'eticket_category' => $request->eticket_category,
                     'title' => $request->title,
@@ -138,6 +142,7 @@ class EticketingController extends Controller
                 ]);
             } else {
                 EticketModel::create([
+                    'eticket_code' => date('Ymd') . '-' . substr(str_replace('-', '', Uuid::uuid4()->toString()), 0, 12),
                     'employee_id' => app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id,
                     'eticket_category' => $request->eticket_category,
                     'title' => $request->title,
@@ -187,7 +192,7 @@ class EticketingController extends Controller
         $insertTime = (int) date('H');
         if ($insertTime >= 7 && $insertTime <= 20) {
 
-            DB::table('eticket')->where('id', $request->id)->update([
+            DB::table('eticket')->where('eticket_code', $request->eticket_code)->update([
                 'eticket_category' => $request->eticket_category,
                 'title' => $request->title,
                 'main_issue' => $request->main_issue,
@@ -235,7 +240,7 @@ class EticketingController extends Controller
         if ($SETTING_TIME->open_schedule_time == 'on') {
             if ($insertTime <= 8 && $insertTime >= 18) {
                 if ($IT_ROLE) {
-                    DB::table('eticket')->where('id', $request->id)->update([
+                    DB::table('eticket')->where('eticket_code', $request->eticket_code)->update([
                         'scheduled' => $request->scheduled,
                         'approval_by_it' => $request->approval_by_it,
                         'status' => $request->status,
@@ -255,7 +260,7 @@ class EticketingController extends Controller
             }
         } else {
             if ($IT_ROLE) {
-                DB::table('eticket')->where('id', $request->id)->update([
+                DB::table('eticket')->where('eticket_code', $request->eticket_code)->update([
                     'scheduled' => $request->scheduled,
                     'approval_by_it' => $request->approval_by_it,
                     'status' => $request->status,
@@ -283,7 +288,7 @@ class EticketingController extends Controller
         if ($SETTING_TIME->open_schedule_time == 'on') {
             if ($insertTime <= 8 && $insertTime >= 18) {
                 if ($IT_ROLE) {
-                    DB::table('eticket')->where('id', $request->id)->update([
+                    DB::table('eticket')->where('eticket_code', $request->eticket_code)->update([
                         'status' => $request->status,
                         'task_complete_date' => $request->task_complete_date,
                         'updated_at' => now(),
@@ -302,7 +307,7 @@ class EticketingController extends Controller
             }
         } else {
             if ($IT_ROLE) {
-                DB::table('eticket')->where('id', $request->id)->update([
+                DB::table('eticket')->where('eticket_code', $request->eticket_code)->update([
                     'status' => $request->status,
                     'task_complete_date' => $request->task_complete_date,
                     'updated_at' => now(),
@@ -325,7 +330,7 @@ class EticketingController extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        $eticket_data = DB::table('v_eticket')->where('id', $request->id)->get();
+        $eticket_data = DB::table('v_eticket')->where('eticket_code', $request->eticket_code)->get();
         return view('layouts.admin_views.eticketing.eticket_detail', compact('eticket_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 }

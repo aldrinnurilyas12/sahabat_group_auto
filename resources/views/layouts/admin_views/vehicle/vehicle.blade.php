@@ -138,7 +138,8 @@
 
                             <div class="information">
                                 <div class="alert alert-info">
-                                    Jika ingin menambahkan media files seperti : Foto dan Video klik button "Detail"
+                                    Jika ingin menambahkan media files untuk Unit Kendaraan seperti : Foto dan Video
+                                    klik button "Detail"
                                 </div>
                             </div>
                         </div>
@@ -222,23 +223,19 @@
                                                         <td>{{ $cars->brand . ' ' . $cars->vehicle_type . ' ' . $cars->manufacture_year }}
                                                         </td>
                                                         <td>{{ $cars->vehicle_registration_number }}</td>
-                                                        <td>
+                                                        <td style="font-size: 16px;">
                                                             @if ($cars->status_vehicle == 'Unit Terjual')
-                                                                <p class="text-danger">
-                                                                    {{ $cars->status_vehicle }}
-                                                                </p>
+                                                                <span class="badge badge-danger">
+                                                                    Unit Terjual</span>
                                                             @elseif($cars->status_vehicle == 'Unit Booked')
-                                                                <p class="text-secondary">
-                                                                    {{ $cars->status_vehicle }}
-                                                                </p>
+                                                                <span class="badge badge-info">
+                                                                    Unit diBooking</span>
                                                             @elseif($cars->status_vehicle == 'Unit Ready')
-                                                                <p class="text-success">
-                                                                    {{ $cars->status_vehicle }}
-                                                                </p>
+                                                                <span class="badge badge-success">
+                                                                    Unit Ready</span>
                                                             @else
-                                                                <p class="text-info">
-                                                                    {{ $cars->status_vehicle }}
-                                                                </p>
+                                                                <span class="badge badge-warning">
+                                                                    Unit dalam Perbaikan</span>
                                                             @endif
                                                         </td>
                                                         <td>{{ $cars->vehicle_type }}</td>

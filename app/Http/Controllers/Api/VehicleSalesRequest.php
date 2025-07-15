@@ -101,7 +101,21 @@ class VehicleSalesRequest extends Controller
 
         $token = $request->unique_tokens;
         $vehicle_sale_request = DB::table('vehicle_sale_request')
-            ->select('vehicle_type', 'vb.brand_name', 'vehicle_year', 'name', 'current_km', 'vehicle_color', 'status', 'unique_tokens', 'description', 'updated_at')
+            ->select(
+                'vehicle_type',
+                'vb.brand_name',
+                'vehicle_year',
+                'name',
+                'current_km',
+                'vehicle_color',
+                DB::raw("CASE WHEN status = 'reviewed' THEN 'Sedang direview'
+                        WHEN status = 'confirmed' THEN 'Dikonfirmasi'
+                        WHEN status = 'canceled' THEN 'Ditolak'
+                        ELSE 'pending' end AS status"),
+                'unique_tokens',
+                'description',
+                'updated_at'
+            )
             ->leftJoin('vehicle_brand as vb', 'vehicle_sale_request.brand_id', '=', 'vb.id')
             ->where('unique_tokens', $token)->get();
 
