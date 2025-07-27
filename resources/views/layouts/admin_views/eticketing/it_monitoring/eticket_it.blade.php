@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Data Kantor Cabang - SAHABAT GROUP AUTO ADMINISTRATOR</title>
+    <title>Data E-Ticket - SAHABAT GROUP AUTO ADMINISTRATOR</title>
 
     <!-- Custom fonts for this template-->
     <link href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
@@ -46,18 +46,96 @@
                 <!-- DataTable -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h5 style="color: black;"><strong>Data E-Ticket</strong></h5>
+                        <h5 style="color: black;"><strong>Data E-Ticket PT Sahabat Group Auto</strong></h5>
                         <br>
-                        <div style="display: flex; flex-wrap:wrap; gap:10px;" class="component">
-                            {{-- <a href="{{ route('eticket_create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus-circle"></i>&nbsp;Buat E-Ticket
-                             </a> --}}
+                        <div style="display: flex; gap:10px;" class="center-download">
+                            <form action="{{ route('download_eticket_excel') }}" method="POST">
+                                @csrf
+                                <input type="text" value="{{ $bulan }}" name="bulan" hidden>
+                                <input type="text" value="{{ $tahun }}" name="tahun" hidden>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-file-excel"></i>
+                                    &nbsp; Download Excel
+                                </button>
+                            </form>
 
-                            {{-- <a class="btn btn-success" href="{{route('branch_export')}}">
-                                <i class="fas fa-file-excel"></i>
-                                                &nbsp; Download
-                             </a> --}}
+                            <form action="{{ route('download_eticket_pdf') }}" method="POST">
+                                @csrf
+                                <input type="text" value="{{ $bulan }}" name="bulan" hidden>
+                                <input type="text" value="{{ $tahun }}" name="tahun" hidden>
+                                <button type="submit" class="btn btn-info">
+                                    <i class="fas fa-file"></i>
+                                    &nbsp; PDF
+                                </button>
+                            </form>
                         </div>
+
+                        <hr>
+                        <div style="color: black;" class="form-group">
+                            <form action="{{ route('filter_eticket') }}" method="GET">
+
+                                <div style="display: flex;gap:10px;" class="grouped-container">
+                                    <div style="display: block" class="select-group">
+                                        <label for="">Bulan</label>
+                                        <select class="form-control" name="bulan">
+                                            <option value="">--- Pilih bulan ---</option>
+                                            <option value="alldata">Semua Data</option>
+                                            @foreach ($months as $month)
+                                                <option value="{{ $month->id }}">{{ $month->month_list }}
+                                                </option>
+                                            @endforeach
+
+                                        </select>
+                                        @if ($errors->has('month'))
+                                            <span class="text-danger">{{ $errors->first('month') }}</span>
+                                        @endif
+                                    </div>
+
+                                    <div style="display: block" class="select-group">
+                                        <label for="">Tahun</label>
+                                        <select class="form-control" name="tahun">
+                                            <option value="">--- Pilih tahun ---</option>
+                                            <option value="alldata">Semua Data</option>
+                                            @foreach ($years as $year)
+                                                <option value="{{ $year }}">{{ $year }}</option>
+                                            @endforeach
+                                        </select>
+                                        @if ($errors->has('year'))
+                                            <span class="text-danger">{{ $errors->first('year') }}</span>
+                                        @endif
+                                    </div>
+
+                                    <button style="height: 40px; align-self:end;" type="submit"
+                                        class="btn btn-primary">Pilih</button>
+                                    <a href="{{ route('transaksi_spk_unit.index') }}"
+                                        style="height: 40px; align-self:end;" class="btn btn-secondary">Reset</a>
+                                </div>
+                                &nbsp;
+
+                            </form>
+                            <div style="font-size:14px;" class="result-selected">
+                                @if ($eticket_data->isNotEmpty())
+                                    <strong>
+                                        Data terpilih:
+                                    </strong>
+                                    <br>
+                                    <!-- Memastikan bahwa $month adalah objek dan mengakses propertinya, misalnya 'name' -->
+                                    <div class="alert alert-warning">
+                                        Bulan : {{ $bulan }} <br>
+
+                                        <!-- Menampilkan tahun yang dipilih dari array $year -->
+                                        Tahun : {{ $tahun }}
+                                    </div>
+                                @elseif($eticket_data->isEmpty())
+                                    <div class="alert alert-warning">
+                                        Tidak ada data.
+                                    </div>
+                                @endif
+
+                                {{-- {{ dd([$month, $year])}} --}}
+                            </div>
+                        </div>
+
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -136,7 +214,8 @@
                                                 @elseif($ticket->approval_by_it == 'sudah konfirmasi')
                                                     <span class="badge badge-success">Sudah Konfirmasi</span>
                                                 @else
-                                                    <span class="badge badge-info">{{ $ticket->approval_by_it }}</span>
+                                                    <span
+                                                        class="badge badge-info">{{ $ticket->approval_by_it }}</span>
                                                 @endif
                                             </td>
                                             <td>
@@ -185,7 +264,8 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel{{ $ticket->eticket_code }}">Konfirmasi E-Ticket:
+                        <h5 class="modal-title" id="exampleModalLabel{{ $ticket->eticket_code }}">Konfirmasi
+                            E-Ticket:
                             {{ $ticket->eticket_category }}</h5>
                         <button class="close" type="button" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>

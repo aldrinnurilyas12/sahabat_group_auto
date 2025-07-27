@@ -14,7 +14,8 @@
         <h5><strong>PT SAHABAT GROUP AUTO</strong></h5>
         <h6>SPK UNIT KENDARAAN</h6>
     </div>
-
+    <hr>
+    <p>Tanggal Cetak : {{ date('d-m-Y h:i a') }}</p>
 
     <div class="spk-information">
         @foreach ($spk_data as $spk)

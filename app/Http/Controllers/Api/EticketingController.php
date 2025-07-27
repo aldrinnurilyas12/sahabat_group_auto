@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\EticketExport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -9,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Api\MasterMainMenuController;
 use App\Models\EticketModel;
 use Ramsey\Uuid\Uuid;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EticketingController extends Controller
 {
@@ -33,14 +36,29 @@ class EticketingController extends Controller
     }
 
 
-    public function index(): View
+    public function index(Request $request): View
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $months = DB::table('months')->get();
+        $years = [
+            '2020',
+            '2021',
+            '2022',
+            '2023',
+            '2024',
+            '2025',
+            '2026',
+            '2027',
+            '2028'
+        ];
+
         $eticket_data = DB::table('v_eticket')->where('employee_id', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id)->orderBy('created_at', 'DESC')->get();
-        return view('layouts.admin_views.eticketing.eticket', compact('eticket_data', 'grouped_sub_menu', 'sidebar_menu'));
+        return view('layouts.admin_views.eticketing.eticket', compact('eticket_data', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
     }
 
     /**
@@ -219,14 +237,29 @@ class EticketingController extends Controller
 
 
     // FOR ROLE IT
-    public function it_eticketing_layouts(): View
+    public function it_eticketing_layouts(Request $request): View
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $months = DB::table('months')->get();
+        $years = [
+            '2020',
+            '2021',
+            '2022',
+            '2023',
+            '2024',
+            '2025',
+            '2026',
+            '2027',
+            '2028'
+        ];
+
         $eticket_data = DB::table('v_eticket')->orderBy('created_at', 'DESC')->get();
-        return view('layouts.admin_views.eticketing.it_monitoring.eticket_it', compact('eticket_data', 'grouped_sub_menu', 'sidebar_menu'));
+        return view('layouts.admin_views.eticketing.it_monitoring.eticket_it', compact('eticket_data', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
     }
 
     public function confirmed_eticket_it(Request $request)
@@ -332,5 +365,93 @@ class EticketingController extends Controller
 
         $eticket_data = DB::table('v_eticket')->where('eticket_code', $request->eticket_code)->get();
         return view('layouts.admin_views.eticketing.eticket_detail', compact('eticket_data', 'grouped_sub_menu', 'sidebar_menu'));
+    }
+
+    public function filter_eticket(Request $request)
+    {
+
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+
+        $eticket_data = DB::table('v_eticket')->get();
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $months = DB::table('months')->get();
+        $years = [
+            '2020',
+            '2021',
+            '2022',
+            '2023',
+            '2024',
+            '2025',
+            '2026',
+            '2027',
+            '2028'
+        ];
+
+
+        if ($bulan && $tahun) {
+            $eticket_data = DB::table('v_eticket')
+                ->whereRaw('MONTH(created_at) = ?', [$bulan])
+                ->whereRaw('YEAR(created_at) = ?', [$tahun])->get();
+        }
+
+        if ($bulan === 'alldata' && $tahun === 'alldata') {
+            $eticket_data = DB::table('v_eticket')->get();
+        }
+
+
+        return view('layouts.admin_views.eticketing.it_monitoring.eticket_it', compact('eticket_data', 'grouped_sub_menu', 'sidebar_menu', 'bulan', 'tahun', 'months', 'years'));
+    }
+
+    public function download_excel(Request $request)
+    {
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+
+        $fileName = 'Data_Eticket_' . '-' . $bulan . '-' . $tahun . '.xlsx';
+
+        return Excel::download(new EticketExport($bulan, $tahun), $fileName);
+    }
+
+    public function download_pdf(Request $request)
+    {
+        $year = date('Y');
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $months = DB::table('months')->get();
+        $years = [
+            '2020',
+            '2021',
+            '2022',
+            '2023',
+            '2024',
+            '2025',
+            '2026',
+            '2027',
+            '2028'
+        ];
+
+        $eticket_data = DB::table('v_eticket')->get();
+
+        if ($bulan && $tahun) {
+            $eticket_data = DB::table('v_eticket')
+                ->whereRaw('MONTH(created_at) = ?', [$bulan])
+                ->whereRaw('YEAR(created_at) = ?', [$tahun])->get();
+        }
+
+        if ($bulan === 'alldata' && $tahun === 'alldata') {
+            $eticket_data = DB::table('v_eticket')->get();
+        }
+
+
+        $fileName = 'Data_Eticket_' . $bulan . '_' . $year . '.pdf';
+        $pdf = Pdf::loadView('layouts.pdf.eticket_pdf', [
+            'eticket_data' => $eticket_data
+        ]);
+        $pdf->setPaper('a4', 'landscape');
+
+        return $pdf->download($fileName);
     }
 }

@@ -61,6 +61,10 @@
                                         &nbsp; Download Excel
                                     </button>
                                 </form>
+
+                                <a class="btn btn-info" href="{{ route('salary_export_pdf') }}">
+                                    <i class="fa fa-file"></i> &nbsp; PDF
+                                </a>
                             @else
                                 <button class="btn btn-dark">
                                     <i class="fas fa-file-excel"></i>

@@ -10,25 +10,31 @@ use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\BeforeSheet;
 use Maatwebsite\Excel\Events\AfterSheet;
+use Illuminate\Support\Facades\Schema;
 
 
 class EmployeeResignExport implements FromCollection, WithHeadings, WithTitle, WithEvents
 {
 
-    public function __construct($offices)
+    public function __construct($selected_data, $offices, $bulan, $tahun)
     {
-        // $this->department = $departments;
+
+        $this->selected_data = $selected_data;
         $this->office = $offices;
+        $this->bulan = $bulan;
+        $this->tahun = $tahun;
     }
 
 
     public function collection()
     {
 
-        if ($this->office == 'alldata') {
+        $column_except = Schema::getColumnListing('v_employee_resign');
+        $column_except =  array_filter($column_except, fn($col) => $col !== 'id');
+
+        if ($this->office == 'alldata' && $this->bulan == 'alldata' && $this->tahun == 'alldata') {
             return DB::table('v_employee_resign')
                 ->select(
-                    'id',
                     'resign_code',
                     'nik',
                     'name',
@@ -46,10 +52,9 @@ class EmployeeResignExport implements FromCollection, WithHeadings, WithTitle, W
                     'updated_at'
                 )
                 ->get();
-        } elseif ($this->office) {
+        } elseif ($this->office && $this->bulan && $this->tahun) {
             return DB::table('v_employee_resign')
                 ->select(
-                    'id',
                     'resign_code',
                     'nik',
                     'name',
@@ -67,6 +72,28 @@ class EmployeeResignExport implements FromCollection, WithHeadings, WithTitle, W
                     'updated_at'
                 )
                 ->where('location_name', [$this->office])
+                ->whereRaw('MONTH(resign_date) = ?', [$this->bulan])
+                ->whereRaw('YEAR(resign_date) = ?', [$this->tahun])
+                ->get();
+        } else {
+            return DB::table('v_employee_resign')
+                ->select(
+                    'resign_code',
+                    'nik',
+                    'name',
+                    'location_name',
+                    'department_name',
+                    'position_name',
+                    'resign_date',
+                    'resign_reasons',
+                    'return_company_property',
+                    'last_day_of_work',
+                    'approval_by_branch_head',
+                    'approval_by_hr_head',
+                    'feedback',
+                    'created_at',
+                    'updated_at'
+                )
                 ->get();
         }
     }
@@ -74,7 +101,6 @@ class EmployeeResignExport implements FromCollection, WithHeadings, WithTitle, W
     public function headings(): array
     {
         return [
-            'id',
             'Kode Resign',
             'NIK',
             'Name',
@@ -87,7 +113,7 @@ class EmployeeResignExport implements FromCollection, WithHeadings, WithTitle, W
             'Hari terakhir kerja',
             'Approval oleh Kepala Cabang',
             'Approval oleh HR',
-            'Feeback',
+            'Feedback',
             'Dibuat pada',
             'Diubah Pada'
         ];
@@ -113,13 +139,8 @@ class EmployeeResignExport implements FromCollection, WithHeadings, WithTitle, W
             },
             // You can also customize formatting for other parts of the sheet (e.g., bold headers)
             AfterSheet::class => function (AfterSheet $event) {
-                $sheet = $event->sheet->getDelegate(); // PhpSpreadsheet worksheet
-
-                // Set bold styling
-                $sheet->getStyle('A2:AF2')->getFont()->setBold(true);
-
-
-
+                $event->sheet->getStyle('A3:O3')->getFont()->setBold(true); // Bold headers
+                $sheet = $event->sheet->getDelegate();
                 // Auto-size all used columns
                 foreach (range('A', 'Z') as $col) {
                     $sheet->getColumnDimension($col)->setAutoSize(true);

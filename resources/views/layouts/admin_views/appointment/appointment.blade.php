@@ -51,15 +51,26 @@
 
                         <br>
                         @if ($appointment_data->isNotEmpty(0))
-                            <form action="{{ route('appointment_export') }}" method="POST">
-                                @csrf
-                                <input type="text" name="bulan" value="{{ $bulan }}" hidden>
-                                <input type="text" name="tahun" value="{{ $tahun }}" hidden>
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-file-excel"></i>
-                                    &nbsp; Download
-                                </button>
-                            </form>
+                            <div style="display: flex; gap:10px;" class="center-download">
+                                <form action="{{ route('appointment_export') }}" method="POST">
+                                    @csrf
+                                    <input type="text" name="bulan" value="{{ $bulan }}" hidden>
+                                    <input type="text" name="tahun" value="{{ $tahun }}" hidden>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-file-excel"></i>
+                                        &nbsp; Download
+                                    </button>
+                                </form>
+
+                                <form action="{{ route('export_appointment_pdf') }}" method="POST">
+                                    @csrf
+                                    <input type="text" name="bulan" value="{{ $bulan }}" hidden>
+                                    <input type="text" name="tahun" value="{{ $tahun }}" hidden>
+                                    <button type="submit" class="btn btn-info">
+                                        <i class="fa fa-file"></i> &nbsp; PDF
+                                    </button>
+                                </form>
+                            </div>
                         @else
                             <button class="btn btn-dark">
                                 <i class="fas fa-file-excel"></i>
@@ -74,7 +85,7 @@
                                 <div style="display: flex;gap:10px;" class="grouped-container">
                                     <div style="display: block" class="select-group">
                                         <label for="">Bulan</label>
-                                        <select class="form-control" name="bulan" id="branch">
+                                        <select class="form-control" name="bulan">
                                             <option value="">--- Pilih bulan ---</option>
                                             <option value="alldata">Semua Data</option>
                                             @foreach ($months as $month)
@@ -109,6 +120,7 @@
                                 &nbsp;
 
                             </form>
+
                             <div style="font-size:14px;" class="result-selected">
                                 @if ($appointment_data->isNotEmpty())
                                     <strong>

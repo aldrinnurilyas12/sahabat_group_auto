@@ -62,6 +62,15 @@
                                             &nbsp; Download Excel
                                         </button>
                                     </form>
+
+                                    <form action="{{ route('export_employee_pdf') }}" method="POST">
+                                        @csrf
+                                        <input type="text" name="office" value="{{ $offices }}" hidden>
+                                        <input type="text" name="department" value="{{ $departments }}" hidden>
+                                        <button type="submit" class="btn btn-info">
+                                            <i class="fa fa-file"></i> &nbsp; PDF
+                                        </button>
+                                    </form>
                                 @else
                                     <button class="btn btn-dark">
                                         <i class="fas fa-file-excel"></i>
@@ -143,8 +152,9 @@
 
                         <ul class="nav nav-tabs mb-3" id="ex1" role="tablist">
                             <li style="padding: 15px;background:whitesmoke;" class="nav-item" role="presentation">
-                                <a data-mdb-tab-init class="nav-link-employee active" id="ex1-tab-1" href="#ex1-tabs-1"
-                                    role="tab" aria-controls="ex1-tabs-1" aria-selected="true">Data Karyawan</a>
+                                <a data-mdb-tab-init class="nav-link-employee active" id="ex1-tab-1"
+                                    href="#ex1-tabs-1" role="tab" aria-controls="ex1-tabs-1"
+                                    aria-selected="true">Data Karyawan</a>
                             </li>
                             <li style="padding: 15px;" class="nav-item" role="presentation">
                                 <a data-mdb-tab-init class="nav-link-employee" id="ex1-tab-2" href="#ex1-tabs-2"

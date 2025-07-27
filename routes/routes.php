@@ -154,6 +154,7 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::get('department_create', [DepartmentController::class, 'department_create_layout'])->name('department_create');
     Route::get('department_update/{id}', [DepartmentController::class, 'edit_layout'])->name('department_update');
     Route::get('department_export', [DepartmentController::class, 'department_export'])->name('department_export');
+    Route::get('department_export_pdf', [DepartmentController::class, 'download_department_pdf'])->name('department_export_pdf');
 
     // MENU ROUTES
     Route::apiResource('master_main_menus', App\Http\Controllers\Api\MasterMainMenuController::class);
@@ -182,6 +183,7 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::delete('delete_foto/{employee_id}', [EmployeeController::class, 'delete_foto'])->name('delete_foto');
     Route::get('resign_employee', [EmployeeResign::class, 'employee_resign_layout'])->name('resign_employee');
     Route::put('generate_qr_code/{nik}', [EmployeeController::class, 'generate_qr_code'])->name('generate_qr_code');
+    Route::post('export_employee_pdf', [EmployeeController::class, 'download_employee_pdf'])->name('export_employee_pdf');
 
     // EMPLOYEE RESIGN
     Route::apiResource('employee_resign', App\Http\Controllers\Api\EmployeeResign::class);
@@ -190,6 +192,7 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::get('get_employee_resign/{id}', [EmployeeResign::class, 'get_resign'])->name('get_employee_resign');
     Route::get('filter_employee_resign', [EmployeeResign::class, 'filter_employee_resign'])->name('filter_employee_resign');
     Route::post('/export_employee_resign', [EmployeeResign::class, 'employee_export_resign'])->name('export_employee_resign');
+    Route::post('export_employee_resign_pdf', [EmployeeResign::class, 'download_employee_resign_pdf'])->name('export_employee_resign_pdf');
 
     // EMPLOYEE LEAVES
     Route::apiResource('employee_leaves', App\Http\Controllers\Api\EmployeeLeaves::class);
@@ -198,6 +201,7 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::get('get_absences_letter/{absences_code}', [EmployeeLeaves::class, 'download_absences_letter'])->name('get_absences_letter');
     Route::get('filter_employee_leaves', [EmployeeLeaves::class, 'filter_employee_leaves'])->name('filter_employee_leaves');
     Route::post('/export_employee_leaves', [EmployeeLeaves::class, 'employee_export_leaves'])->name('export_employee_leaves');
+    Route::post('employee_leaves_export_pdf', [EmployeeLeaves::class, 'download_employee_leaves'])->name('employee_leaves_export_pdf');
 
     // ROUTE FOR API employee
     // Route::get('get_employee', [EmployeeController::class, 'getEmployee'])->name('get_employee');
@@ -210,6 +214,8 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::get('add_emp_salary', [EmployeeSalary::class, 'create_emp_salary_layout'])->name('add_emp_salary');
     Route::get('filter_employee_salary', [EmployeeSalary::class, 'filter_salary'])->name('filter_employee_salary');
     Route::post('/export_employee_salary', [EmployeeSalary::class, 'employee_salary_export'])->name('export_employee_salary');
+    Route::get('salary_export_pdf', [EmployeeSalary::class, 'download_employee_salary'])->name('salary_export_pdf');
+
 
     // EMPLOYEE ATTEDANCE ROUTES
     Route::apiResource('master_employee_attedance', App\Http\Controllers\Api\EmployeeAttedance::class);
@@ -240,7 +246,7 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::delete('delete_onlychoose_images/', [MasterVehicleData::class, 'delete_choose_images'])->name('delete_onlychoose_images');
     Route::get('get_vehicle_location', [MasterVehicleData::class, 'getvehiclelocation'])->name('get_vehicle_location');
     Route::get('payment_method/{id}', [MasterVehicleData::class, 'payment_method_layouts'])->name('payment_method');
-
+    Route::post('vehicle_export_pdf', [MasterVehicleData::class, 'download_vehicle_pdf'])->name('vehicle_export_pdf');
 
     // vehicle export excel
     Route::post('/vehicle_export', [MasterVehicleData::class, 'vehicle_export_data'])->name('vehicle_export');
@@ -265,6 +271,7 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::put('edit_branch/{id}', [BranchController::class, 'update'])->name('edit_branch.update');
     Route::delete('delete_branch/', [BranchController::class, 'destroy'])->name('delete_branch');
     Route::get('branch_export', [BranchController::class, 'branch_export'])->name('branch_export');
+    Route::get('branch_export_pdf', [BranchController::class, 'download_branch_pdf'])->name('branch_export_pdf');
 
     // Route Vehicle Advertisement
     Route::apiResource('master_vehicle_advertisement', App\Http\Controllers\Api\MasterVehicleAdvertisement::class);
@@ -285,18 +292,23 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::put('change_appointment_status/{id}', [MasterAppointment::class, 'change_appointment'])->name('change_appointment_status');
     Route::get('filter_appontment', [MasterAppointment::class, 'filter_appointment'])->name('filter_appointment');
     Route::post('appointment_export', [MasterAppointment::class, 'appointment_export'])->name('appointment_export');
+    Route::post('export_appointment_pdf', [MasterAppointment::class, 'download_appointment_pdf'])->name('export_appointment_pdf');
 
     // customer_vehicle_request
     Route::get('customer_vehicle_request', [MasterAppointment::class, 'customer_vehicle_request']);
     Route::get('customer_vehicle_mail/{id}', [MasterAppointment::class, 'sendMailVehicleRequest'])->name('customer_vehicle_mail');
     Route::put('response_customers_request/{id}', [MasterAppointment::class, 'response_customers_request'])->name('response_customers_request');
     Route::get('filter_request', [MasterAppointment::class, 'filter_request'])->name('filter_request');
-    Route::post('vehicle_req_export', [MasterAppointment::class, 'vehicle_req_export'])->name('vehicle_req_export');
+    Route::post('vehicle_request_export', [MasterAppointment::class, 'vehicle_req_export'])->name('vehicle_request_export');
+    Route::post('customer_request_export_pdf', [MasterAppointment::class, 'download_request_export_pdf'])->name('customer_request_export_pdf');
 
     // customer sale request
     Route::apiResource('master_vehicle_sale', App\Http\Controllers\Api\CustomerRequestVehicleSale::class);
     Route::get('customer_vehicle_sale_mail/{id}', [CustomerRequestVehicleSale::class, 'sendMailVehicleSaleRequest'])->name('customer_vehicle_sale_mail');
     Route::put('response_customers_request_sale/{id}', [CustomerRequestVehicleSale::class, 'response_customers_request_sale'])->name('response_customers_request_sale');
+    Route::get('filter_sales_request', [CustomerRequestVehicleSale::class, 'filter_request'])->name('filter_sales_request');
+    Route::post('vehicle_sale_request_export_excel', [CustomerRequestVehicleSale::class, 'vehicle_sale_export'])->name('vehicle_sale_request_export_excel');
+    Route::post('vehicle_sale_request_export_pdf', [CustomerRequestVehicleSale::class, 'download_request_export_pdf'])->name('vehicle_sale_request_export_pdf');
 
 
     // Email Marketing
@@ -319,6 +331,7 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::get('agenda_create', [AgendaController::class, 'agenda_layouts'])->name('agenda_create');
     Route::get('agenda_edit/{id}', [AgendaController::class, 'agenda_edit_layouts'])->name('agenda_edit');
     Route::put('agenda_update/{id}', [AgendaController::class, 'update'])->name('agenda_update');
+    Route::get('agenda_export_pdf', [AgendaController::class, 'download_agenda_pdf'])->name('agenda_export_pdf');
 
     // SPK Unit Controller
     Route::apiResource('transaksi_spk_unit', App\Http\Controllers\Api\SpkUnitController::class);
@@ -327,6 +340,9 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::get('/get_unit/{vehicleId}', [SpkUnitController::class, 'getUnit']);
     Route::put('confirmed_status_spk/{id}', [SpkUnitController::class, 'confirmedSpkUnit'])->name('confirmed_status_spk');
     Route::get('get_pdf/{id}', [SpkUnitController::class, 'download_spk'])->name('get_pdf');
+    Route::get('filter_spk', [SpkUnitController::class, 'filter_spk_request'])->name('filter_spk');
+    Route::post('spk_export_excel', [SpkUnitController::class, 'download_spk_excel'])->name('spk_export_excel');
+    Route::post('spk_export_pdf', [SpkUnitController::class, 'download_spk_pdf'])->name('spk_export_pdf');
 
     // Maintenence Unit
     Route::apiResource('master_maintenance_unit', App\Http\Controllers\Api\MaintenanceUnitController::class);
@@ -336,6 +352,8 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::get('filter_maintenance', [MaintenanceUnitController::class, 'filter_maintenance'])->name('filter_maintenance');
     Route::post('maintenance_export', [MaintenanceUnitController::class, 'download_excel'])->name('maintenance_export');
     Route::get('cashbon_detail/{vehicle_id}', [MaintenanceUnitController::class, 'cashbon_detail_layout'])->name('cashbon_detail');
+    Route::get('vehicle_maintenance_export_pdf', [MaintenanceUnitController::class, 'download_vehicle_maintenance_pdf'])->name('vehicle_maintenance_export_pdf');
+
 
     // ROUTES MASTER PAYROLL
     Route::apiResource('master_payroll', App\Http\Controllers\Api\PayrollController::class);
@@ -365,6 +383,9 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::get('master_it_eticketing', [EticketingController::class, 'it_eticketing_layouts'])->name('master_it_eticketing');
     Route::put('confirmed_eticket/{eticket_code}', [EticketingController::class, 'confirmed_eticket_it'])->name('confirmed_eticket');
     Route::put('confirmed_eticket_done/{eticket_code}', [EticketingController::class, 'confirmed_eticket_it_done'])->name('confirmed_eticket_done');
+    Route::get('filter_eticket', [EticketingController::class, 'filter_eticket'])->name('filter_eticket');
+    Route::post('download_eticket_excel', [EticketingController::class, 'download_excel'])->name('download_eticket_excel');
+    Route::post('download_eticket_pdf', [EticketingController::class, 'download_pdf'])->name('download_eticket_pdf');
 
     Route::get('/inactive-info', function () {
         return 'Akun Anda tidak aktif. Hubungi HRD atau admin.';
@@ -378,10 +399,11 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
 
     // SHOWTESTIMONIAL
     Route::get('show_testimonial', [Analytics::class, 'show_testimonial_data'])->name('show_testimonial');
-
+    Route::get('filter_testimonial', [Analytics::class, 'filter_testimonial'])->name('filter_testimonial');
+    Route::post('testimonial_export_pdf', [Analytics::class, 'download_testimonial_pdf'])->name('testimonial_export_pdf');
+    Route::post('testimonial_export_excel', [Analytics::class, 'download_excel_testimonial'])->name('testimonial_export_excel');
 
 
     // IT ONLY ACCESS
-
     Route::apiResource('settings_role_permission', App\Http\Controllers\Api\SettingsApp::class);
 });

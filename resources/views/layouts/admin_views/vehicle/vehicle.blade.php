@@ -51,17 +51,30 @@
                                     </a>
 
                                     @if ($vehicle->isNotEmpty())
-                                        <form action="{{ route('vehicle_export') }}" method="POST">
-                                            @csrf
-                                            <input type="text" name="location_unit" value="{{ $selectedLocation }}"
-                                                hidden>
-                                            <input type="text" name="status_vehicle" value="{{ $selectedStatus }}"
-                                                hidden>
-                                            <button type="submit" class="btn btn-success">
-                                                <i class="fas fa-file-excel"></i>
-                                                &nbsp; Download
-                                            </button>
-                                        </form>
+                                        <div style="display: flex; gap:10px;" class="download-component">
+                                            <form action="{{ route('vehicle_export') }}" method="POST">
+                                                @csrf
+                                                <input type="text" name="location_unit"
+                                                    value="{{ $selectedLocation }}" hidden>
+                                                <input type="text" name="status_vehicle"
+                                                    value="{{ $selectedStatus }}" hidden>
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="fas fa-file-excel"></i>
+                                                    &nbsp; Download
+                                                </button>
+                                            </form>
+
+                                            <form action="{{ route('vehicle_export_pdf') }}" method="POST">
+                                                @csrf
+                                                <input type="text" name="location_unit"
+                                                    value="{{ $selectedLocation }}" hidden>
+                                                <input type="text" name="status_vehicle"
+                                                    value="{{ $selectedStatus }}" hidden>
+                                                <button type="submit" class="btn btn-info">
+                                                    <i class="fa fa-file"></i> &nbsp; PDF
+                                                </button>
+                                            </form>
+                                        </div>
                                     @else
                                         <button class="btn btn-dark">
                                             <i class="fas fa-file-excel"></i>
@@ -85,9 +98,8 @@
                                                     <option value="">--- Pilih Lokasi Unit ---</option>
                                                     <option value="alldata">Semua Lokasi</option>
                                                     @foreach ($branch as $item)
-                                                        <option
-                                                            value="{{ $item->location_code . ' - ' . $item->location_name }}">
-                                                            {{ $item->location_code . ' - ' . $item->location_name }}
+                                                        <option value="{{ $item->location_name }}">
+                                                            {{ $item->location_name }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -95,7 +107,7 @@
 
                                             <div style="display: block" class="select-group">
                                                 <label for="">Status unit</label>
-                                                <select class="form-control" name="status" id="status">
+                                                <select class="form-control" name="status_vehicle" id="status">
                                                     <option value="">--- Pilih Status Unit ---</option>
                                                     <option value="alldata">Semua Data</option>
                                                     @foreach ($status_category as $item)
@@ -249,8 +261,20 @@
                                                         <td>{{ $cars->fuel_type }}</td>
                                                         <td>{{ $cars->cylinder_capacity . 'cc' }}</td>
                                                         <td>{{ $cars->transmission }}</td>
-                                                        <td>{{ $cars->backup_vehicle_key }}</td>
-                                                        <td>{{ $cars->services_book }}</td>
+                                                        <td>
+                                                            @if ($cars->backup_vehicle_key)
+                                                                {{ $cars->backup_vehicle_key }}
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if ($cars->services_book)
+                                                                {{ $cars->services_book }}
+                                                            @else
+                                                                -
+                                                            @endif
+                                                        </td>
                                                         <td>{{ $cars->vehicle_identity_number }}</td>
                                                         <td>{{ $cars->engine_number }}</td>
                                                         <td>{{ $cars->coding_number }}</td>

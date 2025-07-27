@@ -53,10 +53,10 @@
                                 <i class="fas fa-plus-circle"></i>&nbsp;Buat Agenda
                             </a>
 
-                            {{-- <a class="btn btn-success" href="{{ route('branch_export') }}">
-                                <i class="fas fa-file-excel"></i>
-                                &nbsp; Download
-                            </a> --}}
+
+                            <a class="btn btn-info" href="{{ route('agenda_export_pdf') }}">
+                                <i class="fa fa-file"></i> &nbsp; PDF
+                            </a>
                         </div>
                     </div>
                     <div class="card-body">
@@ -72,6 +72,7 @@
                                         <th>Pemimpin Meeting</th>
                                         <th>Agenda</th>
                                         <th>Tanggal Agenda</th>
+                                        <th>Status</th>
                                         <th>Jam Mulai</th>
                                         <th>Jam Akhir</th>
                                         <th>Created At</th>
@@ -116,6 +117,13 @@
                                             @endif
                                             <td>{{ $agendas->agenda_name }}</td>
                                             <td>{{ \Carbon\Carbon::parse($agendas->agenda_date)->format('d F Y') }}
+                                            </td>
+                                            <td>
+                                                @if ($agendas->status)
+                                                    {{ $status }}
+                                                @else
+                                                    <span>-</span>
+                                                @endif
                                             </td>
                                             <td>{{ $agendas->start_time }}</td>
                                             <td>{{ $agendas->end_time }}</td>

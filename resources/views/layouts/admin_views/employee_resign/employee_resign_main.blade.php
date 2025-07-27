@@ -50,16 +50,31 @@
                                     <form action="{{ route('export_employee_resign') }}" method="POST">
                                         @csrf
                                         <input type="text" name="office" value="{{ $offices }}" hidden>
-                                        {{-- <input type="text" value="{{ $departments }}" name="department" hidden> --}}
+                                        <input type="text" name="bulan" value="{{ $bulan }}" hidden>
+                                        <input type="text" name="tahun" value="{{ $tahun }}" hidden>
                                         <button type="submit" class="btn btn-success">
                                             <i class="fas fa-file-excel"></i>
                                             &nbsp; Download Excel
+                                        </button>
+                                    </form>
+
+                                    <form action="{{ route('export_employee_resign_pdf') }}" method="POST">
+                                        @csrf
+                                        <input type="text" name="office" value="{{ $offices }}" hidden>
+                                        <input type="text" name="bulan" value="{{ $bulan }}" hidden>
+                                        <input type="text" name="tahun" value="{{ $tahun }}" hidden>
+                                        <button type="submit" class="btn btn-info">
+                                            <i class="fa fa-file"></i> &nbsp; PDF
                                         </button>
                                     </form>
                                 @else
                                     <button class="btn btn-dark">
                                         <i class="fas fa-file-excel"></i>
                                         &nbsp; Download Excel
+                                    </button>
+
+                                    <button class="btn btn-dark">
+                                        <i class="fa fa-file"></i> &nbsp; PDF
                                     </button>
                                 @endif
 
@@ -81,30 +96,39 @@
                                                 @endforeach
 
                                             </select>
-                                            @if ($errors->has('month'))
-                                                <span class="text-danger">{{ $errors->first('month') }}</span>
-                                            @endif
+                                            <x-input-error :messages="$errors->get('office')" class="mt-2" style="color: red;" />
                                         </div>
 
-                                        {{-- <div style="display: block" class="select-group">
-                                            <label for="">Department</label>
-                                            <select class="form-control" name="department" id="status">
-                                                <option value="">--- Pilih Department ---</option>
-                                                <option value="alldata">Semua Department</option>
-                                                @foreach ($department as $dept)
-                                                    <option value="{{ $dept->department_name }}">
-                                                        {{ $dept->department_name }}</option>
+                                        <div style="display: block" class="select-group">
+                                            <label for="">Bulan</label>
+                                            <select class="form-control" name="bulan" id="branch">
+                                                <option value="">--- Pilih bulan ---</option>
+                                                <option value="alldata">Semua Data</option>
+                                                @foreach ($months as $month)
+                                                    <option value="{{ $month->id }}">{{ $month->month_list }}
+                                                    </option>
                                                 @endforeach
 
                                             </select>
-                                            @if ($errors->has('year'))
-                                                <span class="text-danger">{{ $errors->first('year') }}</span>
-                                            @endif
-                                        </div> --}}
+                                            <x-input-error :messages="$errors->get('bulan')" class="mt-2" style="color: red;" />
+                                        </div>
+
+                                        <div style="display: block" class="select-group">
+                                            <label for="">Tahun</label>
+                                            <select class="form-control" name="tahun" id="status">
+                                                <option value="">--- Pilih tahun ---</option>
+                                                <option value="alldata">Semua Data</option>
+                                                @foreach ($years as $year)
+                                                    <option value="{{ $year }}">{{ $year }}</option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('tahun')" class="mt-2" style="color: red;" />
+                                        </div>
+
 
                                         <button style="height: 40px; align-self:end;" type="submit"
                                             class="btn btn-primary">Pilih</button>
-                                        <a href="{{ route('master_employee.index') }}"
+                                        <a href="{{ route('employee_resign.index') }}"
                                             style="height: 40px; align-self:end;" class="btn btn-secondary">Reset</a>
                                     </div>
                                     &nbsp;
@@ -119,6 +143,11 @@
                                         <!-- Memastikan bahwa $month adalah objek dan mengakses propertinya, misalnya 'name' -->
                                         <div class="alert alert-warning">
                                             Kantor :{{ $offices }} <br>
+                                            <span style="display: flex; gap:10px;" class="center-date">
+                                                <p> Bulan : {{ $bulan }}</p>
+                                                <p> Tahun : {{ $tahun }}</p>
+                                            </span>
+
                                             <!-- Menampilkan tahun yang dipilih dari array $year -->
                                         </div>
                                     @elseif($employee_resign->isEmpty())
@@ -139,8 +168,8 @@
 
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table style="font-size: 14px; color:black;" class="table table-bordered" id="dataTable"
-                                    width="100%" cellspacing="0">
+                                <table style="font-size: 14px; color:black;" class="table table-bordered"
+                                    id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
                                             <th>No</th>
@@ -203,8 +232,8 @@
 
                                                 <td>
                                                     @if ($emp->resign_attachment)
-                                                        <a style="color: black;" class="btn btn-warning" href="#"
-                                                            data-toggle="modal"
+                                                        <a style="color: black;" class="btn btn-warning"
+                                                            href="#" data-toggle="modal"
                                                             data-target="#showAttachment{{ $emp->id }}"><i
                                                                 class="fa fa-eye" aria-hidden="true"></i>
                                                             lihat</a>

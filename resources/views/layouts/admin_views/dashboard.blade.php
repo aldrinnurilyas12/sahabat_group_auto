@@ -229,7 +229,9 @@
                                                     <th>Agenda</th>
                                                     <th>Department</th>
                                                     <th>Kantor</th>
+                                                    <th>Pemimpin Meeting</th>
                                                     <th>Tanggal</th>
+                                                    <th>Status Agenda</th>
                                                     <th>Jam Mulai</th>
                                                     <th>Jam Akhir</th>
                                                 </tr>
@@ -253,7 +255,17 @@
                                                         @else
                                                             <td>{{ $agendas->branch }}</td>
                                                         @endif
+                                                        <td>{{ $agendas->name }} <br><span
+                                                                style="color: gray;font-size:13px;font-style:italic;">({{ $agendas->position_name }})</span>
+                                                        </td>
                                                         <td>{{ \Carbon\Carbon::parse($agendas->agenda_date)->format('d F Y') }}
+                                                        </td>
+                                                        <td>
+                                                            @if ($agendas->status)
+                                                                {{ $status }}
+                                                            @else
+                                                                <span>-</span>
+                                                            @endif
                                                         </td>
                                                         <td>{{ $agendas->start_time }}</td>
                                                         <td>{{ $agendas->end_time }}</td>

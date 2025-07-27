@@ -63,6 +63,10 @@
                                     &nbsp; Download Excel
                                 </button>
                             </form>
+
+                            <a class="btn btn-info" href="{{ route('vehicle_maintenance_export_pdf') }}">
+                                <i class="fa fa-file"></i> &nbsp; PDF
+                            </a>
                         </div>
                         <br>
 

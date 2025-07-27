@@ -63,13 +63,130 @@
                             @else
                             @endif
 
-                            <a class="btn btn-success" href="{{ route('branch_export') }}">
+                            {{-- <a class="btn btn-success" href="{{ route('branch_export') }}">
                                 <i class="fas fa-file-excel"></i>
-                                &nbsp; Download
-                            </a>
-                        </div>
-                    </div>
+                                &nbsp; Download Excel
+                            </a> --}}
 
+                            <div style="display: flex; gap:10px;" class="center-download">
+                                <form action="{{ route('spk_export_excel') }}" method="POST">
+                                    @csrf
+                                    <input type="text" name="branch" value="{{ $branch_request }}" hidden>
+                                    <input type="text" value="{{ $bulan }}" name="bulan" hidden>
+                                    <input type="text" value="{{ $tahun }}" name="tahun" hidden>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-file-excel"></i>
+                                        &nbsp; Download Excel
+                                    </button>
+                                </form>
+
+                                <form action="{{ route('spk_export_pdf') }}" method="POST">
+                                    @csrf
+                                    <input type="text" name="branch" value="{{ $branch_request }}" hidden>
+                                    <input type="text" value="{{ $bulan }}" name="bulan" hidden>
+                                    <input type="text" value="{{ $tahun }}" name="tahun" hidden>
+                                    <button type="submit" class="btn btn-info">
+                                        <i class="fas fa-file"></i>
+                                        &nbsp; PDF
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+
+                        <hr>
+
+                        <div style="display: flex; flex-wrap:wrap; gap:10px; font-family:inter,sans-serif;justify-content:space-between;align-items:center;"
+                            class="btn-content">
+
+                            <div style="color: black;" class="form-group">
+                                <form action="{{ route('filter_spk') }}" method="GET">
+
+                                    <div style="display: flex;gap:10px;" class="grouped-container">
+                                        <div style="display: block" class="select-group">
+                                            <label for="">Kantor</label>
+                                            <select class="form-control" name="branch" id="branch">
+                                                <option value="">--- Pilih cabang ---</option>
+                                                <option value="alldata">Semua Data</option>
+                                                @foreach ($branch as $cab)
+                                                    <option value="{{ $cab->location_name }}">
+                                                        {{ $cab->location_name }}
+                                                    </option>
+                                                @endforeach
+
+                                            </select>
+                                            @if ($errors->has('month'))
+                                                <span class="text-danger">{{ $errors->first('month') }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div style="display: block" class="select-group">
+                                            <label for="">Bulan</label>
+                                            <select class="form-control" name="bulan">
+                                                <option value="">--- Pilih bulan ---</option>
+                                                <option value="alldata">Semua Data</option>
+                                                @foreach ($months as $month)
+                                                    <option value="{{ $month->id }}">{{ $month->month_list }}
+                                                    </option>
+                                                @endforeach
+
+                                            </select>
+                                            @if ($errors->has('month'))
+                                                <span class="text-danger">{{ $errors->first('month') }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div style="display: block" class="select-group">
+                                            <label for="">Tahun</label>
+                                            <select class="form-control" name="tahun">
+                                                <option value="">--- Pilih tahun ---</option>
+                                                <option value="alldata">Semua Data</option>
+                                                @foreach ($years as $year)
+                                                    <option value="{{ $year }}">{{ $year }}</option>
+                                                @endforeach
+                                            </select>
+                                            @if ($errors->has('year'))
+                                                <span class="text-danger">{{ $errors->first('year') }}</span>
+                                            @endif
+                                        </div>
+
+                                        <button style="height: 40px; align-self:end;" type="submit"
+                                            class="btn btn-primary">Pilih</button>
+                                        <a href="{{ route('transaksi_spk_unit.index') }}"
+                                            style="height: 40px; align-self:end;" class="btn btn-secondary">Reset</a>
+                                    </div>
+                                    &nbsp;
+
+                                </form>
+                                <div style="font-size:14px;" class="result-selected">
+                                    @if ($all_spk_data->isNotEmpty())
+                                        <strong>
+                                            Data terpilih:
+                                        </strong>
+                                        <br>
+                                        <!-- Memastikan bahwa $month adalah objek dan mengakses propertinya, misalnya 'name' -->
+                                        <div class="alert alert-warning">
+                                            Cabang : {{ $branch_request }}
+                                            <br>
+                                            Bulan : {{ $bulan }} <br>
+
+                                            <!-- Menampilkan tahun yang dipilih dari array $year -->
+                                            Tahun : {{ $tahun }}
+                                        </div>
+                                    @elseif($all_spk_data->isEmpty())
+                                        <div class="alert alert-warning">
+                                            Tidak ada data.
+                                        </div>
+                                    @endif
+
+                                    {{-- {{ dd([$month, $year])}} --}}
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
 
 
                     <ul class="nav nav-tabs mb-3" id="ex1" role="tablist">
@@ -79,8 +196,8 @@
                                 Semua SPK</a>
                         </li>
                         <li style="padding: 15px;" class="nav-item" role="presentation">
-                            <a data-mdb-tab-init class="nav-link-spk" id="ex1-tab-2" href="#ex1-tabs-2" role="tab"
-                                aria-controls="ex1-tabs-2" aria-selected="false">Data
+                            <a data-mdb-tab-init class="nav-link-spk" id="ex1-tab-2" href="#ex1-tabs-2"
+                                role="tab" aria-controls="ex1-tabs-2" aria-selected="false">Data
                                 SPK Sudah Approval</a>
                         </li>
                     </ul>
@@ -113,6 +230,7 @@
                                                 @endif
                                                 <th>PDF</th>
                                                 <th>SPK Status</th>
+                                                <th>Tanggal SPK</th>
                                                 <th>Unit</th>
                                                 <th>Lokasi Unit</th>
                                                 <th>Metode Bayar</th>
@@ -190,6 +308,7 @@
                                                                 Sudah Konfirmasi</span>
                                                         @endif
                                                     </td>
+                                                    <td>{{ $spk->spk_confirmation_date }}</td>
                                                     <td>{{ $spk->unit }}</td>
                                                     <td>{{ $spk->location_unit }}</td>
                                                     <td>{{ $spk->payment_method }}</td>
@@ -244,6 +363,7 @@
                                             <tr>
                                                 <th>No</th>
                                                 <th>PDF</th>
+                                                <th>Tanggal SPK</th>
                                                 <th>Unit</th>
                                                 <th>Lokasi Unit</th>
                                                 <th>Metode Bayar</th>
@@ -281,6 +401,7 @@
                                                                 <p class="text-secondary">SPK belum dikonfirmasi</p>
                                                             @endif
                                                     </td>
+                                                    <td>{{ $spk->spk_confirmation_date }}</td>
                                                     <td>{{ $spk_all->unit }}</td>
                                                     <td>{{ $spk_all->location_unit }}</td>
                                                     <td>{{ $spk_all->payment_method }}</td>

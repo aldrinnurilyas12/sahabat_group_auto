@@ -31,7 +31,6 @@ class AppointmentExport implements FromCollection, WithHeadings, WithTitle, With
             return DB::table('v_appointment')
                 ->select(
                     'id',
-                    'advertisement_id',
                     'unit',
                     'location_unit',
                     'category_name',
@@ -49,7 +48,6 @@ class AppointmentExport implements FromCollection, WithHeadings, WithTitle, With
             return DB::table('v_appointment')
                 ->select(
                     'id',
-                    'advertisement_id',
                     'unit',
                     'location_unit',
                     'category_name',
@@ -67,7 +65,6 @@ class AppointmentExport implements FromCollection, WithHeadings, WithTitle, With
             return DB::table('v_appointment')
                 ->select(
                     'id',
-                    'advertisement_id',
                     'unit',
                     'location_unit',
                     'category_name',
@@ -85,7 +82,6 @@ class AppointmentExport implements FromCollection, WithHeadings, WithTitle, With
             return DB::table('v_appointment')
                 ->select(
                     'id',
-                    'advertisement_id',
                     'unit',
                     'location_unit',
                     'category_name',
@@ -103,7 +99,6 @@ class AppointmentExport implements FromCollection, WithHeadings, WithTitle, With
             return DB::table('v_appointment')
                 ->select(
                     'id',
-                    'advertisement_id',
                     'unit',
                     'location_unit',
                     'category_name',
@@ -121,7 +116,6 @@ class AppointmentExport implements FromCollection, WithHeadings, WithTitle, With
             return DB::table('v_appointment')
                 ->select(
                     'id',
-                    'advertisement_id',
                     'unit',
                     'location_unit',
                     'category_name',
@@ -140,7 +134,6 @@ class AppointmentExport implements FromCollection, WithHeadings, WithTitle, With
             return DB::table('v_appointment')
                 ->select(
                     'id',
-                    'advertisement_id',
                     'unit',
                     'location_unit',
                     'category_name',
@@ -161,7 +154,6 @@ class AppointmentExport implements FromCollection, WithHeadings, WithTitle, With
     {
         return  [
             'Appointment ID',
-            'ads ID',
             'Unit',
             'Lokasi Unit',
             'Status Unit',
@@ -196,9 +188,7 @@ class AppointmentExport implements FromCollection, WithHeadings, WithTitle, With
             },
             // You can also customize formatting for other parts of the sheet (e.g., bold headers)
             AfterSheet::class => function (AfterSheet $event) {
-                $event->sheet->getStyle('A4:AF2')->getFont()->setBold(true);
-
-                // CODE UNTUK AUTO-SIZE COLUMN
+                $event->sheet->getStyle('A4:L4')->getFont()->setBold(true); // Bold headers
                 $sheet = $event->sheet->getDelegate();
                 // Auto-size all used columns
                 foreach (range('A', 'Z') as $col) {

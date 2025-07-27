@@ -14,7 +14,8 @@
         <h5><strong>PT SAHABAT GROUP AUTO</strong></h5>
         <h6>Surat Cuti Karyawan</h6>
     </div>
-
+    <hr>
+    <p>Tanggal Cetak : {{ date('d-m-Y h:i') }}</p>
 
     <div class="spk-information">
         @foreach ($employee_leaves as $emp)

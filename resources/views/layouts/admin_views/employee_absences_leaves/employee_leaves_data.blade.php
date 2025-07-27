@@ -56,6 +56,14 @@
                                             &nbsp; Download Excel
                                         </button>
                                     </form>
+
+                                    <form action="{{ route('employee_leaves_export_pdf') }}" method="POST">
+                                        @csrf
+                                        <input type="text" name="location_name" value="{{ $offices }}" hidden>
+                                        <button type="submit" class="btn btn-info">
+                                            <i class="fa fa-file"></i> &nbsp; PDF
+                                        </button>
+                                    </form>
                                 @else
                                     <button class="btn btn-dark">
                                         <i class="fas fa-file-excel"></i>

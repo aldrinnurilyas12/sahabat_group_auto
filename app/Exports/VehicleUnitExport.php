@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\BeforeSheet;
 use Maatwebsite\Excel\Events\AfterSheet;
+use Illuminate\Support\Facades\Schema;
 
 
 class VehicleUnitExport implements FromCollection, WithHeadings, WithTitle, WithEvents
@@ -18,36 +19,36 @@ class VehicleUnitExport implements FromCollection, WithHeadings, WithTitle, With
      * @return \Illuminate\Support\Collection
      */
 
-    public function __construct($selected_data, $location_unit, $category_name)
+    public function __construct($selected_data, $location_unit, $status_vehicle)
     {
         $this->selected_data = $selected_data;
         $this->location_unit = $location_unit;
-        $this->category_name = $category_name; // Ganti $users dengan $employee_id
+        $this->status_vehicle = $status_vehicle; // Ganti $users dengan $employee_id
     }
 
 
     public function collection()
     {
-
-
-        if ($this->location_unit == 'alldata' && $this->category_name == 'alldata') {
-            return DB::table('v_vehicle')
+        $columns = Schema::getColumnListing('v_vehicle');
+        $columns = array_filter($columns, fn($col) => $col !== 'location_name');
+        if ($this->location_unit == 'alldata' && $this->status_vehicle == 'alldata') {
+            return DB::table('v_vehicle')->select($columns)
                 ->get();
-        } elseif ($this->category_name == 'alldata') {
-            return DB::table('v_vehicle')
+        } elseif ($this->status_vehicle == 'alldata') {
+            return DB::table('v_vehicle')->select($columns)
                 ->where('location_unit', [$this->location_unit])
                 ->get();
         } elseif ($this->location_unit == 'alldata') {
-            return DB::table('v_vehicle')
-                ->where('category_name', [$this->category_name])
+            return DB::table('v_vehicle')->select($columns)
+                ->where('status_vehicle', [$this->status_vehicle])
                 ->get();
-        } elseif ($this->location_unit && $this->category_name) {
-            return DB::table('v_vehicle')
+        } elseif ($this->location_unit && $this->status_vehicle) {
+            return DB::table('v_vehicle')->select($columns)
                 ->where('location_unit', [$this->location_unit])
-                ->where('category_name', [$this->category_name])
+                ->where('status_vehicle', [$this->status_vehicle])
                 ->get();
         } else {
-            return DB::table('v_vehicle')
+            return DB::table('v_vehicle')->select($columns)
                 ->get();
         }
     }
@@ -57,6 +58,7 @@ class VehicleUnitExport implements FromCollection, WithHeadings, WithTitle, With
         return [
             'No',
             'No.Pol',
+            'Unit',
             'Harga',
             'Harga Kredit',
             'Merk',
@@ -80,12 +82,13 @@ class VehicleUnitExport implements FromCollection, WithHeadings, WithTitle, With
             'Tanggal Pajak',
             'Nomor BPKB',
             'Kode Lokasi',
+            'Status Unit',
             'Nomor Antrian Kendaraan',
             'Nama Pemilik',
             'Alamat',
             'Lokasi Unit',
-            'Status Unit',
-            'Tanggal',
+            'Pembayaran Melalui',
+            'Tanggal buat',
             'Diupdate',
             'Tanggal Update',
             'Dibuat'
@@ -103,13 +106,13 @@ class VehicleUnitExport implements FromCollection, WithHeadings, WithTitle, With
             // Event before sheet is created, you can set titles, etc.
             BeforeSheet::class => function (BeforeSheet $event) {
                 // Set title for the sheet (optional)
-                $event->sheet->setCellValue('A1', 'Data Unit Kendaraan ' . ' ' . $this->location_unit . ' ' . ' - ' . "Kategori : " . $this->category_name); // Set custom title at the top of the sheet
+                $event->sheet->setCellValue('A1', 'Data Unit Kendaraan ' . ' ' . $this->location_unit . ' ' . ' - ' . "Kategori : " . $this->status_vehicle); // Set custom title at the top of the sheet
                 $event->sheet->mergeCells('A1:L1'); // Merge cells for the title
                 $event->sheet->getStyle('A1')->getFont()->setSize(16)->setBold(true); // Optional styling for title
             },
             // You can also customize formatting for other parts of the sheet (e.g., bold headers)
             AfterSheet::class => function (AfterSheet $event) {
-                $event->sheet->getStyle('A2:AF2')->getFont()->setBold(true); // Bold headers
+                $event->sheet->getStyle('A2:AJ2')->getFont()->setBold(true); // Bold headers
                 $sheet = $event->sheet->getDelegate();
                 // Auto-size all used columns
                 foreach (range('A', 'Z') as $col) {

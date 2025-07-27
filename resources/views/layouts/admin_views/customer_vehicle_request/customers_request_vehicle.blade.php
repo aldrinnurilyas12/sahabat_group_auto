@@ -49,15 +49,27 @@
                         <h5 style="color: black;"><strong>Data Permintaan unit Kendaraan Customer</strong></h5>
                         <br>
                         @if ($request_vehicle_data->isNotEmpty())
-                            <form action="{{ route('vehicle_req_export') }}" method="POST">
-                                @csrf
-                                <input type="text" value="{{ $bulan }}" name="bulan" hidden>
-                                <input type="text" value="{{ $tahun }}" name="tahun" hidden>
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-file-excel"></i>
-                                    &nbsp; Download Excel
-                                </button>
-                            </form>
+                            <div style="display: flex; gap:10px;" class="download-center">
+                                <form action="{{ route('vehicle_request_export') }}" method="POST">
+                                    @csrf
+                                    <input type="text" value="{{ $bulan }}" name="bulan" hidden>
+                                    <input type="text" value="{{ $tahun }}" name="tahun" hidden>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-file-excel"></i>
+                                        &nbsp; Download Excel
+                                    </button>
+                                </form>
+
+                                <form action="{{ route('customer_request_export_pdf') }}" method="POST">
+                                    @csrf
+                                    <input type="text" value="{{ $bulan }}" name="bulan" hidden>
+                                    <input type="text" value="{{ $tahun }}" name="tahun" hidden>
+                                    <button type="submit" class="btn btn-info">
+                                        <i class="fas fa-file"></i>
+                                        &nbsp; PDF
+                                    </button>
+                                </form>
+                            </div>
                         @else
                             <button class="btn btn-dark">
                                 <i class="fas fa-file-excel"></i>

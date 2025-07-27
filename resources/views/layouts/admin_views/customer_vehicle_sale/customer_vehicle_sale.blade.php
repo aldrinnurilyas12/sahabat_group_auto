@@ -49,15 +49,27 @@
                         <h5 style="color: black;"><strong>Data Permintaan Jual Unit Kendaraan Customer</strong></h5>
                         <br>
                         @if ($customer_request_sale_data->isNotEmpty())
-                            <form action="{{ route('vehicle_req_export') }}" method="POST">
-                                @csrf
-                                <input type="text" value="{{ $bulan }}" name="bulan" hidden>
-                                <input type="text" value="{{ $tahun }}" name="tahun" hidden>
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-file-excel"></i>
-                                    &nbsp; Download Excel
-                                </button>
-                            </form>
+                            <div style="display: flex; gap:10px;" class="center-download">
+                                <form action="{{ route('vehicle_sale_request_export_excel') }}" method="POST">
+                                    @csrf
+                                    <input type="text" value="{{ $bulan }}" name="bulan" hidden>
+                                    <input type="text" value="{{ $tahun }}" name="tahun" hidden>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-file-excel"></i>
+                                        &nbsp; Download Excel
+                                    </button>
+                                </form>
+
+                                <form action="{{ route('vehicle_sale_request_export_pdf') }}" method="POST">
+                                    @csrf
+                                    <input type="text" value="{{ $bulan }}" name="bulan" hidden>
+                                    <input type="text" value="{{ $tahun }}" name="tahun" hidden>
+                                    <button type="submit" class="btn btn-info">
+                                        <i class="fas fa-file"></i>
+                                        &nbsp; PDF
+                                    </button>
+                                </form>
+                            </div>
                         @else
                             <button class="btn btn-dark">
                                 <i class="fas fa-file-excel"></i>
@@ -71,7 +83,7 @@
                             class="btn-content">
 
                             <div style="color: black;" class="form-group">
-                                <form action="{{ route('filter_request') }}" method="GET">
+                                <form action="{{ route('filter_sales_request') }}" method="GET">
 
                                     <div style="display: flex;gap:10px;" class="grouped-container">
                                         <div style="display: block" class="select-group">

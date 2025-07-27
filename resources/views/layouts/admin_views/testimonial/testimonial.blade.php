@@ -49,11 +49,121 @@
                         <br>
                         <div style="display: flex; flex-wrap:wrap; gap:10px;" class="component">
 
+                            @if (in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, [
+                                    '1',
+                                    '4',
+                                    '6',
+                                    '9',
+                                    '11',
+                                ]))
+                                <a href="{{ route('spk_create') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus-circle"></i>&nbsp;Buat SPK Unit
+                                </a>
+                            @else
+                            @endif
+
                             {{-- <a class="btn btn-success" href="{{ route('branch_export') }}">
                                 <i class="fas fa-file-excel"></i>
-                                &nbsp; Download
+                                &nbsp; Download Excel
                             </a> --}}
+
+                            <div style="display: flex; gap:10px;" class="center-download">
+                                <form action="{{ route('testimonial_export_excel') }}" method="POST">
+                                    @csrf
+                                    <input type="text" value="{{ $bulan }}" name="bulan" hidden>
+                                    <input type="text" value="{{ $tahun }}" name="tahun" hidden>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-file-excel"></i>
+                                        &nbsp; Download Excel
+                                    </button>
+                                </form>
+
+                                <form action="{{ route('testimonial_export_pdf') }}" method="POST">
+                                    @csrf
+                                    <input type="text" value="{{ $bulan }}" name="bulan" hidden>
+                                    <input type="text" value="{{ $tahun }}" name="tahun" hidden>
+                                    <button type="submit" class="btn btn-info">
+                                        <i class="fas fa-file"></i>
+                                        &nbsp; PDF
+                                    </button>
+                                </form>
+                            </div>
                         </div>
+
+
+                        <hr>
+
+                        <div style="display: flex; flex-wrap:wrap; gap:10px; font-family:inter,sans-serif;justify-content:space-between;align-items:center;"
+                            class="btn-content">
+
+                            <div style="color: black;" class="form-group">
+                                <form action="{{ route('filter_testimonial') }}" method="GET">
+
+                                    <div style="display: flex;gap:10px;" class="grouped-container">
+                                        <div style="display: block" class="select-group">
+                                            <label for="">Bulan</label>
+                                            <select class="form-control" name="bulan">
+                                                <option value="">--- Pilih bulan ---</option>
+                                                <option value="alldata">Semua Data</option>
+                                                @foreach ($months as $month)
+                                                    <option value="{{ $month->id }}">{{ $month->month_list }}
+                                                    </option>
+                                                @endforeach
+
+                                            </select>
+                                            @if ($errors->has('month'))
+                                                <span class="text-danger">{{ $errors->first('month') }}</span>
+                                            @endif
+                                        </div>
+
+                                        <div style="display: block" class="select-group">
+                                            <label for="">Tahun</label>
+                                            <select class="form-control" name="tahun">
+                                                <option value="">--- Pilih tahun ---</option>
+                                                <option value="alldata">Semua Data</option>
+                                                @foreach ($years as $year)
+                                                    <option value="{{ $year }}">{{ $year }}</option>
+                                                @endforeach
+                                            </select>
+                                            @if ($errors->has('year'))
+                                                <span class="text-danger">{{ $errors->first('year') }}</span>
+                                            @endif
+                                        </div>
+
+                                        <button style="height: 40px; align-self:end;" type="submit"
+                                            class="btn btn-primary">Pilih</button>
+                                        <a href="{{ route('transaksi_spk_unit.index') }}"
+                                            style="height: 40px; align-self:end;" class="btn btn-secondary">Reset</a>
+                                    </div>
+                                    &nbsp;
+
+                                </form>
+                                <div style="font-size:14px;" class="result-selected">
+                                    @if ($testimonial->isNotEmpty())
+                                        <strong>
+                                            Data terpilih:
+                                        </strong>
+                                        <br>
+                                        <!-- Memastikan bahwa $month adalah objek dan mengakses propertinya, misalnya 'name' -->
+                                        <div class="alert alert-warning">
+                                            Bulan : {{ $bulan }} <br>
+
+                                            <!-- Menampilkan tahun yang dipilih dari array $year -->
+                                            Tahun : {{ $tahun }}
+                                        </div>
+                                    @elseif($testimonial->isEmpty())
+                                        <div class="alert alert-warning">
+                                            Tidak ada data.
+                                        </div>
+                                    @endif
+
+                                    {{-- {{ dd([$month, $year])}} --}}
+                                </div>
+                            </div>
+
+
+                        </div>
+
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">

@@ -56,6 +56,12 @@
                                 <i class="fas fa-file-excel"></i>
                                 &nbsp; Download
                             </a>
+
+                            <a class="btn btn-info" href="{{ route('branch_export_pdf') }}">
+                                <i class="fas fa-file"></i>
+                                &nbsp; PDF
+                            </a>
+
                         </div>
                     </div>
                     <div class="card-body">
