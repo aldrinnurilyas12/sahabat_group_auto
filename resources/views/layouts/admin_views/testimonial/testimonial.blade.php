@@ -64,7 +64,7 @@
 
                             {{-- <a class="btn btn-success" href="{{ route('branch_export') }}">
                                 <i class="fas fa-file-excel"></i>
-                                &nbsp; Download Excel
+                                &nbsp; Excel
                             </a> --}}
 
                             <div style="display: flex; gap:10px;" class="center-download">
@@ -74,7 +74,7 @@
                                     <input type="text" value="{{ $tahun }}" name="tahun" hidden>
                                     <button type="submit" class="btn btn-success">
                                         <i class="fas fa-file-excel"></i>
-                                        &nbsp; Download Excel
+                                        &nbsp; Excel
                                     </button>
                                 </form>
 

@@ -358,7 +358,7 @@ class MasterMainMenuController extends Controller
                     'admin_role' => $request->admin_role,
                     'superadmin_role' => $request->superadmin_role,
                     'branch_head_role' => $request->branch_head_role,
-                    'is_active' => $request->is_active,
+                    'is_active' => "Y",
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
@@ -378,7 +378,7 @@ class MasterMainMenuController extends Controller
                 'admin_role' => $request->admin_role,
                 'superadmin_role' => $request->superadmin_role,
                 'branch_head_role' => $request->branch_head_role,
-                'is_active' => $request->is_active,
+                'is_active' => "Y",
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                 'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
             ]);

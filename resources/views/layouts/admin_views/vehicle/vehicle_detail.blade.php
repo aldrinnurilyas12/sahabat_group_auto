@@ -97,7 +97,7 @@
                                 </div>
 
                                 <h5 style="color: black;margin-bottom:30px;">
-                                    {{ 'IDR ' . number_format($vehicle->first()->price) }}</h5>
+                                    {{ 'Rp ' . number_format($vehicle->first()->price) }}</h5>
 
 
                                 <div style="display: block; gap:10px; justify-content:center;margin-top:10p"
@@ -347,19 +347,51 @@
                                 {{-- credit simulation --}}
                                 <div class="tab-pane fade" id="ex1-tabs-2" role="tabpanel"
                                     aria-labelledby="ex1-tab-2">
-                                    <div class="card-header py-3">
-                                        @if ($vehicle->isNotEmpty())
-                                            <a href="{{ route('add_credit_simulation', $vehicle->first()->id) }}"
-                                                class="btn btn-primary">
-                                                <i class="fas fa-plus-circle"></i>&nbsp;Buat Simulasi Kredit
-                                            </a>
-                                        @else
-                                            <a href="{{ route('add_credit_simulation', $vehicle->first()->id) }}"
-                                                class="btn btn-primary">
-                                                <i class="fas fa-plus-circle"></i>&nbsp;Buat Simulasi Kredit
-                                            </a>
-                                        @endif
+                                    <div class="header" style="display: flex; gap:10px;">
+
+                                        <div style="height: max-content;" class="btn-add-credit">
+                                            @if ($vehicle->isNotEmpty())
+                                                <a href="{{ route('add_credit_simulation', $vehicle->first()->id) }}"
+                                                    class="btn btn-primary">
+                                                    <i class="fas fa-plus-circle"></i>&nbsp; Buat Simulasi Kredit
+                                                </a>
+                                            @else
+                                                <a href="{{ route('add_credit_simulation', $vehicle->first()->id) }}"
+                                                    class="btn btn-primary">
+                                                    <i class="fas fa-plus-circle"></i>&nbsp;Buat Simulasi Kredit
+                                                </a>
+                                            @endif
+                                        </div>
+
+                                        <div style="display: flex; gap:10px; class="center-download">
+                                            <form action="{{ route('export_credit_excel') }}" method="POST">
+                                                @csrf
+                                                <input type="text" name="vehicle_id"
+                                                    value="{{ $vehicle->first()->id }}" hidden>
+
+                                                <input type="text" name="unit"
+                                                    value="{{ $vehicle->first()->unit }}" hidden>
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="fas fa-file-excel"></i>
+                                                    &nbsp; Excel
+                                                </button>
+                                            </form>
+
+                                            <form action="{{ route('export_credit_pdf') }}" method="POST">
+                                                @csrf
+                                                <input type="text" name="vehicle_id"
+                                                    value="{{ $vehicle->first()->id }}" hidden>
+                                                <input type="text" name="unit"
+                                                    value="{{ $vehicle->first()->unit }}" hidden>
+                                                <button type="submit" class="btn btn-info">
+                                                    <i class="fas fa-file"></i>
+                                                    &nbsp; PDF
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
+
+
                                     <div class="card-body">
                                         <div id="table-detail" class="table-responsive">
 
@@ -372,6 +404,7 @@
                                                         <th>Unit</th>
                                                         <th>Harga Unit</th>
                                                         <th>Biaya DP Unit</th>
+                                                        <th>Total Harga DP</th>
                                                         <th>Asuransi</th>
                                                         <th>Tenor 12 Bulan</th>
                                                         <th>Tenor 24 Bulan</th>
@@ -405,21 +438,31 @@
                                                                     </form>
                                                             </td>
                                                             <td>{{ $credit->unit }}</td>
-                                                            <td>{{ 'IDR ' . number_format($credit->price) }}</td>
-                                                            <td>{{ 'IDR ' . number_format($credit->down_payment) }}
+                                                            <td>{{ 'Rp ' . number_format($credit->credit_price) }}</td>
+                                                            <td>{{ $credit->down_payment . '%' }}
                                                             </td>
-                                                            <td>{{ $credit->insurance_name }}</td>
-                                                            <td>{{ 'IDR ' . number_format($credit->tenor_12_month) }}
+                                                            <td>{{ 'Rp ' . number_format($credit->total_down_payment) }}
                                                             </td>
-                                                            <td>{{ 'IDR ' . number_format($credit->tenor_24_month) }}
+                                                            <td>
+
+                                                                @if ($credit->insurance_name)
+                                                                    {{ $credit->insurance_name }}
+                                                                @else
+                                                                    <span class="text-secondary">Tidak ada
+                                                                        asuransi</span>
+                                                                @endif
                                                             </td>
-                                                            <td>{{ 'IDR ' . number_format($credit->tenor_36_month) }}
+                                                            <td>{{ 'Rp ' . number_format($credit->tenor_12_month) }}
                                                             </td>
-                                                            <td>{{ 'IDR ' . number_format($credit->tenor_48_month) }}
+                                                            <td>{{ 'Rp ' . number_format($credit->tenor_24_month) }}
                                                             </td>
-                                                            <td>{{ 'IDR ' . number_format($credit->tenor_60_month) }}
+                                                            <td>{{ 'Rp ' . number_format($credit->tenor_36_month) }}
                                                             </td>
-                                                            <td>{{ 'IDR ' . number_format($credit->tenor_72_month) }}
+                                                            <td>{{ 'Rp ' . number_format($credit->tenor_48_month) }}
+                                                            </td>
+                                                            <td>{{ 'Rp ' . number_format($credit->tenor_60_month) }}
+                                                            </td>
+                                                            <td>{{ 'Rp ' . number_format($credit->tenor_72_month) }}
                                                             </td>
 
                                                         </tr>
@@ -903,6 +946,18 @@
         Swal.fire({
             title: 'Berhasil',
             text: "{{ Session::get('delete_document') }}",
+            icon: 'success',
+            timer: 2000,
+            confirmButtonText: 'OK'
+        });
+    </script>
+@endif
+
+@if (Session::has('delete_success'))
+    <script>
+        Swal.fire({
+            title: 'Berhasil',
+            text: "{{ Session::get('delete_success') }}",
             icon: 'success',
             timer: 2000,
             confirmButtonText: 'OK'

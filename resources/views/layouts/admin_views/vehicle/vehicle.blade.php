@@ -60,7 +60,7 @@
                                                     value="{{ $selectedStatus }}" hidden>
                                                 <button type="submit" class="btn btn-success">
                                                     <i class="fas fa-file-excel"></i>
-                                                    &nbsp; Download
+                                                    &nbsp; Excel
                                                 </button>
                                             </form>
 
@@ -78,7 +78,7 @@
                                     @else
                                         <button class="btn btn-dark">
                                             <i class="fas fa-file-excel"></i>
-                                            &nbsp; Download Excel
+                                            &nbsp; Excel
                                         </button>
                                     @endif
 
@@ -150,7 +150,8 @@
 
                             <div class="information">
                                 <div class="alert alert-info">
-                                    Jika ingin menambahkan media files untuk Unit Kendaraan seperti : Foto dan Video
+                                    Jika ingin menambahkan media files untuk Unit Kendaraan seperti : Foto dan Video &
+                                    Jika ingin menambahkan data Kredit Unit Kendaraan
                                     klik button "Detail"
                                 </div>
                             </div>
@@ -169,6 +170,7 @@
                                                     <th>No</th>
                                                     <th>Detail</th>
                                                     <th>Aksi</th>
+                                                    <th>Export data Kredit Unit</th>
                                                     <th>Kendaraan</th>
                                                     <th>VIN/NO.POL</th>
                                                     <th>Status Unit</th>
@@ -231,6 +233,50 @@
                                                                     data-target="#deleteUnit{{ $cars->id }}"><i
                                                                         class="fas fa-trash"></i></a>
 
+                                                        </td>
+                                                        <td>
+
+                                                            @php
+                                                                $credit_data = DB::table('credit_simulation')
+                                                                    ->where('vehicle_id', $cars->id)
+                                                                    ->get();
+
+                                                            @endphp
+
+                                                            @if ($credit_data->isNotEmpty())
+                                                                <div
+                                                                    style="display: flex; gap:10px; class="center-download">
+                                                                    <form action="{{ route('export_credit_excel') }}"
+                                                                        method="POST">
+                                                                        @csrf
+                                                                        <input type="text" name="vehicle_id"
+                                                                            value="{{ $cars->id }}" hidden>
+
+                                                                        <input type="text" name="unit"
+                                                                            value="{{ $cars->brand . ' ' . $cars->vehicle_type . ' ' . $cars->manufacture_year }}"
+                                                                            hidden>
+                                                                        <button type="submit"
+                                                                            class="btn btn-success">
+                                                                            <i class="fas fa-file-excel"></i>
+                                                                        </button>
+                                                                    </form>
+
+                                                                    <form action="{{ route('export_credit_pdf') }}"
+                                                                        method="POST">
+                                                                        @csrf
+                                                                        <input type="text" name="vehicle_id"
+                                                                            value="{{ $cars->id }}" hidden>
+                                                                        <input type="text" name="unit"
+                                                                            value="{{ $cars->brand . ' ' . $cars->vehicle_type . ' ' . $cars->manufacture_year }}"
+                                                                            hidden>
+                                                                        <button type="submit" class="btn btn-info">
+                                                                            <i class="fas fa-file"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            @else
+                                                                <span>-</span>
+                                                            @endif
                                                         </td>
                                                         <td>{{ $cars->brand . ' ' . $cars->vehicle_type . ' ' . $cars->manufacture_year }}
                                                         </td>

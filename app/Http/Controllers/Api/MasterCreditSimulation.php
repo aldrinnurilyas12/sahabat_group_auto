@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\CreditDataVehicleExport;
 use App\Http\Controllers\Controller;
 use App\Models\CreditSimulation;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Svg\Tag\Rect;
 
 use function Laravel\Prompts\table;
 
@@ -33,15 +37,17 @@ class MasterCreditSimulation extends Controller
         ]);
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
-        // $vehicle = DB::table('v_vehicle')->get();
+        $vehicle = DB::table('v_credit_simulation')->select('unit', 'vehicle_id')->distinct()->get();
         $credit_simulation = DB::table('v_credit_simulation')->get();
-        return view('layouts.admin_views.credit_simulation.index', compact('credit_simulation', 'grouped_sub_menu', 'sidebar_menu'));
+        $request_unit = $request->unit;
+
+        return view('layouts.admin_views.credit_simulation.index', compact('credit_simulation', 'request_unit', 'vehicle', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     /**
@@ -212,20 +218,128 @@ class MasterCreditSimulation extends Controller
                 if ($CreditSimulation) {
                     $CreditSimulation->delete();
                     $this->insertLogActivityUsers(__METHOD__);
-                    session()->flash('delete_success', 'Data Berhasil dihapus!');
-                    return redirect()->route('master_credit_simulation.index');
+                    session()->flash('delete_success', 'Data Kredit Berhasil dihapus!');
+                    return redirect()->back();
                 }
             } else {
-                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                session()->flash('failed_insert', 'Data gagal dihapus, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
                 return redirect()->back();
             }
         } else {
             if ($CreditSimulation) {
                 $CreditSimulation->delete();
                 $this->insertLogActivityUsers(__METHOD__);
-                session()->flash('delete_success', 'Data Berhasil dihapus!');
-                return redirect()->route('master_credit_simulation.index');
+                session()->flash('delete_success', 'Data Kredit Berhasil dihapus!');
+                return redirect()->back();
             }
         }
+    }
+
+
+    public function calculation_credit_simulation(Request $request)
+    {
+        $request->validate([
+            'credit_price' => 'required|numeric|min:0',
+            'down_payment' => 'required|numeric|min:0|lte:credit_price',
+        ]);
+
+
+        $price_unit = $request->credit_price;
+        $down_payment = $request->down_payment;
+
+        $credit_calculations = $price_unit - $down_payment;
+
+        if (!$request->expectsJson()) {
+            return response()->json(['error' => 'Invalid request'], 400);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'perhitungan data credit',
+            'data'  => [
+                'tenor_12_month' => round($credit_calculations / 12),
+                'tenor_24_month' => round($credit_calculations / 24),
+                'tenor_36_month' => round($credit_calculations / 36),
+                'tenor_48_month' => round($credit_calculations / 48),
+                'tenor_60_month' => round($credit_calculations / 60),
+                'tenor_72_month' => round($credit_calculations / 72),
+            ]
+        ]);
+    }
+
+
+    public function filter_credit(Request $request)
+    {
+
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+        $vehicle = DB::table('v_credit_simulation')->select('unit', 'vehicle_id')->distinct()->get();
+        $credit_simulation = DB::table('v_credit_simulation')->get();
+
+        $request_unit = $request->vehicle_id;
+        // dd($request_unit);
+
+        if ($request_unit) {
+            $credit_simulation = DB::table('v_credit_simulation')->where('vehicle_id', $request_unit)->get();
+        }
+
+        if ($request_unit == 'alldata') {
+            $credit_simulation = DB::table('v_credit_simulation')->get();
+        }
+
+        if ($credit_simulation->isEmpty()) {
+            session()->flash('failed_insert', 'Data Kredit tidak ada!');
+            return redirect()->back();
+        }
+
+        return view('layouts.admin_views.credit_simulation.index', compact('credit_simulation', 'request_unit', 'vehicle', 'grouped_sub_menu', 'sidebar_menu'));
+    }
+
+
+
+
+    public function download_excel(Request $request)
+    {
+
+        $vehicle_id = $request->vehicle_id;
+        $unit = $request->unit;
+
+        $vehicle_unit = DB::table('v_credit_simulation')->select('unit')->distinct()->where('vehicle_id', $vehicle_id)->pluck('unit')->first();
+
+        $filename = 'Data_Kredit'  . '-' . $vehicle_unit . '.xlsx';
+
+        return Excel::download(new CreditDataVehicleExport($vehicle_id), $filename);
+    }
+
+    public function download_pdf(Request $request)
+    {
+
+        $vehicle_id = $request->vehicle_id;
+        $unit = $request->unit;
+
+        $credit_simulation = DB::table('v_credit_simulation')->where('vehicle_id', $vehicle_id)->get();
+        $vehicle_unit = DB::table('v_credit_simulation')->select('unit')->distinct()->where('vehicle_id', $vehicle_id)->pluck('unit')->first();
+
+
+        $request_unit = $request->vehicle_id;
+        // dd($request_unit);
+
+        if ($request_unit) {
+            $credit_simulation = DB::table('v_credit_simulation')->where('vehicle_id', $request_unit)->get();
+        }
+
+        if ($request_unit == 'alldata') {
+            $credit_simulation = DB::table('v_credit_simulation')->get();
+        }
+
+        $fileName = 'Data_Kredit' . '-' . $vehicle_unit . '.pdf';
+        // Generate PDF
+        $pdf = Pdf::loadView('layouts.pdf.credit_vehicle_pdf', [
+            'credit_simulation' => $credit_simulation
+        ]);
+        $pdf->setPaper('a4', 'landscape');
+
+        return $pdf->download($fileName);
     }
 }

@@ -60,7 +60,7 @@
                                 <input type="text" name="tahun" value="{{ $tahun }}" hidden>
                                 <button type="submit" class="btn btn-success">
                                     <i class="fas fa-file-excel"></i>
-                                    &nbsp; Download Excel
+                                    &nbsp; Excel
                                 </button>
                             </form>
 

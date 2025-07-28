@@ -72,7 +72,7 @@
                                 @else
                                     <button class="btn btn-dark">
                                         <i class="fas fa-file-excel"></i>
-                                        &nbsp; Download Excel
+                                        &nbsp; Excel
                                     </button>
                                 @endif
 

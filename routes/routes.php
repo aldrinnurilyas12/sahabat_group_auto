@@ -262,7 +262,10 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::get('edit_credit_simulation/{id}', [MasterCreditSimulation::class, 'edit_credit_simulation_layout'])->name('edit_credit_simulation');
     Route::put('update_credit_simulation/{id}', [MasterCreditSimulation::class, 'update'])->name('update_credit_simulation.update');
     Route::delete('delete_credit/', [MasterCreditSimulation::class, 'destroy'])->name('delete_credit');
-
+    Route::post('credit_calculations', [MasterCreditSimulation::class, 'calculation_credit_simulation'])->name('credit_calculations');
+    Route::get('filter_credit_data', [MasterCreditSimulation::class, 'filter_credit'])->name('filter_credit_data');
+    Route::post('export_credit_excel', [MasterCreditSimulation::class, 'download_excel'])->name('export_credit_excel');
+    Route::post('export_credit_pdf', [MasterCreditSimulation::class, 'download_pdf'])->name('export_credit_pdf');
 
     // Branch Routes
     Route::apiResource('master_branch', App\Http\Controllers\Api\BranchController::class);

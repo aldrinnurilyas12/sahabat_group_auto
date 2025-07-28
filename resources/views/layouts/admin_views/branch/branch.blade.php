@@ -54,7 +54,7 @@
 
                             <a class="btn btn-success" href="{{ route('branch_export') }}">
                                 <i class="fas fa-file-excel"></i>
-                                &nbsp; Download
+                                &nbsp; Excel
                             </a>
 
                             <a class="btn btn-info" href="{{ route('branch_export_pdf') }}">
