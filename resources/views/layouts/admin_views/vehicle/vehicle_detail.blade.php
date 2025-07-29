@@ -130,9 +130,12 @@
                                             @else
                                             @endif
 
-                                            <a style="font-size:12px; text-decoration:underline;" href="#"
-                                                data-toggle="modal" data-target="#changeStatusModal">Ubah Status <i
-                                                    class="fas fa-share-square"></i></a>
+                                            @if ($vehicle->first()->status_vehicle == 'Unit Terjual')
+                                            @else
+                                                <a style="font-size:12px; text-decoration:underline;" href="#"
+                                                    data-toggle="modal" data-target="#changeStatusModal">Ubah Status <i
+                                                        class="fas fa-share-square"></i></a>
+                                            @endif
 
                                         </div>
                                     </div>
@@ -157,12 +160,17 @@
                                         <div style="display: flex;flex-wrap:wrap;" class="active-status-vehicle">
                                             <p>Status iklan :</p>
                                             @if ($check_ads == null)
-                                                <p class="text-danger">Belum terpasang
-                                                <p>
-                                                    <a style="font-size:12px; text-decoration:underline;"
-                                                        href="{{ route('add_vehicle_advertisement', $vehicle->first()->id) }}">Pasang
-                                                        Iklan <i class="fas fa-share-square"></i></a>
-                                                @else
+                                                @if ($images->isNotEmpty())
+                                                    <p class="text-danger">Belum terpasang
+                                                        <a style="font-size:12px; text-decoration:underline;"
+                                                            href="{{ route('add_vehicle_advertisement', $vehicle->first()->id) }}">Pasang
+                                                            Iklan <i class="fas fa-share-square"></i></a>
+                                                    @else
+                                                    <p class="text-danger">Belum terpasang
+                                                    <p style="font-size:12px; font-style:italic;">*Belum upload
+                                                        foto</p>
+                                                @endif
+                                            @else
                                                 <p class="text-success"><i style="color: green;"
                                                         class="fa fa-check-circle"></i> Sudah terpasang</p>
                                             @endif
@@ -171,7 +179,11 @@
                                     @else
                                         <div style="display: flex;flex-wrap:wrap;" class="active-status-vehicle">
                                             <p>Status iklan :</p>
-                                            <p class="text-danger">Tidak bisa pasang iklan, unit tidak ready</p>
+                                            @if ($vehicle->first()->status_vehicle == 'Unit Terjual')
+                                                <p class="text-danger">Unit Sudah Terjual</p>
+                                            @else
+                                                <p class="text-danger">Unit Tidak Ready</p>
+                                            @endif
                                         </div>
                                     @endif
 
@@ -239,6 +251,11 @@
                                                         <td class="title">Harga</td>
                                                         <td>{{ 'Rp' . number_format($cars->price) }}</td>
                                                     </tr>
+
+                                                    <tr>
+                                                        <td class="title">Harga Kredit</td>
+                                                        <td>{{ 'Rp' . number_format($cars->credit_price) }}</td>
+                                                    </tr>
                                                     <tr>
                                                         <td class="title">Kategori/Jenis</td>
                                                         <td>{{ $cars->vehicle_category }}</td>
@@ -297,7 +314,12 @@
                                                     </tr>
                                                     <tr>
                                                         <td class="title">Tanggal Pajak</td>
-                                                        <td>{{ $cars->tax_date }}</td>
+                                                        @if ($cars->tax_date)
+                                                            <td>{{ \Carbon\Carbon::parse($cars->tax_date)->format('m-Y') }}
+                                                            </td>
+                                                        @else
+                                                            <td>-</td>
+                                                        @endif
                                                     </tr>
                                                     <tr>
                                                         <td class="title">Nomor BPKB</td>
@@ -351,10 +373,14 @@
 
                                         <div style="height: max-content;" class="btn-add-credit">
                                             @if ($vehicle->isNotEmpty())
-                                                <a href="{{ route('add_credit_simulation', $vehicle->first()->id) }}"
-                                                    class="btn btn-primary">
-                                                    <i class="fas fa-plus-circle"></i>&nbsp; Buat Simulasi Kredit
-                                                </a>
+
+                                                @if ($vehicle->first()->status_vehicle == 'Unit Terjual')
+                                                @else
+                                                    <a href="{{ route('add_credit_simulation', $vehicle->first()->id) }}"
+                                                        class="btn btn-primary">
+                                                        <i class="fas fa-plus-circle"></i>&nbsp; Buat Simulasi Kredit
+                                                    </a>
+                                                @endif
                                             @else
                                                 <a href="{{ route('add_credit_simulation', $vehicle->first()->id) }}"
                                                     class="btn btn-primary">
@@ -518,20 +544,28 @@
 
                                         <div style="border: 1px solid rgb(194, 194, 194);padding:10px; border-radius:5px;"
                                             class="form-doc-upload">
-                                            <label style="color:black;" for=""><strong>Attachment
-                                                    Files</strong></label>
-                                            <form action="{{ route('document_upload') }}" method="POST"
-                                                enctype="multipart/form-data">
-                                                @csrf
-                                                <div class="form-group">
-                                                    <input type="text" name="vehicle_id"
-                                                        value="{{ $vehicle->first()->id }}" hidden>
-                                                    <input type="file" name="document_files[]" multiple required>
+                                            @if ($vehicle->first()->status_vehicle == 'Unit Terjual')
+                                                <div style="width: 100%;text-align:center;"
+                                                    class="alert alert-warning">
+                                                    <p>Tidak bisa upload data dokument untuk unit ini</p>
                                                 </div>
-                                                <button style="margin-bottom: 20px;" class="btn btn-info"
-                                                    type="submit"><i class="fas fa-upload"></i> &nbsp; Upload
-                                                    Dokumen</button>
-                                            </form>
+                                            @else
+                                                <label style="color:black;" for=""><strong>Attachment
+                                                        Files</strong></label>
+                                                <form action="{{ route('document_upload') }}" method="POST"
+                                                    enctype="multipart/form-data">
+                                                    @csrf
+                                                    <div class="form-group">
+                                                        <input type="text" name="vehicle_id"
+                                                            value="{{ $vehicle->first()->id }}" hidden>
+                                                        <input type="file" name="document_files[]" multiple
+                                                            required>
+                                                    </div>
+                                                    <button style="margin-bottom: 20px;" class="btn btn-info"
+                                                        type="submit"><i class="fas fa-upload"></i> &nbsp; Upload
+                                                        Dokumen</button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </div>
                                     <br>
@@ -612,20 +646,27 @@
                                             @endforeach
                                             <div style="border: 1px solid rgb(194, 194, 194);padding:10px; border-radius:5px;"
                                                 class="form-fotos-upload">
-                                                <label style="color:black;" for=""><strong>Attachment
-                                                        Files</strong></label>
-                                                <form action="{{ route('image_upload') }}" method="POST"
-                                                    enctype="multipart/form-data">
-                                                    @csrf
-                                                    <div class="form-group">
-                                                        <input type="text" name="vehicle_id"
-                                                            value="{{ $vehicle->first()->id }}" hidden>
-                                                        <input type="file" name="images[]" multiple required>
+                                                @if ($vehicle->first()->status_vehicle == 'Unit Terjual')
+                                                    <div style="width: 100%;text-align:center;"
+                                                        class="alert alert-warning">
+                                                        <p>Tidak bisa upload foto untuk unit ini</p>
                                                     </div>
-                                                    <button style="margin-bottom: 20px;" class="btn btn-info"
-                                                        type="submit"><i class="fas fa-upload"></i> &nbsp; Upload
-                                                        Foto</button>
-                                                </form>
+                                                @else
+                                                    <label style="color:black;" for=""><strong>Attachment
+                                                            Files</strong></label>
+                                                    <form action="{{ route('image_upload') }}" method="POST"
+                                                        enctype="multipart/form-data">
+                                                        @csrf
+                                                        <div class="form-group">
+                                                            <input type="text" name="vehicle_id"
+                                                                value="{{ $vehicle->first()->id }}" hidden>
+                                                            <input type="file" name="images[]" multiple required>
+                                                        </div>
+                                                        <button style="margin-bottom: 20px;" class="btn btn-info"
+                                                            type="submit"><i class="fas fa-upload"></i> &nbsp; Upload
+                                                            Foto</button>
+                                                    </form>
+                                                @endif
                                             </div>
                                         @else
                                         @endif
@@ -699,33 +740,40 @@
 
                                     <div style="border: 1px solid rgb(194, 194, 194);padding:10px; border-radius:5px;"
                                         class="form-video-upload">
-                                        <form action="{{ route('vehicle_media_upload') }}" method="POST"
-                                            enctype="multipart/form-data">
-                                            @csrf
-                                            <div class="form-group">
-                                                <input type="text" name="vehicle_id"
-                                                    value="{{ $vehicle->first()->id }}" hidden>
-                                                <label style="color:black;" for=""><strong> Tipe
-                                                        Media</strong></label>
-                                                <select class="form-control" name="media_type" id="">
-                                                    <option value="">=== Pilih Tipe Media ===</option>
-                                                    <option value="video">Video</option>
-                                                    <option value="engine sound">Suara Mesin</option>
-                                                </select>
-                                                @if ($errors->has('media_type'))
-                                                    <span
-                                                        class="text-danger">{{ $errors->first('media_type') }}</span>
-                                                @endif
-                                                <br>
-                                                <label style="color:black;" for=""><strong>Attachment
-                                                        Files</strong></label>
-                                                <br>
-                                                <input type="file" name="media_files">
+
+                                        @if ($vehicle->first()->status_vehicle == 'Unit Terjual')
+                                            <div style="width: 100%;text-align:center;" class="alert alert-warning">
+                                                <p>Tidak bisa upload media untuk unit ini</p>
                                             </div>
-                                            <button style="margin-bottom: 20px;" class="btn btn-info"
-                                                type="submit"><i class="fas fa-upload"></i> &nbsp; Upload
-                                                Media</button>
-                                        </form>
+                                        @else
+                                            <form action="{{ route('vehicle_media_upload') }}" method="POST"
+                                                enctype="multipart/form-data">
+                                                @csrf
+                                                <div class="form-group">
+                                                    <input type="text" name="vehicle_id"
+                                                        value="{{ $vehicle->first()->id }}" hidden>
+                                                    <label style="color:black;" for=""><strong> Tipe
+                                                            Media</strong></label>
+                                                    <select class="form-control" name="media_type" id="">
+                                                        <option value="">=== Pilih Tipe Media ===</option>
+                                                        <option value="video">Video</option>
+                                                        <option value="engine sound">Suara Mesin</option>
+                                                    </select>
+                                                    @if ($errors->has('media_type'))
+                                                        <span
+                                                            class="text-danger">{{ $errors->first('media_type') }}</span>
+                                                    @endif
+                                                    <br>
+                                                    <label style="color:black;" for=""><strong>Attachment
+                                                            Files</strong></label>
+                                                    <br>
+                                                    <input type="file" name="media_files">
+                                                </div>
+                                                <button style="margin-bottom: 20px;" class="btn btn-info"
+                                                    type="submit"><i class="fas fa-upload"></i> &nbsp; Upload
+                                                    Media</button>
+                                            </form>
+                                        @endif
                                     </div>
                                     <br>
 
@@ -909,8 +957,6 @@
             title: 'Berhasil',
             text: "{{ Session::get('message_success') }}",
             icon: 'success',
-            toast: true,
-            position: 'bottom-end',
             showConfirmButton: false,
             timer: 2000
         });

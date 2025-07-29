@@ -12,6 +12,7 @@ class VehicleModel extends Model
 
 
     protected $fillable = [
+        'vehicle_code',
         'vehicle_registration_number',
         'vehicle_type',
         'price',

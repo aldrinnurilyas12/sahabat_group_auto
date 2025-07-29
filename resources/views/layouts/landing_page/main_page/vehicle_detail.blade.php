@@ -132,7 +132,7 @@
 
                                 <div style="display: flex; gap:20px; flex-wrap:wrap;margin-bottom:0;"
                                     class="price-info">
-                                    <div style="margin: 0;" class="price">
+                                    <div style="margin: 0;" class="credit-price">
                                         <label style="font-weight: normal;font-size: 12px; color:gray;"
                                             for="">Harga Cash</label>
                                         <h4 style="font-weight: bold;">{{ 'Rp ' . number_format($vehicle->price) }}
@@ -371,7 +371,8 @@
                                             <th>No</th>
                                             <th>Unit</th>
                                             <th>Harga Kredit Unit</th>
-                                            <th>Biaya DP Unit</th>
+                                            <th>Besar DP Unit</th>
+                                            <th>Total Harga DP</th>
                                             <th>Asuransi</th>
                                             <th>Tenor 12 Bulan</th>
                                             <th>Tenor 24 Bulan</th>
@@ -389,7 +390,8 @@
                                                 <td><?php echo $no++; ?></td>
                                                 <td>{{ $credit->unit }}</td>
                                                 <td>{{ 'Rp ' . number_format($credit->credit_price) }}</td>
-                                                <td>{{ 'Rp ' . number_format($credit->down_payment) }}</td>
+                                                <td>{{ $credit->down_payment . '%' }}</td>
+                                                <td>{{ 'Rp' . number_format($credit->total_down_payment) }}</td>
                                                 <td>{{ $credit->insurance_name }}</td>
                                                 <td>
                                                     @if ($credit->tenor_12_month)

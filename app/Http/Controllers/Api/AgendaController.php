@@ -250,6 +250,20 @@ class AgendaController extends Controller
         }
     }
 
+    public function changeStatus(Request $request)
+    {
+        $request->validate([
+            'status' => 'required'
+
+        ]);
+
+        AgendaModel::where('id', $request->id)->update([
+            'status' => $request->status
+        ]);
+        session()->flash('message_success', 'Agenda berhasil diperbarui!');
+        return redirect()->route('master_agenda.index');
+    }
+
 
     public function download_agenda_pdf()
     {

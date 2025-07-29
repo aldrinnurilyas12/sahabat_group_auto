@@ -42,12 +42,22 @@
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <div class="header" style="display: flex; gap:10px;">
+                            <div class="header">
                                 {{-- <a href="{{ route('add_credit_simulation', ['id' => $credit_simulation->first()->id]) }}"
                                     class="btn btn-primary">
                                     <i class="fas fa-plus-circle"></i>&nbsp;Simulasi Kredit
                                 </a> --}}
 
+                                <div style="font-size: 13px;" class="alert alert-info">
+                                    <ul>
+                                        <li>Info! </li>
+                                        <li>Untuk melakukan penambahan Data Kredit untuk unit kendaraan hanya ada di
+                                            menu Master Data Unit Kendaraan.</li>
+                                        <li>Menu Master > pilih "Unit Kendaraan" > klik "Detail" > pilih menu "Simulasi
+                                            Kredit" .</li>
+
+                                    </ul>
+                                </div>
 
                                 <div style="display: flex; gap:10px; class="center-download">
                                     <form action="{{ route('export_credit_excel') }}" method="POST">

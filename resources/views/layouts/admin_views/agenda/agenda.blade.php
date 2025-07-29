@@ -67,6 +67,7 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Aksi</th>
+                                        <th>Ubah Status</th>
                                         <th>Department</th>
                                         <th>Kantor</th>
                                         <th>Pemimpin Meeting</th>
@@ -97,6 +98,15 @@
                                                         data-target="#deleteUnit{{ $agendas->id }}"><i
                                                             class="fas fa-trash"></i></a>
                                             </td>
+                                            <td>
+                                                @if ($agendas->status == 'canceled' || $agendas->status == 'done')
+                                                    <a class="btn btn-secondary">Selesai</a>
+                                                @else
+                                                    <a class="btn btn-info" href="#" data-toggle="modal"
+                                                        data-target="#changeStatus{{ $agendas->id }}">Ubah</a>
+                                                @endif
+                                            </td>
+
 
                                             @if ($agendas->department_name == null)
                                                 <td>Semua Department</td>
@@ -119,12 +129,19 @@
                                             <td>{{ \Carbon\Carbon::parse($agendas->agenda_date)->format('d F Y') }}
                                             </td>
                                             <td>
-                                                @if ($agendas->status)
-                                                    {{ $status }}
+                                                @if ($agendas->status == 'ongoing')
+                                                    <span class="badge badge-info">Sedang berlangsung</span>
+                                                @elseif($agendas->status == 'done')
+                                                    <span class="badge badge-success">Selesai</span>
+                                                @elseif($agendas->status == 'pending')
+                                                    <span class="badge badge-warning">Ditunda</span>
+                                                @elseif($agendas->status == 'canceled')
+                                                    <span class="badge badge-danger">Dibatalkan</span>
                                                 @else
                                                     <span>-</span>
                                                 @endif
                                             </td>
+
                                             <td>{{ $agendas->start_time }}</td>
                                             <td>{{ $agendas->end_time }}</td>
                                             <td>{{ $agendas->created_at }}</td>
@@ -151,7 +168,7 @@
 
     </div>
 
-    {{-- modal change status --}}
+    {{-- modal delete agenda --}}
 
     @foreach ($agenda as $agendas)
         <div class="modal fade" id="deleteUnit{{ $agendas->id }}" tabindex="-1" role="dialog"
@@ -187,6 +204,59 @@
     @endforeach
 
     {{-- end modal --}}
+
+    {{-- Modal change Agenda Status --}}
+
+    @foreach ($agenda as $agendas)
+        <div class="modal fade" id="changeStatus{{ $agendas->id }}" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalLabel{{ $agendas->id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel{{ $agendas->id }}">Ubah Agenda:
+                            {{ $agendas->agenda_name }}</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+
+                    <form method="POST" action="{{ route('change_status', $agendas->id) }}">
+                        @csrf
+                        @method('PUT')
+                        <div style="color: black;" class="modal-body">
+                            Apakah Anda ingin mengubah status Agenda:
+                            {{ $agendas->agenda_name }} ?
+                            <hr>
+                            <div class="form-group">
+                                <label style="color: black;" for="">Status Agenda</label>
+                                <select style="width: max-content;" class="form-control" name="status"
+                                    id="status">
+                                    <option value="">--- Status Agenda ---</option>
+                                    <option value="ongoing">Meeting sedang berlangsung</option>
+                                    <option value="pending">Meeting ditunda</option>
+                                    <option value="canceled">Meeting dibatalkan</option>
+                                    <option value="done">Meeting selesai</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                            <button class="btn btn-primary" type="submit">Ubah Status</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
+
+
+
+    {{-- end --}}
+
+
     <!-- End of Page Wrapper -->
 
     <!-- Scroll to Top Button-->

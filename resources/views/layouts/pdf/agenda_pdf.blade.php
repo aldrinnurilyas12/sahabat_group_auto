@@ -33,6 +33,7 @@
                         <th>Tanggal Agenda</th>
                         <th>Jam Mulai</th>
                         <th>Jam Akhir</th>
+                        <th>Status Agenda</th>
                         <th>Created At</th>
                         <th>Created By</th>
                         <th>Updated At</th>
@@ -69,6 +70,7 @@
                             </td>
                             <td>{{ $agendas->start_time }}</td>
                             <td>{{ $agendas->end_time }}</td>
+                            <td>{{ $agendas->status }}</td>
                             <td>{{ $agendas->created_at }}</td>
                             <td>{{ $agendas->created_by }}</td>
                             <td>{{ $agendas->updated_at }}</td>

@@ -18,6 +18,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Carbon\Carbon;
 use ZipArchive;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Ramsey\Uuid\Uuid;
 
 class MasterVehicleData extends Controller
 {
@@ -151,6 +152,7 @@ class MasterVehicleData extends Controller
         if ($SETTING_TIME->open_schedule_time == 'on') {
             if ($insertTime >= 7  && $insertTime <= 20) {
                 VehicleModel::create([
+                    'vehicle_code' => Uuid::uuid4()->toString(),
                     'vehicle_registration_number' => $request->vehicle_registration_number,
                     'vehicle_type' => $request->vehicle_type,
                     'price' => $request->price,
@@ -193,6 +195,7 @@ class MasterVehicleData extends Controller
             }
         } else {
             VehicleModel::create([
+                'vehicle_code' => Uuid::uuid4()->toString(),
                 'vehicle_registration_number' => $request->vehicle_registration_number,
                 'vehicle_type' => $request->vehicle_type,
                 'price' => $request->price,
@@ -357,8 +360,6 @@ class MasterVehicleData extends Controller
             'fuel_type' => 'required',
             'cylinder_capacity' => 'required',
             'transmission' => 'required',
-            'backup_vehicle_key' => 'required',
-            'services_book' => 'required',
             'vehicle_identity_number' => 'required',
             'engine_number' => 'required',
             'coding_number' => 'required',
@@ -372,10 +373,96 @@ class MasterVehicleData extends Controller
         date_default_timezone_set('Asia/Jakarta');
         $insertTime = (int) date('H');
         $SETTING_TIME = DB::table('settings_schedule_time')->first();
+        $find_vehicle_code = DB::table('vehicle')->select('vehicle_code')->where('id', $request->id)->first();
 
         if ($SETTING_TIME->open_schedule_time == 'on') {
             if ($insertTime >= 7 && $insertTime <= 18) {
+
+                if ($find_vehicle_code && $find_vehicle_code->vehicle_code === null || $find_vehicle_code->vehicle_code === '') {
+                    $updateData = DB::table('vehicle')->where('id', $request->id)->update([
+                        'vehicle_code' => Uuid::uuid4()->toString(),
+                        'vehicle_registration_number' => $request->vehicle_registration_number,
+                        'vehicle_type' => $request->vehicle_type,
+                        'price' => $request->price,
+                        'credit_price' => $request->credit_price,
+                        'brand' => $request->brand,
+                        'current_km' => $request->current_km,
+                        'manufacture_year' => $request->manufacture_year,
+                        'vehicle_category' => $request->vehicle_category,
+                        'model' => $request->model,
+                        'color' => $request->color,
+                        'fuel_type' => $request->fuel_type,
+                        'cylinder_capacity' => $request->cylinder_capacity,
+                        'transmission' => $request->transmission,
+                        'backup_vehicle_key' => $request->backup_vehicle_key,
+                        'services_book' => $request->services_book,
+                        'vehicle_identity_number' => $request->vehicle_identity_number,
+                        'engine_number' => $request->engine_number,
+                        'coding_number' => $request->coding_number,
+                        'licence_plate_color' => $request->licence_plate_color,
+                        'old_vin' => $request->old_vin,
+                        'registration_year' => $request->registration_year,
+                        'tax_date' => $request->tax_date,
+                        'bpkb_number' => $request->bpkb_number,
+                        'location_code' => $request->location_code,
+                        'registration_queue_number' => $request->registration_queue_number,
+                        'name_of_owner' => $request->name_of_owner,
+                        'address' => $request->address,
+                        'location_branch_vehicle' => $request->location_branch_vehicle,
+                        'status_vehicle_id' => $request->status_vehicle_id,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_at' => now()
+                    ]);
+                } else {
+                    DB::table('vehicle')->where('id', $request->id)->update([
+                        'vehicle_registration_number' => $request->vehicle_registration_number,
+                        'vehicle_type' => $request->vehicle_type,
+                        'price' => $request->price,
+                        'credit_price' => $request->credit_price,
+                        'brand' => $request->brand,
+                        'current_km' => $request->current_km,
+                        'manufacture_year' => $request->manufacture_year,
+                        'vehicle_category' => $request->vehicle_category,
+                        'model' => $request->model,
+                        'color' => $request->color,
+                        'fuel_type' => $request->fuel_type,
+                        'cylinder_capacity' => $request->cylinder_capacity,
+                        'transmission' => $request->transmission,
+                        'backup_vehicle_key' => $request->backup_vehicle_key,
+                        'services_book' => $request->services_book,
+                        'vehicle_identity_number' => $request->vehicle_identity_number,
+                        'engine_number' => $request->engine_number,
+                        'coding_number' => $request->coding_number,
+                        'licence_plate_color' => $request->licence_plate_color,
+                        'old_vin' => $request->old_vin,
+                        'registration_year' => $request->registration_year,
+                        'tax_date' => $request->tax_date,
+                        'bpkb_number' => $request->bpkb_number,
+                        'location_code' => $request->location_code,
+                        'registration_queue_number' => $request->registration_queue_number,
+                        'name_of_owner' => $request->name_of_owner,
+                        'address' => $request->address,
+                        'location_branch_vehicle' => $request->location_branch_vehicle,
+                        'status_vehicle_id' => $request->status_vehicle_id,
+                        'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                        'updated_at' => now()
+                    ]);
+                }
+
+
+
+                $this->insertLogActivityUsers(__METHOD__);
+                session()->flash('message_success', 'Data Berhasil disimpan!');
+                return redirect()->route('master_vehicle_data.index');
+            } else {
+                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
+                return redirect()->route('master_vehicle_data.index');
+            }
+        } else {
+
+            if ($find_vehicle_code && $find_vehicle_code->vehicle_code === null || $find_vehicle_code->vehicle_code === '') {
                 $updateData = DB::table('vehicle')->where('id', $request->id)->update([
+                    'vehicle_code' => Uuid::uuid4()->toString(),
                     'vehicle_registration_number' => $request->vehicle_registration_number,
                     'vehicle_type' => $request->vehicle_type,
                     'price' => $request->price,
@@ -408,47 +495,42 @@ class MasterVehicleData extends Controller
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'updated_at' => now()
                 ]);
-                $this->insertLogActivityUsers(__METHOD__);
-                session()->flash('message_success', 'Data Berhasil disimpan!');
-                return redirect()->route('master_vehicle_data.index');
             } else {
-                session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
-                return redirect()->route('master_vehicle_data.index');
+                DB::table('vehicle')->where('id', $request->id)->update([
+                    'vehicle_registration_number' => $request->vehicle_registration_number,
+                    'vehicle_type' => $request->vehicle_type,
+                    'price' => $request->price,
+                    'credit_price' => $request->credit_price,
+                    'brand' => $request->brand,
+                    'current_km' => $request->current_km,
+                    'manufacture_year' => $request->manufacture_year,
+                    'vehicle_category' => $request->vehicle_category,
+                    'model' => $request->model,
+                    'color' => $request->color,
+                    'fuel_type' => $request->fuel_type,
+                    'cylinder_capacity' => $request->cylinder_capacity,
+                    'transmission' => $request->transmission,
+                    'backup_vehicle_key' => $request->backup_vehicle_key,
+                    'services_book' => $request->services_book,
+                    'vehicle_identity_number' => $request->vehicle_identity_number,
+                    'engine_number' => $request->engine_number,
+                    'coding_number' => $request->coding_number,
+                    'licence_plate_color' => $request->licence_plate_color,
+                    'old_vin' => $request->old_vin,
+                    'registration_year' => $request->registration_year,
+                    'tax_date' => $request->tax_date,
+                    'bpkb_number' => $request->bpkb_number,
+                    'location_code' => $request->location_code,
+                    'registration_queue_number' => $request->registration_queue_number,
+                    'name_of_owner' => $request->name_of_owner,
+                    'address' => $request->address,
+                    'location_branch_vehicle' => $request->location_branch_vehicle,
+                    'status_vehicle_id' => $request->status_vehicle_id,
+                    'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
+                    'updated_at' => now()
+                ]);
             }
-        } else {
-            $updateData = DB::table('vehicle')->where('id', $request->id)->update([
-                'vehicle_registration_number' => $request->vehicle_registration_number,
-                'vehicle_type' => $request->vehicle_type,
-                'price' => $request->price,
-                'credit_price' => $request->credit_price,
-                'brand' => $request->brand,
-                'current_km' => $request->current_km,
-                'manufacture_year' => $request->manufacture_year,
-                'vehicle_category' => $request->vehicle_category,
-                'model' => $request->model,
-                'color' => $request->color,
-                'fuel_type' => $request->fuel_type,
-                'cylinder_capacity' => $request->cylinder_capacity,
-                'transmission' => $request->transmission,
-                'backup_vehicle_key' => $request->backup_vehicle_key,
-                'services_book' => $request->services_book,
-                'vehicle_identity_number' => $request->vehicle_identity_number,
-                'engine_number' => $request->engine_number,
-                'coding_number' => $request->coding_number,
-                'licence_plate_color' => $request->licence_plate_color,
-                'old_vin' => $request->old_vin,
-                'registration_year' => $request->registration_year,
-                'tax_date' => $request->tax_date,
-                'bpkb_number' => $request->bpkb_number,
-                'location_code' => $request->location_code,
-                'registration_queue_number' => $request->registration_queue_number,
-                'name_of_owner' => $request->name_of_owner,
-                'address' => $request->address,
-                'location_branch_vehicle' => $request->location_branch_vehicle,
-                'status_vehicle_id' => $request->status_vehicle_id,
-                'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
-                'updated_at' => now()
-            ]);
+
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Berhasil disimpan!');
             return redirect()->route('master_vehicle_data.index');

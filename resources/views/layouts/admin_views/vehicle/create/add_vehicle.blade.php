@@ -213,8 +213,12 @@
                         </div>
                         <div class="form-group">
                             <label>Warna Plat Nomor Kendaraan (TNKB)</label>
-                            <input type="text" class="form-control" value="{{ old('licence_plate_color') }}"
-                                name="licence_plate_color" placeholder="Warna TNKB" autocomplete="off">
+                            <select class="form-control" name="licence_plate_color" id="">
+                                <option value="">--- Pilih Warna Plat Nomor ---</option>
+                                <option value="Hitam">Hitam</option>
+                                <option value="Putih">Putih</option>
+                            </select>
+
                             <x-input-error :messages="$errors->get('licence_plate_color')" class="mt-2" style="color: red;" />
                         </div>
 
@@ -267,12 +271,9 @@
                             <ul>
                                 <li>Penambahan master data kendaraan diharapkan benar</li>
                                 <br>
-                                <li>User bisa melakukan upload foto dan dokumen kendaraan</li>
-                                <br>
-                                <li>Upload Foto kendaraan hanya bisa setelah upload master data kendataan dan Ketentuan
-                                    upload gambar dengan format : JPEG, JPG, PNG, jpeg,jpg</li>
-                                <br>
-                                <li>Ketentuan upload dokumen seperti dokumen STNK & BPKB serta dokumen lainnya</li>
+                                <li>User bisa melakukan upload foto, media file, dan dokumen kendaraan pada menu master
+                                    "Unit
+                                    Kendaraan" jika sudah menambahkan data kendaraan pada form ini</li>
                             </ul>
 
                         </div>
