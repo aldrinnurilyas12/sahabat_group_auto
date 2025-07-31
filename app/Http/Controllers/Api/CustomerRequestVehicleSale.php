@@ -39,17 +39,14 @@ class CustomerRequestVehicleSale extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
         return view('layouts.admin_views.customer_vehicle_sale.customer_vehicle_sale', compact('customer_request_sale_data', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
     }
@@ -156,17 +153,14 @@ class CustomerRequestVehicleSale extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
         $branch = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name;
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -255,17 +249,14 @@ class CustomerRequestVehicleSale extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
 
         $customer_request_sale_data = DB::table('vehicle_sale_request as vsr')

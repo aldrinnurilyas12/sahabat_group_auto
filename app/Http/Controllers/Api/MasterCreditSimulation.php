@@ -85,7 +85,14 @@ class MasterCreditSimulation extends Controller
 
 
         $request->validate([
-            'vehicle_id' => 'required'
+            'vehicle_id' => 'required',
+            'down_payment' => 'required',
+            'tenor_12_month' => 'required',
+            'tenor_24_month' => 'required',
+            'tenor_36_month' => 'required',
+            'tenor_48_month' => 'required',
+            'tenor_60_month' => 'required',
+            'tenor_72_month' => 'required'
         ]);
 
         $SETTING_TIME = DB::table('settings_schedule_time')->first();
@@ -96,6 +103,7 @@ class MasterCreditSimulation extends Controller
                     'vehicle_id' => $request->vehicle_id,
                     'normal_price' => $request->normal_price,
                     'down_payment' => $request->down_payment,
+                    'interest_rate' => $request->interest_rate,
                     'insurance_id' => $request->insurance_id,
                     'tenor_12_month' => $request->tenor_12_month,
                     'tenor_24_month' => $request->tenor_24_month,
@@ -108,7 +116,7 @@ class MasterCreditSimulation extends Controller
 
                 ]);
                 $this->insertLogActivityUsers(__METHOD__);
-                session()->flash('message_success', 'Data Berhasil disimpan!');
+                session()->flash('message_success', 'Data Kredit Berhasil disimpan!');
                 return redirect()->route('detail_vehicle', $request->vehicle_id);
             } else {
                 session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
@@ -119,6 +127,7 @@ class MasterCreditSimulation extends Controller
                 'vehicle_id' => $request->vehicle_id,
                 'normal_price' => $request->normal_price,
                 'down_payment' => $request->down_payment,
+                'interest_rate' => $request->interest_rate,
                 'insurance_id' => $request->insurance_id,
                 'tenor_12_month' => $request->tenor_12_month,
                 'tenor_24_month' => $request->tenor_24_month,
@@ -131,7 +140,7 @@ class MasterCreditSimulation extends Controller
 
             ]);
             $this->insertLogActivityUsers(__METHOD__);
-            session()->flash('message_success', 'Data Berhasil disimpan!');
+            session()->flash('message_success', 'Data Kredit Berhasil disimpan!');
             return redirect()->route('detail_vehicle', $request->vehicle_id);
         }
     }
@@ -166,6 +175,7 @@ class MasterCreditSimulation extends Controller
                 DB::table('credit_simulation')->where('id', $request->id)->update([
                     'vehicle_id' => $request->vehicle_id,
                     'down_payment' => $request->down_payment,
+                    'interest_rate' => $request->interest_rate,
                     'insurance_id' => $request->insurance_id,
                     'tenor_12_month' => $request->tenor_12_month,
                     'tenor_24_month' => $request->tenor_24_month,
@@ -177,7 +187,7 @@ class MasterCreditSimulation extends Controller
                     'updated_at' => now()
                 ]);
                 $this->insertLogActivityUsers(__METHOD__);
-                session()->flash('message_success', 'Data Berhasil disimpan!');
+                session()->flash('message_success', 'Data Kredit berhasil diperbarui');
                 return redirect()->route('detail_vehicle',  $request->vehicle_id);
             } else {
                 session()->flash('failed_insert', 'Data gagal disimpan, Jam untuk melakukan operasional: 08.00 wib - 18.00 wib');
@@ -187,6 +197,7 @@ class MasterCreditSimulation extends Controller
             DB::table('credit_simulation')->where('id', $request->id)->update([
                 'vehicle_id' => $request->vehicle_id,
                 'down_payment' => $request->down_payment,
+                'interest_rate' => $request->interest_rate,
                 'insurance_id' => $request->insurance_id,
                 'tenor_12_month' => $request->tenor_12_month,
                 'tenor_24_month' => $request->tenor_24_month,
@@ -198,7 +209,7 @@ class MasterCreditSimulation extends Controller
                 'updated_at' => now()
             ]);
             $this->insertLogActivityUsers(__METHOD__);
-            session()->flash('message_success', 'Data Berhasil disimpan!');
+            session()->flash('message_success', 'Data Kredit berhasil diperbarui');
             return redirect()->route('detail_vehicle',  $request->vehicle_id);
         }
     }
@@ -241,11 +252,12 @@ class MasterCreditSimulation extends Controller
         $request->validate([
             'credit_price' => 'required|numeric|min:0',
             'down_payment' => 'required|numeric|min:0|lte:credit_price',
+            'interest_rate' => 'required|numeric|min:0',
         ]);
-
 
         $price_unit = $request->credit_price;
         $down_payment = $request->down_payment;
+        $interest_rate = $request->interest_rate;
 
         $credit_calculations = $price_unit - $down_payment;
 
@@ -253,16 +265,25 @@ class MasterCreditSimulation extends Controller
             return response()->json(['error' => 'Invalid request'], 400);
         }
 
+        // Fungsi bantu menghitung cicilan per tenor
+        function calculateInstallment($principal, $interest_rate, $tenor)
+        {
+            $monthly_principal = $principal / $tenor;
+            $total_interest = ($principal * $interest_rate) / 100; // bunga total
+            $monthly_interest = $total_interest / $tenor;
+            return round($monthly_principal + $monthly_interest, 2);
+        }
+
         return response()->json([
             'status' => true,
-            'message' => 'perhitungan data credit',
+            'message' => 'Perhitungan data credit',
             'data'  => [
-                'tenor_12_month' => round($credit_calculations / 12),
-                'tenor_24_month' => round($credit_calculations / 24),
-                'tenor_36_month' => round($credit_calculations / 36),
-                'tenor_48_month' => round($credit_calculations / 48),
-                'tenor_60_month' => round($credit_calculations / 60),
-                'tenor_72_month' => round($credit_calculations / 72),
+                'tenor_12_month' => calculateInstallment($credit_calculations, $interest_rate, 12),
+                'tenor_24_month' => calculateInstallment($credit_calculations, $interest_rate, 24),
+                'tenor_36_month' => calculateInstallment($credit_calculations, $interest_rate, 36),
+                'tenor_48_month' => calculateInstallment($credit_calculations, $interest_rate, 48),
+                'tenor_60_month' => calculateInstallment($credit_calculations, $interest_rate, 60),
+                'tenor_72_month' => calculateInstallment($credit_calculations, $interest_rate, 72),
             ]
         ]);
     }

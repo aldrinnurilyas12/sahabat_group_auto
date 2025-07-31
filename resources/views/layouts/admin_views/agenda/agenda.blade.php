@@ -54,9 +54,126 @@
                             </a>
 
 
-                            <a class="btn btn-info" href="{{ route('agenda_export_pdf') }}">
-                                <i class="fa fa-file"></i> &nbsp; PDF
-                            </a>
+                            <div style="display: flex; gap:10px; font-family:inter,sans-serif;" class="btn-content">
+
+                                @if ($agenda->isNotEmpty())
+                                    <form action="{{ route('agenda_export_excel') }}" method="POST">
+                                        @csrf
+                                        <input type="text" name="office" value="{{ $offices }}" hidden>
+                                        <input type="text" name="bulan" value="{{ $bulan }}" hidden>
+                                        <input type="text" name="tahun" value="{{ $tahun }}" hidden>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-file-excel"></i>
+                                            &nbsp; Excel
+                                        </button>
+                                    </form>
+
+                                    <form action="{{ route('agenda_export_pdf') }}" method="POST">
+                                        @csrf
+                                        <input type="text" name="office" value="{{ $offices }}" hidden>
+                                        <input type="text" name="bulan" value="{{ $bulan }}" hidden>
+                                        <input type="text" name="tahun" value="{{ $tahun }}" hidden>
+                                        <button type="submit" class="btn btn-info">
+                                            <i class="fa fa-file"></i> &nbsp; PDF
+                                        </button>
+                                    </form>
+                                @else
+                                    <button class="btn btn-dark">
+                                        <i class="fas fa-file-excel"></i>
+                                        &nbsp; Excel
+                                    </button>
+
+                                    <button class="btn btn-dark">
+                                        <i class="fa fa-file"></i> &nbsp; PDF
+                                    </button>
+                                @endif
+
+
+                            </div>
+                        </div>
+
+
+                        <br>
+                        <div style="color: black;" class="form-group">
+                            <form action="{{ route('filter_agenda') }}" method="GET">
+
+                                <div style="display: flex;gap:10px;" class="grouped-container">
+                                    <div style="display: block" class="select-group">
+                                        <label for="">Kantor</label>
+                                        <select class="form-control" name="office" id="branch">
+                                            <option value="">--- Pilih Kantor ---</option>
+                                            <option value="alldata">Semua Kantor</option>
+                                            @foreach ($office as $kantor)
+                                                <option value="{{ $kantor->location_name }}">
+                                                    {{ $kantor->location_name }}</option>
+                                            @endforeach
+
+                                        </select>
+                                        <x-input-error :messages="$errors->get('office')" class="mt-2" style="color: red;" />
+                                    </div>
+
+                                    <div style="display: block" class="select-group">
+                                        <label for="">Bulan</label>
+                                        <select class="form-control" name="bulan" id="branch">
+                                            <option value="">--- Pilih bulan ---</option>
+                                            <option value="alldata">Semua Data</option>
+                                            @foreach ($months as $month)
+                                                <option value="{{ $month->id }}">{{ $month->month_list }}
+                                                </option>
+                                            @endforeach
+
+                                        </select>
+                                        <x-input-error :messages="$errors->get('bulan')" class="mt-2" style="color: red;" />
+                                    </div>
+
+                                    <div style="display: block" class="select-group">
+                                        <label for="">Tahun</label>
+                                        <select class="form-control" name="tahun" id="status">
+                                            <option value="">--- Pilih tahun ---</option>
+                                            <option value="alldata">Semua Data</option>
+                                            @foreach ($years as $year)
+                                                <option value="{{ $year }}">{{ $year }}</option>
+                                            @endforeach
+                                        </select>
+                                        <x-input-error :messages="$errors->get('tahun')" class="mt-2" style="color: red;" />
+                                    </div>
+
+
+                                    <button style="height: 40px; align-self:end;" type="submit"
+                                        class="btn btn-primary">Pilih</button>
+                                    <a href="{{ route('master_agenda.index') }}"
+                                        style="height: 40px; align-self:end;" class="btn btn-secondary">Reset</a>
+                                </div>
+                                &nbsp;
+
+                            </form>
+
+                            <div style="font-size:14px;" class="result-selected">
+                                @if ($agenda->isNotEmpty())
+                                    <strong>
+                                        Data terpilih:
+                                    </strong>
+                                    <br>
+                                    <!-- Memastikan bahwa $month adalah objek dan mengakses propertinya, misalnya 'name' -->
+                                    <div class="alert alert-warning">
+                                        Kantor :{{ $offices }} <br>
+                                        <span style="display: flex; gap:10px;" class="center-date">
+                                            <p> Bulan : {{ $bulan }}</p>
+                                            <p> Tahun : {{ $tahun }}</p>
+                                        </span>
+
+                                        <!-- Menampilkan tahun yang dipilih dari array $year -->
+                                    </div>
+                                @elseif($agenda->isEmpty())
+                                    <div class="alert alert-warning">
+                                        Tidak ada data dipilih
+                                    </div>
+                                @endif
+
+                            </div>
+
+
+
                         </div>
                     </div>
                     <div class="card-body">
@@ -68,12 +185,13 @@
                                         <th>No</th>
                                         <th>Aksi</th>
                                         <th>Ubah Status</th>
-                                        <th>Department</th>
                                         <th>Kantor</th>
+                                        <th>Department</th>
                                         <th>Pemimpin Meeting</th>
                                         <th>Agenda</th>
                                         <th>Tanggal Agenda</th>
                                         <th>Status</th>
+                                        <th>Alasan</th>
                                         <th>Jam Mulai</th>
                                         <th>Jam Akhir</th>
                                         <th>Created At</th>
@@ -92,8 +210,11 @@
                                             <td>
                                                 <div style="display:flex; justify-content:center;gap:8px; "
                                                     class="action">
-                                                    <a href="{{ route('agenda_edit', ['id' => $agendas->id]) }}"><i
-                                                            class="fas fa-edit"></i></a>
+                                                    @if ($agendas->status == 'done')
+                                                    @else
+                                                        <a href="{{ route('agenda_edit', ['id' => $agendas->id]) }}"><i
+                                                                class="fas fa-edit"></i></a>
+                                                    @endif
                                                     <a style="size: 12px;" href="#" data-toggle="modal"
                                                         data-target="#deleteUnit{{ $agendas->id }}"><i
                                                             class="fas fa-trash"></i></a>
@@ -108,16 +229,16 @@
                                             </td>
 
 
-                                            @if ($agendas->department_name == null)
-                                                <td>Semua Department</td>
-                                            @else
-                                                <td>{{ $agendas->department_name }}</td>
-                                            @endif
-
                                             @if ($agendas->branch == null)
                                                 <td>Semua Kantor</td>
                                             @else
                                                 <td>{{ $agendas->branch }}</td>
+                                            @endif
+
+                                            @if ($agendas->department_name == null)
+                                                <td>Semua Department</td>
+                                            @else
+                                                <td>{{ $agendas->department_name }}</td>
                                             @endif
 
                                             @if ($agendas->meeting_leader == null)
@@ -134,9 +255,18 @@
                                                 @elseif($agendas->status == 'done')
                                                     <span class="badge badge-success">Selesai</span>
                                                 @elseif($agendas->status == 'pending')
-                                                    <span class="badge badge-warning">Ditunda</span>
+                                                    <span class="badge badge-secondary">Ditunda</span>
                                                 @elseif($agendas->status == 'canceled')
                                                     <span class="badge badge-danger">Dibatalkan</span>
+                                                @elseif($agendas->status == 'scheduled')
+                                                    <span class="badge badge-warning">Dijadwalkan</span>
+                                                @else
+                                                    <span>-</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if ($agendas->reasons)
+                                                    <span>{{ $agendas->reasons }}</span>
                                                 @else
                                                     <span>-</span>
                                                 @endif

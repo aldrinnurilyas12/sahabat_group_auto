@@ -35,6 +35,27 @@ class EmployeeLeaves extends Controller
         $hr_login_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations';
         $branch_id_login_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id;
 
+        $office = DB::table('branch')->get();
+
+
+        $departments = $request->department;
+
+        $office = DB::table('branch')->get();
+        $department = DB::table('department')->get();
+        $offices = $request->office;
+        $departments = $request->department;
+
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $months = DB::table('months')->get();
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
         if ($branch_login_session) {
             $employee_leaves = DB::table('v_employee_leaves')->where('branch_id', $branch_id_login_session)->orderBy('created_at', 'desc')->get();
@@ -44,11 +65,8 @@ class EmployeeLeaves extends Controller
             $employee_leaves = DB::table('v_employee_leaves')->orderBy('created_at', 'desc')->get();
         }
 
-        $office = DB::table('branch')->get();
-        $department = DB::table('department')->get();
-        $offices = $request->office;
-        $departments = $request->department;
-        return view('layouts.admin_views.employee_absences_leaves.employee_leaves_data', compact('employee_leaves', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'department', 'departments'));
+
+        return view('layouts.admin_views.employee_absences_leaves.employee_leaves_data', compact('employee_leaves', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'bulan', 'tahun', 'months', 'years', 'department', 'departments'));
     }
 
     public function employee_absences_leaves(Request $request): View
@@ -315,13 +333,26 @@ class EmployeeLeaves extends Controller
         $department = DB::table('department')->get();
         $offices = $request->office;
         $departments = $request->department;
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $months = DB::table('months')->get();
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
 
-        if ($offices) {
-            $employee_leaves = DB::table('v_employee_leaves')->where('location_name', $offices)->get();
+
+        if ($offices && $bulan && $tahun) {
+            $employee_leaves = DB::table('v_employee_leaves')->where('location_name', $offices)
+                ->whereRaw('MONTH(created_at) = ?', [$bulan])
+                ->whereRaw('YEAR(created_at) = ?', [$tahun])->get();
         }
         if ($offices === 'alldata') {
-            $employee = DB::table('v_employee_leaves')->get();
             $employee_leaves = DB::table('v_employee_leaves')->get();
         }
 
@@ -330,7 +361,7 @@ class EmployeeLeaves extends Controller
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
-        return view('layouts.admin_views.employee_absences_leaves.employee_leaves_data', compact('employee_leaves', 'employee', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices'));
+        return view('layouts.admin_views.employee_absences_leaves.employee_leaves_data', compact('employee_leaves', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'years', 'months', 'tahun', 'bulan'));
     }
 
 
@@ -338,30 +369,42 @@ class EmployeeLeaves extends Controller
     {
         // $departments = $request->department; // Full month name (e.g., January)
         $offices = $request->office; // Current year (e.g., 2024)
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $fileName = 'Data_Cuti_Karyawan' . '-' . $offices . '-' . $bulan .  '-' . $tahun . '.xlsx';
 
-        $fileName = 'Data_Cuti_Karyawan' . '_' . $offices . '-' . date('Y') . '.xlsx';
-
-        return Excel::download(new EmployeeLeavesExport($offices), $fileName);
+        return Excel::download(new EmployeeLeavesExport($offices, $bulan, $tahun), $fileName);
     }
 
     public function download_employee_leaves(Request $request)
     {
         $offices = $request->office;
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $months = DB::table('months')->get();
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
 
-        if ($offices) {
-            $employee_leaves = DB::table('v_employee_leaves')->where('location_name', $offices)->get();
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
+
+
+
+        if ($offices && $bulan && $tahun) {
+            $leaves = DB::table('v_employee_leaves')->where('location_name', $offices)
+                ->whereRaw('MONTH(created_at) = ?', [$bulan])
+                ->whereRaw('YEAR(created_at) = ?', [$tahun])->get();
         }
         if ($offices === 'alldata') {
-            $employee = DB::table('v_employee_leaves')->get();
-            $employee_leaves = DB::table('v_employee_leaves')->get();
+            $leaves = DB::table('v_employee_leaves')->get();
         }
 
-        $query = DB::table('v_employee_leaves');
-
-        $leaves = $query->get();
 
         // Nama file PDF
-        $fileName = 'Data_Cuti_Karyawan' . '-' . $offices . '.pdf';
+        $fileName = 'Data_Cuti_Karyawan' . '-' . $offices . '-' . $bulan . '-' . $tahun . '.pdf';
 
         // Generate PDF
         $pdf = Pdf::loadView('layouts.pdf.employee_leaves_pdf', [

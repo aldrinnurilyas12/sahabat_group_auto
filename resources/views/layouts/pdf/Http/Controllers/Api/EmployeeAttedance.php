@@ -54,17 +54,14 @@ class EmployeeAttedance extends Controller
         $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->value('total_alpha_ongoing');
 
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
         $bulan = $request->month;
         $tahun = $request->year;
 
@@ -153,17 +150,14 @@ class EmployeeAttedance extends Controller
         $attendance_abnormal_branch = DB::table('v_employee_attedance')->where('attedance_type', 'sakit')->where('branch', $branch_location)->count();
         $attendance_alpha_branch = DB::table('v_employee_attedance')->where('branch', $branch_location)->value('total_alpha_ongoing');
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
 
         $employee_attedance = DB::table('v_employee_attedance')->where('branch', $branch_location)->orderBy('created_at', 'desc')->get();

@@ -56,17 +56,14 @@ class SpkUnitController extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
         return view('layouts.admin_views.spk_unit.spk', compact('all_spk_data', 'spk_data', 'branch', 'branch_request', 'bulan', 'tahun', 'years', 'months', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -281,17 +278,14 @@ class SpkUnitController extends Controller
 
 
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
         $branch = DB::table('v_branch')->select('location_name')->get();
 

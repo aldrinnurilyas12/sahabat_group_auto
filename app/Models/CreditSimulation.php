@@ -14,6 +14,7 @@ class CreditSimulation extends Model
     protected $fillable = [
         'vehicle_id',
         'down_payment',
+        'interest_rate',
         'insurance_id',
         'tenor_12_month',
         'tenor_24_month',

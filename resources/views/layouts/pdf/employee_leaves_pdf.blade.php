@@ -14,6 +14,12 @@
         <h3>Data Cuti Karyawan PT Sahabat Group Auto</h3>
         <hr>
         <p>Cabang : {{ $leaves->first()->location_name }}</p>
+        <span class="date-center" style="display: flex; gap:20px;">
+            <p>Bulan : {{ \Carbon\Carbon::parse($leaves->first()->created_at)->translatedFormat('F') }}
+                &nbsp; <span>Tahun :
+                    {{ \Carbon\Carbon::parse($leaves->first()->created_at)->translatedFormat('Y') }}</span>
+            </p>
+        </span>
         <p>Tanggal Cetak : {{ date('d-m-Y h:i a') }}</p>
 
     </div>

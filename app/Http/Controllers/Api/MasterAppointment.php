@@ -35,17 +35,14 @@ class MasterAppointment extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
         $appointment_data = DB::table('v_appointment')->where('id', '!=', '')->orderBy('created_at', 'DESC')->where('location_unit', '=', $branch)->get();
         return view('layouts.admin_views.appointment.appointment', compact('appointment_data', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
@@ -59,17 +56,14 @@ class MasterAppointment extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
         $branch = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name;
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -228,17 +222,14 @@ class MasterAppointment extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $branch = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id;
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
         $bulan = $request->bulan;
         $tahun = $request->tahun;
 
@@ -257,17 +248,14 @@ class MasterAppointment extends Controller
 
 
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
         $bulan = $request->bulan;
         $tahun = $request->tahun;
@@ -335,17 +323,14 @@ class MasterAppointment extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
         $appointment_data = DB::table('v_appointment')->where('id', '!=', '')->orderBy('created_at', 'DESC')->where('location_unit', '=', $branch)->get();
 
@@ -408,17 +393,14 @@ class MasterAppointment extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
         $request_vehicle_data = DB::table('customer_vehicle_request as cr')
             ->select('cr.id', 'cr.vehicle_type', 'cr.name', 'vb.brand_name', 'cr.year', 'cr.vehicle_color', 'cr.email', 'cr.phone_number', 'cr.created_at', 'cr.sending_mail', 'cr.description')

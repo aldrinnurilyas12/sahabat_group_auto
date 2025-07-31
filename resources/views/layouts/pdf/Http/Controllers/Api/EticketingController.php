@@ -44,17 +44,14 @@ class EticketingController extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
         $eticket_data = DB::table('v_eticket')->where('employee_id', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id)->orderBy('created_at', 'DESC')->get();
         return view('layouts.admin_views.eticketing.eticket', compact('eticket_data', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
@@ -245,17 +242,14 @@ class EticketingController extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
         $eticket_data = DB::table('v_eticket')->orderBy('created_at', 'DESC')->get();
         return view('layouts.admin_views.eticketing.it_monitoring.eticket_it', compact('eticket_data', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
@@ -377,17 +371,14 @@ class EticketingController extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
 
         if ($bulan && $tahun) {
@@ -410,17 +401,14 @@ class EticketingController extends Controller
         $bulan = $request->bulan;
         $tahun = $request->tahun;
         $months = DB::table('months')->get();
-        $years = [
-            '2020',
-            '2021',
-            '2022',
-            '2023',
-            '2024',
-            '2025',
-            '2026',
-            '2027',
-            '2028'
-        ];
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
         $eticket_data = DB::table('v_eticket')->get();
 

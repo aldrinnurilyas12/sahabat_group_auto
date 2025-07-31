@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\AgendaExport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\AgendaModel;
@@ -10,6 +11,7 @@ use Illuminate\View\View;
 use App\Http\Controllers\Api\MasterMainMenuController;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AgendaController extends Controller
 {
@@ -21,13 +23,28 @@ class AgendaController extends Controller
         $this->MasterMainMenuController = $MasterMainMenuController;
     }
 
-    public function index(): View
+    public function index(Request $request): View
     {
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+        $office = DB::table('branch')->get();
+        $department = DB::table('department')->get();
+        $offices = $request->office;
+        $departments = $request->department;
 
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $months = DB::table('months')->get();
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
 
 
         $agenda = DB::table('v_agenda as va')
@@ -41,6 +58,7 @@ class AgendaController extends Controller
                 'va.agenda_date',
                 'va.start_time',
                 'va.status',
+                'va.reasons',
                 'va.end_time',
                 'va.created_at',
                 'va.created_by',
@@ -49,7 +67,7 @@ class AgendaController extends Controller
             )
             ->leftJoin('v_employee as ve', 'va.meeting_leader', '=', 've.nik')
             ->orderBy('created_at', 'DESC')->get();
-        return view('layouts.admin_views.agenda.agenda', compact('agenda', 'grouped_sub_menu', 'sidebar_menu'));
+        return view('layouts.admin_views.agenda.agenda', compact('agenda', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'bulan', 'tahun', 'months', 'years', 'department', 'departments'));
     }
 
     /**
@@ -102,6 +120,7 @@ class AgendaController extends Controller
                     'meeting_leader' => $request->meeting_leader,
                     'agenda_name' => $request->agenda_name,
                     'agenda_date' => $request->agenda_date,
+                    'status' => 'scheduled',
                     'start_time' => $request->start_time,
                     'end_time' => $request->end_time,
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
@@ -121,6 +140,7 @@ class AgendaController extends Controller
                 'meeting_leader' => $request->meeting_leader,
                 'agenda_name' => $request->agenda_name,
                 'agenda_date' => $request->agenda_date,
+                'status' => 'scheduled',
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
@@ -187,6 +207,7 @@ class AgendaController extends Controller
                     'meeting_leader' => $request->meeting_leader,
                     'agenda_name' => $request->agenda_name,
                     'agenda_date' => $request->agenda_date,
+                    'reasons' => $request->reasons,
                     'start_time' => $request->start_time,
                     'end_time' => $request->end_time,
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
@@ -206,6 +227,7 @@ class AgendaController extends Controller
                 'meeting_leader' => $request->meeting_leader,
                 'agenda_name' => $request->agenda_name,
                 'agenda_date' => $request->agenda_date,
+                'reasons' => $request->reasons,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
@@ -264,14 +286,192 @@ class AgendaController extends Controller
         return redirect()->route('master_agenda.index');
     }
 
-
-    public function download_agenda_pdf()
+    public function filter_agenda(Request $request)
     {
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        $agenda = DB::table('v_agenda')->get();
+        $office = DB::table('branch')->get();
+        $department = DB::table('department')->get();
+        $offices = $request->office;
+        $departments = $request->department;
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $months = DB::table('months')->get();
+
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
+
+        $agenda = DB::table('v_agenda as va')
+            ->select(
+                'va.id',
+                'va.department_name',
+                'va.branch',
+                'va.meeting_leader',
+                've.name',
+                'va.agenda_name',
+                'va.agenda_date',
+                'va.start_time',
+                'va.status',
+                'va.end_time',
+                'va.created_at',
+                'va.created_by',
+                'va.updated_by',
+                'va.updated_at'
+            )
+            ->leftJoin('v_employee as ve', 'va.meeting_leader', '=', 've.nik')
+            ->orderBy('created_at', 'DESC')->get();
+
+        if ($offices && $bulan && $tahun) {
+            $agenda = DB::table('v_agenda as va')
+                ->select(
+                    'va.id',
+                    'va.department_name',
+                    'va.branch',
+                    'va.meeting_leader',
+                    've.name',
+                    'va.agenda_name',
+                    'va.agenda_date',
+                    'va.reasons',
+                    'va.start_time',
+                    'va.status',
+                    'va.end_time',
+                    'va.created_at',
+                    'va.created_by',
+                    'va.updated_by',
+                    'va.updated_at'
+                )
+                ->where('location_name', $offices)->whereRaw('MONTH(agenda_date) = ?', [$bulan])
+                ->whereRaw('YEAR(agenda_date) = ?', [$tahun])
+                ->leftJoin('v_employee as ve', 'va.meeting_leader', '=', 've.nik')
+                ->orderBy('created_at', 'DESC')->get();
+        }
+
+        if ($offices === 'alldata' && $bulan === 'alldata' && $tahun === 'alldata') {
+            $agenda = DB::table('v_agenda as va')
+                ->select(
+                    'va.id',
+                    'va.department_name',
+                    'va.branch',
+                    'va.meeting_leader',
+                    've.name',
+                    'va.agenda_name',
+                    'va.agenda_date',
+                    'va.reasons',
+                    'va.start_time',
+                    'va.status',
+                    'va.end_time',
+                    'va.created_at',
+                    'va.created_by',
+                    'va.updated_by',
+                    'va.updated_at'
+                )
+                ->leftJoin('v_employee as ve', 'va.meeting_leader', '=', 've.nik')
+                ->orderBy('created_at', 'DESC')->get();
+        }
+
+        return view('layouts.admin_views.agenda.agenda', compact('agenda', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'bulan', 'tahun', 'months', 'years', 'department', 'departments'));
+    }
+
+
+    public function download_agenda_pdf(Request $request)
+    {
+        $office = DB::table('branch')->get();
+        $department = DB::table('department')->get();
+        $offices = $request->office;
+        $departments = $request->department;
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $months = DB::table('months')->get();
+
+        $currentYear = date("Y");
+        $startYear = $currentYear - 10; // 4 tahun ke belakang dari tahun sekarang
+        $endYear = $currentYear;   // 4 tahun ke depan dari tahun sekarang
+
+        $years = [];
+        for ($year = $startYear; $year <= $endYear; $year++) {
+            $years[] = (string)$year;
+        }
+
+        $agenda = DB::table('v_agenda as va')
+            ->select(
+                'va.id',
+                'va.department_name',
+                'va.branch',
+                'va.meeting_leader',
+                've.name',
+                'va.agenda_name',
+                'va.agenda_date',
+                'va.reasons',
+                'va.start_time',
+                'va.status',
+                'va.end_time',
+                'va.created_at',
+                'va.created_by',
+                'va.updated_by',
+                'va.updated_at'
+            )
+            ->leftJoin('v_employee as ve', 'va.meeting_leader', '=', 've.nik')
+            ->orderBy('created_at', 'DESC')->get();
+
+        if ($offices && $bulan && $tahun) {
+            $agenda = DB::table('v_agenda as va')
+                ->select(
+                    'va.id',
+                    'va.department_name',
+                    'va.branch',
+                    'va.meeting_leader',
+                    've.name',
+                    'va.agenda_name',
+                    'va.agenda_date',
+                    'va.reasons',
+                    'va.start_time',
+                    'va.status',
+                    'va.end_time',
+                    'va.created_at',
+                    'va.created_by',
+                    'va.updated_by',
+                    'va.updated_at'
+                )
+                ->where('location_name', $offices)->whereRaw('MONTH(agenda_date) = ?', [$bulan])
+                ->whereRaw('YEAR(agenda_date) = ?', [$tahun])
+                ->leftJoin('v_employee as ve', 'va.meeting_leader', '=', 've.nik')
+                ->orderBy('created_at', 'DESC')->get();
+        }
+
+        if ($offices === 'alldata' && $bulan === 'alldata' && $tahun === 'alldata') {
+            $agenda = DB::table('v_agenda as va')
+                ->select(
+                    'va.id',
+                    'va.department_name',
+                    'va.branch',
+                    'va.meeting_leader',
+                    've.name',
+                    'va.agenda_name',
+                    'va.agenda_date',
+                    'va.reasons',
+                    'va.start_time',
+                    'va.status',
+                    'va.end_time',
+                    'va.created_at',
+                    'va.created_by',
+                    'va.updated_by',
+                    'va.updated_at'
+                )
+                ->leftJoin('v_employee as ve', 'va.meeting_leader', '=', 've.nik')
+                ->orderBy('created_at', 'DESC')->get();
+        }
+
 
         // Nama file PDF
-        $fileName = 'Data_agenda_' . '.pdf';
+        $fileName = 'Data_agenda_' . $offices . '-' . $bulan . '-' . $tahun . '.pdf';
 
         // Generate PDF
         $pdf = Pdf::loadView('layouts.pdf.agenda_pdf', [
@@ -280,5 +480,14 @@ class AgendaController extends Controller
         $pdf->setPaper('a4', 'landscape');
 
         return $pdf->download($fileName);
+    }
+
+    public function download_agenda_excel(Request $request)
+    {
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+        $offices = $request->office;
+        $fileName = 'Agenda_data_' . '-' . $offices . '-' . $bulan .  '-' . $tahun . '.xlsx';
+        return Excel::download(new AgendaExport($offices, $bulan, $tahun), $fileName);
     }
 }

@@ -376,10 +376,25 @@
 
                                                 @if ($vehicle->first()->status_vehicle == 'Unit Terjual')
                                                 @else
-                                                    <a href="{{ route('add_credit_simulation', $vehicle->first()->id) }}"
-                                                        class="btn btn-primary">
-                                                        <i class="fas fa-plus-circle"></i>&nbsp; Buat Simulasi Kredit
-                                                    </a>
+                                                    @if (in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, [
+                                                            '1',
+                                                            '2',
+                                                            '4',
+                                                            '6',
+                                                            '9',
+                                                            '11',
+                                                            // FOR DEVELOPMENT IT :
+                                                            5,
+                                                            7,
+                                                            15,
+                                                        ]))
+                                                        <a href="{{ route('add_credit_simulation', $vehicle->first()->id) }}"
+                                                            class="btn btn-primary">
+                                                            <i class="fas fa-plus-circle"></i>&nbsp; Buat Simulasi
+                                                            Kredit
+                                                        </a>
+                                                    @else
+                                                    @endif
                                                 @endif
                                             @else
                                                 <a href="{{ route('add_credit_simulation', $vehicle->first()->id) }}"
@@ -429,6 +444,7 @@
                                                         <th>Aksi</th>
                                                         <th>Unit</th>
                                                         <th>Harga Unit</th>
+                                                        <th>Bunga Pinjaman (%)</th>
                                                         <th>Biaya DP Unit</th>
                                                         <th>Total Harga DP</th>
                                                         <th>Asuransi</th>
@@ -452,19 +468,15 @@
                                                                     <a
                                                                         href="{{ route('edit_credit_simulation', $credit->id) }}"><i
                                                                             class="fas fa-edit"></i></a>
-                                                                    <form
-                                                                        action="{{ route('master_credit_simulation.destroy', $credit->id) }}"
-                                                                        method="POST">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <button
-                                                                            style="width:25px;justify-content:center;display:flex;"
-                                                                            class="btn btn-primary" type="submit"><i
-                                                                                class="fas fa-trash"></i></button>
-                                                                    </form>
+                                                                    <a style="size: 12px;" href="#"
+                                                                        data-toggle="modal"
+                                                                        data-target="#deleteCredit{{ $credit->id }}"><i
+                                                                            class="fas fa-trash"></i></a>
                                                             </td>
                                                             <td>{{ $credit->unit }}</td>
                                                             <td>{{ 'Rp ' . number_format($credit->credit_price) }}</td>
+                                                            <td>{{ $credit->interest_rate . '%' }}
+                                                            </td>
                                                             <td>{{ $credit->down_payment . '%' }}
                                                             </td>
                                                             <td>{{ 'Rp ' . number_format($credit->total_down_payment) }}
@@ -920,6 +932,39 @@
         <div class="spinner-border" role="status">
         </div>
     </div>
+
+    @foreach ($credit_simulation as $credit)
+        <div class="modal fade" id="deleteCredit{{ $credit->id }}" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalLabel{{ $credit->id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel{{ $credit->id }}">Hapus data cabang:
+                            {{ $credit->unit }}</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+
+                    <form action="{{ route('master_credit_simulation.destroy', $credit->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <div style="color: black;" class="modal-body">
+                            Apakah Anda ingin menghapus data kredit:
+                            {{ $credit->unit }} ?
+                            <br>
+                            <span style="font-style: italic;color:gray;font-size:12px;">*Data akan terhapus
+                                permanen.</span>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                            <button class="btn btn-danger" type="submit">Hapus</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
 
     <style>
         #loadingSpinnerWrapper {

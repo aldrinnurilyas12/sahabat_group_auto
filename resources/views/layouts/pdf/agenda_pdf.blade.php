@@ -13,6 +13,13 @@
     <div class="container-title">
         <h3>Data Agenda/Meeting PT Sahabat Group Auto</h3>
         <hr>
+        <p>Cabang : {{ $agenda->first()->branch }}</p>
+        <span class="date-center" style="display: flex; gap:20px;">
+            <p>Bulan : {{ \Carbon\Carbon::parse($agenda->first()->agenda_date)->translatedFormat('F') }}
+                &nbsp; <span>Tahun :
+                    {{ \Carbon\Carbon::parse($agenda->first()->agenda_date)->translatedFormat('Y') }}</span>
+            </p>
+        </span>
         <p>Tanggal Cetak : {{ date('d-m-Y h:i a') }}</p>
 
     </div>
@@ -34,6 +41,7 @@
                         <th>Jam Mulai</th>
                         <th>Jam Akhir</th>
                         <th>Status Agenda</th>
+                        <th>Alasan</th>
                         <th>Created At</th>
                         <th>Created By</th>
                         <th>Updated At</th>
@@ -71,6 +79,13 @@
                             <td>{{ $agendas->start_time }}</td>
                             <td>{{ $agendas->end_time }}</td>
                             <td>{{ $agendas->status }}</td>
+                            <td>
+                                @if ($agendas->reasons)
+                                    <span>{{ $agendas->reasons }}</span>
+                                @else
+                                    <span>-</span>
+                                @endif
+                            </td>
                             <td>{{ $agendas->created_at }}</td>
                             <td>{{ $agendas->created_by }}</td>
                             <td>{{ $agendas->updated_at }}</td>

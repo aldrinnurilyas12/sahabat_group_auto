@@ -51,6 +51,8 @@
                                     <form action="{{ route('export_employee_leaves') }}" method="POST">
                                         @csrf
                                         <input type="text" name="office" value="{{ $offices }}" hidden>
+                                        <input type="text" name="bulan" value="{{ $bulan }}" hidden>
+                                        <input type="text" name="tahun" value="{{ $tahun }}" hidden>
                                         <button type="submit" class="btn btn-success">
                                             <i class="fas fa-file-excel"></i>
                                             &nbsp; Excel
@@ -59,7 +61,9 @@
 
                                     <form action="{{ route('employee_leaves_export_pdf') }}" method="POST">
                                         @csrf
-                                        <input type="text" name="location_name" value="{{ $offices }}" hidden>
+                                        <input type="text" name="office" value="{{ $offices }}" hidden>
+                                        <input type="text" name="bulan" value="{{ $bulan }}" hidden>
+                                        <input type="text" name="tahun" value="{{ $tahun }}" hidden>
                                         <button type="submit" class="btn btn-info">
                                             <i class="fa fa-file"></i> &nbsp; PDF
                                         </button>
@@ -94,17 +98,31 @@
                                             @endif
                                         </div>
 
-                                        {{-- <div style="display: block" class="select-group">
-                                            <label for="">Status Cuti</label>
-                                            <select class="form-control" name="department" id="status">
-                                                <option value="">--- Pilih Department ---</option>
-                                               
+                                        <div style="display: block" class="select-group">
+                                            <label for="">Bulan</label>
+                                            <select class="form-control" name="bulan" id="branch">
+                                                <option value="">--- Pilih bulan ---</option>
+                                                <option value="alldata">Semua Data</option>
+                                                @foreach ($months as $month)
+                                                    <option value="{{ $month->id }}">{{ $month->month_list }}
+                                                    </option>
+                                                @endforeach
 
                                             </select>
-                                            @if ($errors->has('year'))
-                                                <span class="text-danger">{{ $errors->first('year') }}</span>
-                                            @endif
-                                        </div> --}}
+                                            <x-input-error :messages="$errors->get('bulan')" class="mt-2" style="color: red;" />
+                                        </div>
+
+                                        <div style="display: block" class="select-group">
+                                            <label for="">Tahun</label>
+                                            <select class="form-control" name="tahun" id="status">
+                                                <option value="">--- Pilih tahun ---</option>
+                                                <option value="alldata">Semua Data</option>
+                                                @foreach ($years as $year)
+                                                    <option value="{{ $year }}">{{ $year }}</option>
+                                                @endforeach
+                                            </select>
+                                            <x-input-error :messages="$errors->get('tahun')" class="mt-2" style="color: red;" />
+                                        </div>
 
                                         <button style="height: 40px; align-self:end;" type="submit"
                                             class="btn btn-primary">Pilih</button>
@@ -123,6 +141,11 @@
                                         <!-- Memastikan bahwa $month adalah objek dan mengakses propertinya, misalnya 'name' -->
                                         <div class="alert alert-warning">
                                             Kantor :{{ $offices }} <br>
+                                            <span style="display: flex; gap:10px;" class="center-date">
+                                                <p> Bulan : {{ $bulan }}</p>
+                                                <p> Tahun : {{ $tahun }}</p>
+                                            </span>
+
                                             <!-- Menampilkan tahun yang dipilih dari array $year -->
                                         </div>
                                     @elseif($employee_leaves->isEmpty())
@@ -144,8 +167,8 @@
 
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table style="font-size: 14px; color:black;" class="table table-bordered" id="dataTable"
-                                    width="100%" cellspacing="0">
+                                <table style="font-size: 14px; color:black;" class="table table-bordered"
+                                    id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
                                             <th>No</th>
@@ -207,8 +230,8 @@
                                                 @endif
                                                 <td>
                                                     @if ($emp->attachment)
-                                                        <a style="color: black;" class="btn btn-warning" href="#"
-                                                            data-toggle="modal"
+                                                        <a style="color: black;" class="btn btn-warning"
+                                                            href="#" data-toggle="modal"
                                                             data-target="#showAttachment{{ $emp->id }}"><i
                                                                 class="fa fa-eye" aria-hidden="true"></i>
                                                             lihat</a>

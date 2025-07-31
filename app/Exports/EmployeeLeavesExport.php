@@ -15,17 +15,19 @@ use Maatwebsite\Excel\Events\AfterSheet;
 class EmployeeLeavesExport implements FromCollection, WithHeadings, WithTitle, WithEvents
 {
 
-    public function __construct($offices)
+    public function __construct($offices, $bulan, $tahun)
     {
         // $this->department = $departments;
         $this->office = $offices;
+        $this->bulan = $bulan;
+        $this->tahun = $tahun;
     }
 
 
     public function collection()
     {
 
-        if ($this->office == 'alldata') {
+        if ($this->office == 'alldata' && $this->bulan && $this->tahun) {
             return DB::table('v_employee_leaves')
                 ->select(
                     'id',
@@ -49,7 +51,7 @@ class EmployeeLeavesExport implements FromCollection, WithHeadings, WithTitle, W
                     'updated_at'
                 )
                 ->get();
-        } elseif ($this->office) {
+        } elseif ($this->office && $this->bulan && $this->tahun) {
             return DB::table('v_employee_leaves')
                 ->select(
                     'id',
@@ -73,6 +75,8 @@ class EmployeeLeavesExport implements FromCollection, WithHeadings, WithTitle, W
                     'updated_at'
                 )
                 ->where('location_name', [$this->office])
+                ->whereRaw('MONTH(created_at) = ?', [$this->bulan])
+                ->whereRaw('YEAR(created_at) = ?', [$this->tahun])
                 ->get();
         }
     }
@@ -117,7 +121,8 @@ class EmployeeLeavesExport implements FromCollection, WithHeadings, WithTitle, W
                 $event->sheet->mergeCells('A1:O1'); // Merge cells for the title
                 $event->sheet->setCellValue('A2', 'Kantor : ' . $this->office);
                 $event->sheet->getStyle('A1')->getFont()->setSize(16)->setBold(true);
-                $event->sheet->getStyle('A3:H2')->getFont()->setBold(true); // Optional styling for title
+                $event->sheet->getStyle('A2:H2')->getFont()->setBold(true); // Optional styling for title
+                $event->sheet->getStyle('A3:H2')->getFont()->setBold(true);
             },
             // You can also customize formatting for other parts of the sheet (e.g., bold headers)
             AfterSheet::class => function (AfterSheet $event) {
@@ -125,7 +130,7 @@ class EmployeeLeavesExport implements FromCollection, WithHeadings, WithTitle, W
 
                 // Set bold styling
                 $sheet->getStyle('A2:AF2')->getFont()->setBold(true);
-                $sheet->getStyle('A3:S4')->getFont()->setBold(true);
+                $sheet->getStyle('A3:S3')->getFont()->setBold(true);
 
 
                 // Auto-size all used columns

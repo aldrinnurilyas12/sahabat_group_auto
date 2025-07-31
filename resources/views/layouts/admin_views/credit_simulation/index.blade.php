@@ -153,6 +153,7 @@
                                             <th>Harga Unit</th>
                                             <th>Biaya DP</th>
                                             <th>Total Harga DP</th>
+                                            <th>Bunga Pinjaman (%)</th>
                                             <th>Asuransi</th>
                                             <th>Tenor 12 Bulan</th>
                                             <th>Tenor 24 Bulan</th>
@@ -173,21 +174,21 @@
                                                         class="action">
                                                         <a href="{{ route('edit_credit_simulation', $credit->id) }}"><i
                                                                 class="fas fa-edit"></i></a>
-                                                        <form
-                                                            action="{{ route('master_credit_simulation.destroy', $credit->id) }}"
-                                                            method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button
-                                                                style="width:25px;justify-content:center;display:flex;"
-                                                                class="btn btn-primary" type="submit"><i
-                                                                    class="fas fa-trash"></i></button>
-                                                        </form>
+                                                        <a style="size: 12px;" href="#" data-toggle="modal"
+                                                            data-target="#deleteCredit{{ $credit->id }}"><i
+                                                                class="fas fa-trash"></i></a>
                                                 </td>
                                                 <td>{{ $credit->unit }}</td>
                                                 <td>{{ 'Rp ' . number_format($credit->credit_price) }}</td>
                                                 <td>{{ $credit->down_payment . '%' }}</td>
                                                 <td>{{ 'Rp ' . number_format($credit->total_down_payment) }}
+                                                </td>
+                                                <td>
+                                                    @if ($credit->interest_rate)
+                                                        {{ $credit->interest_rate }}
+                                                    @else
+                                                        <span>-</span>
+                                                    @endif
                                                 </td>
                                                 <td>{{ $credit->insurance_name }}</td>
                                                 <td>{{ 'Rp ' . number_format($credit->tenor_12_month) }}</td>
@@ -224,6 +225,39 @@
         <i class="fas fa-angle-up"></i>
     </a>
 
+
+    @foreach ($credit_simulation as $credit)
+        <div class="modal fade" id="deleteCredit{{ $credit->id }}" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalLabel{{ $credit->id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel{{ $credit->id }}">Hapus data cabang:
+                            {{ $credit->unit }}</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+
+                    <form action="{{ route('master_credit_simulation.destroy', $credit->id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <div style="color: black;" class="modal-body">
+                            Apakah Anda ingin menghapus data kredit:
+                            {{ $credit->unit }} ?
+                            <br>
+                            <span style="font-style: italic;color:gray;font-size:12px;">*Data akan terhapus
+                                permanen.</span>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                            <button class="btn btn-danger" type="submit">Hapus</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endforeach
 
 
     <!-- Page level plugins -->
@@ -266,8 +300,6 @@
                 title: 'Berhasil',
                 text: "{{ Session::get('delete_success') }}",
                 icon: 'success',
-                toast: true,
-                position: 'bottom-end',
                 showConfirmButton: false,
                 timer: 2000
             });

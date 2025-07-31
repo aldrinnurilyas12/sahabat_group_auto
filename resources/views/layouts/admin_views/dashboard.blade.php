@@ -210,11 +210,9 @@
                                         </a>
                                         <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
                                             aria-labelledby="dropdownMenuLink">
-                                            <div class="dropdown-header">Dropdown Header:</div>
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">Something else here</a>
+                                            <div class="dropdown-header">Menu:</div>
+                                            <a class="dropdown-item" href="{{ route('agenda_create') }}">Buat
+                                                Agenda</a>
                                         </div>
                                     </div>
                                 </div>
@@ -232,6 +230,7 @@
                                                     <th>Pemimpin Meeting</th>
                                                     <th>Tanggal</th>
                                                     <th>Status Agenda</th>
+                                                    <th>Alasan</th>
                                                     <th>Jam Mulai</th>
                                                     <th>Jam Akhir</th>
                                                 </tr>
@@ -261,8 +260,24 @@
                                                         <td>{{ \Carbon\Carbon::parse($agendas->agenda_date)->format('d F Y') }}
                                                         </td>
                                                         <td>
-                                                            @if ($agendas->status)
-                                                                {{ $status }}
+                                                            @if ($agendas->status == 'ongoing')
+                                                                <span class="badge badge-info">Sedang
+                                                                    berlangsung</span>
+                                                            @elseif($agendas->status == 'done')
+                                                                <span class="badge badge-success">Selesai</span>
+                                                            @elseif($agendas->status == 'pending')
+                                                                <span class="badge badge-secondary">Ditunda</span>
+                                                            @elseif($agendas->status == 'canceled')
+                                                                <span class="badge badge-danger">Dibatalkan</span>
+                                                            @elseif($agendas->status == 'scheduled')
+                                                                <span class="badge badge-warning">Dijadwalkan</span>
+                                                            @else
+                                                                <span>-</span>
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @if ($agendas->reasons)
+                                                                <span>{{ $agenda->reasons }}</span>
                                                             @else
                                                                 <span>-</span>
                                                             @endif
@@ -331,13 +346,7 @@
             <!-- End of Main Content -->
 
             <!-- Footer -->
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2021</span>
-                    </div>
-                </div>
-            </footer>
+            @include('layouts.admin_views.footer')
             <!-- End of Footer -->
 
         </div>

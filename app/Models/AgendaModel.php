@@ -17,6 +17,7 @@ class AgendaModel extends Model
         'agenda_name',
         'agenda_date',
         'status',
+        'reasons',
         'start_time',
         'end_time',
         'created_by',

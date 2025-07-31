@@ -100,6 +100,15 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label>Alasan</label>
+                                    <textarea class="form-control" name="reasons" id="" rows="2">
+                                    {{ $agendas->reasons }}
+                                   </textarea>
+                                    <small style="color: red;">*Masukan alasan jika Agenda/Meeting ditunda atau
+                                        dibatalkan</small>
+                                </div>
+
+                                <div class="form-group">
                                     <label>Tanggal Agenda</label>
                                     <input type="date" class="form-control"
                                         value="{{ old('agenda_date', $agendas->agenda_date ? $agendas_date->format('Y-m-d') : null) }}"

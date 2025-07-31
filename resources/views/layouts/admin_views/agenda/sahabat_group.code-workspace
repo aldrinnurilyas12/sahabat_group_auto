@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"name": "sahabat_group",
+			"path": "../../../../.."
+		}
+	],
+	"settings": {
+		"sqltools.connections": [
+			{
+				"mysqlOptions": {
+					"authProtocol": "default",
+					"enableSsl": "Disabled"
+				},
+				"previewLimit": 50,
+				"server": "localhost",
+				"port": 3306,
+				"driver": "MySQL",
+				"name": "my-db-connection",
+				"group": "my-db-connection-group",
+				"database": "sahabat_group_db",
+				"username": "root",
+				"password": ""
+			}
+		]
+	}
+}

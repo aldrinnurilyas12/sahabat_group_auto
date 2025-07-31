@@ -334,8 +334,10 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::get('agenda_create', [AgendaController::class, 'agenda_layouts'])->name('agenda_create');
     Route::get('agenda_edit/{id}', [AgendaController::class, 'agenda_edit_layouts'])->name('agenda_edit');
     Route::put('change_status/{id}', [AgendaController::class, 'changeStatus'])->name('change_status');
+    Route::get('filter_agenda', [AgendaController::class, 'filter_agenda'])->name('filter_agenda');
     Route::put('agenda_update/{id}', [AgendaController::class, 'update'])->name('agenda_update');
-    Route::get('agenda_export_pdf', [AgendaController::class, 'download_agenda_pdf'])->name('agenda_export_pdf');
+    Route::post('agenda_export_pdf', [AgendaController::class, 'download_agenda_pdf'])->name('agenda_export_pdf');
+    Route::post('agenda_export_excel', [AgendaController::class, 'download_agenda_excel'])->name('agenda_export_excel');
 
     // SPK Unit Controller
     Route::apiResource('transaksi_spk_unit', App\Http\Controllers\Api\SpkUnitController::class);
