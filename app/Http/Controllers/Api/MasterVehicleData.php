@@ -135,13 +135,13 @@ class MasterVehicleData extends Controller
             'transmission' => 'required',
             'backup_vehicle_key' => 'required',
             'services_book' => 'required',
-            'vehicle_identity_number' => 'required',
-            'engine_number' => 'required',
-            'coding_number' => 'required',
+            'vehicle_identity_number' => 'required|unique:vehicle',
+            'engine_number' => 'required|unique:vehicle',
+            'coding_number' => 'required|unique:vehicle',
             'licence_plate_color' => 'required',
             'registration_year' => 'required',
             'tax_date' => 'required',
-            'bpkb_number' => 'required',
+            'bpkb_number' => 'required|unique:vehicle',
             'status_vehicle_id' => 'required',
             'location_branch_vehicle' => 'required'
         ]);
@@ -276,21 +276,29 @@ class MasterVehicleData extends Controller
         $selectedStatus = $request->status_vehicle;
         $selectedLocation = $request->location_unit;
 
-        if ($selectedStatus && $selectedLocation) {
-            $vehicle = DB::table('v_vehicle')->where('location_unit', $selectedLocation)->where('status_vehicle', $selectedStatus)->get();
+        if ($selectedStatus) {
+            $vehicle = DB::table('v_vehicle')->where('status_vehicle', $selectedStatus)->get();
+        }
+        if ($selectedStatus === 'alldata') {
+            $vehicle = DB::table('v_vehicle')->get();
         }
 
-        if ($selectedStatus === 'alldata') {
+        if ($selectedLocation) {
             $vehicle = DB::table('v_vehicle')->where('location_unit', $selectedLocation)->get();
         }
-
         if ($selectedLocation === 'alldata') {
-            $vehicle = DB::table('v_vehicle')->where('status_vehicle', $selectedStatus)->get();
+            $vehicle = DB::table('v_vehicle')->get();
+        }
+
+        if ($selectedLocation && $selectedStatus) {
+            $vehicle = DB::table('v_vehicle')->where('location_unit', $selectedLocation)
+                ->where('status_vehicle', $selectedStatus)->get();
         }
 
         if ($selectedLocation === 'alldata' && $selectedStatus === 'alldata') {
             $vehicle = DB::table('v_vehicle')->get();
         }
+
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -319,18 +327,31 @@ class MasterVehicleData extends Controller
         $selectedStatus = $request->status_vehicle;
         $selectedLocation = $request->location_unit;
         $year = date('Y');
-        $query = DB::table('v_vehicle');
+        $vehicle = DB::table('v_vehicle');
 
-        if ($selectedStatus !== 'alldata' && $selectedLocation !== 'alldata') {
-            $query->where('status_vehicle', $selectedStatus)
-                ->where('location_unit', $selectedLocation);
-        } elseif ($selectedStatus !== 'alldata') {
-            $query->where('status_vehicle', $selectedStatus);
-        } elseif ($selectedLocation !== 'alldata') {
-            $query->where('location_unit', $selectedLocation);
+
+        if ($selectedStatus) {
+            $vehicle = DB::table('v_vehicle')->where('status_vehicle', $selectedStatus)->get();
+        }
+        if ($selectedStatus === 'alldata') {
+            $vehicle = DB::table('v_vehicle')->get();
         }
 
-        $vehicle = $query->get();
+        if ($selectedLocation) {
+            $vehicle = DB::table('v_vehicle')->where('location_unit', $selectedLocation)->get();
+        }
+        if ($selectedLocation === 'alldata') {
+            $vehicle = DB::table('v_vehicle')->get();
+        }
+
+        if ($selectedLocation && $selectedStatus) {
+            $vehicle = DB::table('v_vehicle')->where('location_unit', $selectedLocation)
+                ->where('status_vehicle', $selectedStatus)->get();
+        }
+
+        if ($selectedLocation === 'alldata' && $selectedStatus === 'alldata') {
+            $vehicle = DB::table('v_vehicle')->get();
+        }
 
         // Nama file PDF
         $fileName = 'Data_Unit_' . $selectedLocation . '_' . $selectedStatus . '-' . $year . '.pdf';

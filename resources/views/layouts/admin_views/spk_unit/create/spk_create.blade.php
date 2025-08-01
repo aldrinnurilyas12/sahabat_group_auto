@@ -110,7 +110,8 @@
 
                             <div class="form-group">
                                 <label for="">Terbilang</label>
-                                <input class="form-control" type="text" placeholder="Nominal terbilang"
+                                <input class="form-control" type="text"
+                                    placeholder="Nominal terbilang contoh : (Tiga Ratus Lima Puluh Juta Rupiah)"
                                     name="price_nominal">
                             </div>
 

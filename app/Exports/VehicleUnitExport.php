@@ -47,6 +47,14 @@ class VehicleUnitExport implements FromCollection, WithHeadings, WithTitle, With
                 ->where('location_unit', [$this->location_unit])
                 ->where('status_vehicle', [$this->status_vehicle])
                 ->get();
+        } elseif ($this->status_vehicle) {
+            return DB::table('v_vehicle')->select($columns)
+                ->where('status_vehicle', [$this->status_vehicle])
+                ->get();
+        } elseif ($this->location_unit) {
+            return DB::table('v_vehicle')->select($columns)
+                ->where('location_unit', [$this->location_unit])
+                ->get();
         } else {
             return DB::table('v_vehicle')->select($columns)
                 ->get();
@@ -56,7 +64,8 @@ class VehicleUnitExport implements FromCollection, WithHeadings, WithTitle, With
     public function headings(): array
     {
         return [
-            'No',
+            'ID',
+            'Kode Kendaraan',
             'No.Pol',
             'Unit',
             'Harga',
@@ -89,9 +98,9 @@ class VehicleUnitExport implements FromCollection, WithHeadings, WithTitle, With
             'Lokasi Unit',
             'Pembayaran Melalui',
             'Tanggal buat',
-            'Diupdate',
+            'Diupdate oleh',
             'Tanggal Update',
-            'Dibuat'
+            'Dibuat oleh'
         ];
     }
 
@@ -112,7 +121,7 @@ class VehicleUnitExport implements FromCollection, WithHeadings, WithTitle, With
             },
             // You can also customize formatting for other parts of the sheet (e.g., bold headers)
             AfterSheet::class => function (AfterSheet $event) {
-                $event->sheet->getStyle('A2:AJ2')->getFont()->setBold(true); // Bold headers
+                $event->sheet->getStyle('A2:AK2')->getFont()->setBold(true); // Bold headers
                 $sheet = $event->sheet->getDelegate();
                 // Auto-size all used columns
                 foreach (range('A', 'Z') as $col) {

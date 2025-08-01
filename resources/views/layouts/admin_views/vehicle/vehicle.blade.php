@@ -134,9 +134,13 @@
                                                 Status Unit : {{ $selectedStatus }} <br>
                                             @endif
 
-                                            @if ($selectedStatus && $selectedLocation !== 'alldata')
-                                                Lokasi Unit : {{ $selectedLocation }}
+                                            @if ($selectedLocation)
+                                                Lokasi Unit : {{ $selectedLocation }} <br>
                                             @endif
+
+                                            {{-- @if ($selectedStatus && $selectedLocation !== 'alldata')
+                                                Lokasi Unit : {{ $selectedLocation }}
+                                            @endif --}}
                                         @else
                                             <div class="alert alert-warning">
                                                 Terapkan filter untuk mendapatkan data.

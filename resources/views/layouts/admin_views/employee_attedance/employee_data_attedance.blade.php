@@ -267,20 +267,24 @@
 
                                 {{-- OPEN CAMERA --}}
 
-                                <div style="display: block;" class="open-camera-scanner">
-                                    <label for=""><strong>SCAN KODE QR UNTUK PRESENSI
-                                            KEHADIRAN</strong></label>
-                                    <br>
-                                    <video id="preview" width="300" height="200" autoplay></video>
+                                @if (in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, ['12', '10', '5']))
+                                    <div style="display: block;" class="open-camera-scanner">
+                                        <label for=""><strong>SCAN KODE QR UNTUK PRESENSI
+                                                KEHADIRAN</strong></label>
+                                        <br>
+                                        <video id="preview" width="300" height="200" autoplay></video>
 
-                                    <div class="alert alert-warning">
-                                        <ul style="font-size: 12px;">
-                                            <li>SCAN KODE QR HANYA UNTUK PRESENSI KEHADIRAN</li>
-                                            <li>BILA SAKIT ATAU IZIN MAKA KLIK BUTTON ("PRESENSI")</li>
-                                            <li>JAM UNTUK PRESENSI HANYA DIBUKA MULAI JAM 8 PAGI s/d JAM 10 PAGI</li>
-                                        </ul>
+                                        <div class="alert alert-warning">
+                                            <ul style="font-size: 12px;">
+                                                <li>SCAN KODE QR HANYA UNTUK PRESENSI KEHADIRAN</li>
+                                                <li>BILA SAKIT ATAU IZIN MAKA KLIK BUTTON ("PRESENSI")</li>
+                                                <li>JAM UNTUK PRESENSI HANYA DIBUKA MULAI JAM 8 PAGI s/d JAM 10 PAGI
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </div>
-                                </div>
+                                @else
+                                @endif
 
 
                             </div>

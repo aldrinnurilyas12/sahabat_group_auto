@@ -77,7 +77,7 @@ class SpkUnitController extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $branch = DB::table('v_branch')->get();
         $vehicle_data = DB::table('v_vehicle as vhcl')
-            ->where('vhcl.category_name', '<>', 'Unit Terjual')
+            ->where('vhcl.status_vehicle', '<>', 'Unit Terjual')
             ->get();
         return view('layouts.admin_views.spk_unit.create.spk_create', compact('vehicle_data', 'branch', 'grouped_sub_menu', 'sidebar_menu'));
     }
@@ -91,7 +91,7 @@ class SpkUnitController extends Controller
 
 
         $spk_data = DB::table('v_spk')->where('id', $request->id)->get();
-        $vehicle_data = DB::table('v_vehicle')->where('category_name', '<>', 'Unit Terjual')->get();
+        $vehicle_data = DB::table('v_vehicle')->where('status_vehicle', '<>', 'Unit Terjual')->get();
         return view('layouts.admin_views.spk_unit.edit.spk_edit', compact('spk_data', 'vehicle_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 

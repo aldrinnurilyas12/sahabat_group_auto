@@ -13,8 +13,16 @@
     <div class="container-title">
         <h3>Data Kendaraan PT Sahabat Group Auto</h3>
         <hr>
-        <p>Cabang : {{ $vehicle->first()->location_unit }}</p>
-        <p>Status Kendaraan : {{ $vehicle->first()->status_vehicle }}</p>
+        @php
+            $firstVehicle = $vehicle->first();
+        @endphp
+
+        @if (!$firstVehicle || $firstVehicle->location_unit == null)
+            Cabang : -
+        @else
+            <p>Cabang : {{ $firstVehicle->location_unit }}</p>
+        @endif
+        <p>Status Kendaraan : {{ $firstVehicle->status_vehicle ?? '-' }}</p>
         <p>Tanggal Cetak : {{ date('d-m-Y h:i a') }}</p>
 
     </div>
