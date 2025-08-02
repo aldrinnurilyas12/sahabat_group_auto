@@ -25,7 +25,7 @@ class EmployeeLeaves extends Controller
     }
 
 
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -65,11 +65,17 @@ class EmployeeLeaves extends Controller
             $employee_leaves = DB::table('v_employee_leaves')->orderBy('created_at', 'desc')->get();
         }
 
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
 
         return view('layouts.admin_views.employee_absences_leaves.employee_leaves_data', compact('employee_leaves', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'bulan', 'tahun', 'months', 'years', 'department', 'departments'));
     }
 
-    public function employee_absences_leaves(Request $request): View
+    public function employee_absences_leaves(Request $request)
     {
 
         if (auth()->user()->nik  !== auth()->user()->nik) {
@@ -85,6 +91,7 @@ class EmployeeLeaves extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $main_menu = DB::table('v_main_menu')->get();
+
 
         $employee = DB::table('v_employee')->where('nik', auth()->user()->nik)->get();
         return view('layouts.admin_views.employee_absences_leaves.create.add_employee_absences', compact('employee', 'grouped_sub_menu', 'sidebar_menu'));
@@ -359,6 +366,13 @@ class EmployeeLeaves extends Controller
 
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         return view('layouts.admin_views.employee_absences_leaves.employee_leaves_data', compact('employee_leaves', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'years', 'months', 'tahun', 'bulan'));

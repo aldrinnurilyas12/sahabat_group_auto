@@ -26,7 +26,7 @@ class Analytics extends Controller
     }
 
 
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -75,6 +75,12 @@ class Analytics extends Controller
         $appointment_total = DB::table('appointment')->count();
         $unit_request = DB::table('customer_vehicle_request')->count();
         $sale_unit_request = DB::table('vehicle_sale_request')->count();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
 
         return view('layouts.admin_views.analytics.analytics', compact('revenue', 'employee', 'grouped_sub_menu', 'sidebar_menu', 'appointment_total', 'unit_request', 'sale_unit_request', 'vehicle_ads', 'vehicle_total_clicked', 'vehicle_total', 'vehicle_brand', 'years', 'months', 'bulan', 'tahun', 'location_unit'));
     }
@@ -320,6 +326,12 @@ class Analytics extends Controller
 
         $testimonial = DB::table('customers_testimonial')->orderBy('created_at', 'desc')->get();
 
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
 
         return view('layouts.admin_views.testimonial.testimonial', compact('testimonial', 'bulan', 'tahun', 'months', 'years', 'grouped_sub_menu', 'sidebar_menu',));
     }

@@ -754,6 +754,17 @@
     </script>
 @endif
 
+@if (Session::has('failed_insert'))
+    <script>
+        Swal.fire({
+            title: 'Gagal',
+            text: "{{ Session::get('failed_insert') }}",
+            icon: 'error',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    </script>
+@endif
 
 @if (session('alert'))
     <script type="text/javascript">

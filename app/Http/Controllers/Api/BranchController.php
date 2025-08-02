@@ -34,20 +34,28 @@ class BranchController extends Controller
     }
 
 
-    public function index(): View
+    public function index()
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
         $branch = DB::table('v_branch')->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.branch.branch', compact('branch', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create_branch_layout(): View
+    public function create_branch_layout()
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -58,6 +66,14 @@ class BranchController extends Controller
             ->where('e.job_position', '10')->where('branch_head_id', null)->get();
 
         $branch = BranchModel::all();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.branch.create.branch_create', compact('branch', 'grouped_sub_menu', 'sidebar_menu', 'branch_head'));
     }
 
@@ -120,7 +136,7 @@ class BranchController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit_branch_layout(Request $request): View
+    public function edit_branch_layout(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -131,6 +147,14 @@ class BranchController extends Controller
         $branch_head = DB::table('employee as e')->select(DB::raw("CONCAT(e.nik, '-', e.name) as branch_head"), 'e.id', 'e.nik', 'e.name')
             ->leftJoin('branch as b', 'e.id', '=', 'b.branch_head_id')
             ->where('e.job_position', '10')->where('branch_head_id', null)->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.branch.edit.branch_edit', compact('branch', 'branch_head', 'grouped_sub_menu', 'sidebar_menu'));
     }
 

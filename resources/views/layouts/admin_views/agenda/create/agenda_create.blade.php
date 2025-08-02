@@ -101,14 +101,14 @@
 
                             <div class="form-group">
                                 <label>Jam Mulai</label>
-                                <input type="time" class="form-control" min="07:00" max="17:00"
+                                <input type="time" class="form-control" min="07:00" max="22:00"
                                     name="start_time" autocomplete="off">
                                 <x-input-error :messages="$errors->get('start_time')" class="mt-2" style="color: red;" />
                             </div>
 
                             <div class="form-group">
                                 <label>Jam Akhir</label>
-                                <input type="time" class="form-control" min="07:00" max="17:00" name="end_time"
+                                <input type="time" class="form-control" min="07:00" max="22:00" name="end_time"
                                     autocomplete="off">
                                 <x-input-error :messages="$errors->get('end_time')" class="mt-2" style="color: red;" />
                             </div>

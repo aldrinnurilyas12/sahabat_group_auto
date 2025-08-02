@@ -137,6 +137,12 @@ class MasterAppointment extends Controller
             ->select('vr.id', 'vr.name', 'vr.email', 'vr.phone_number', 'vr.vehicle_type', 'vehicle_brand.brand_name', 'vr.year', 'vr.vehicle_color', 'vr.sending_mail', 'vr.description')
             ->leftJoin('vehicle_brand', 'vr.brand', '=', 'vehicle_brand.id')->where('vr.id', $request->id)->get();
 
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.customer_vehicle_request.send_mail_customer_request', compact('vehicle_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 

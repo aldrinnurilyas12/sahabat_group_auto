@@ -35,7 +35,7 @@ class EmployeeSalary extends Controller
         ]);
     }
 
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -49,18 +49,34 @@ class EmployeeSalary extends Controller
             ->whereRaw('job_position.id', $request->jb_id)->get();
 
         $employee_salary = DB::table('v_employee_salary')->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.employee_salary.employee_salary', compact('employee_salary', 'grouped_sub_menu', 'show_employee', 'sidebar_menu', 'department', 'departments'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create_emp_salary_layout(): View
+    public function create_emp_salary_layout()
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $department = DB::table('department')->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.employee_salary.create.employee_salary_create', compact('grouped_sub_menu', 'sidebar_menu', 'department'));
     }
 
@@ -116,7 +132,7 @@ class EmployeeSalary extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request): View
+    public function show(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -124,6 +140,14 @@ class EmployeeSalary extends Controller
 
         $employee_salary = DB::table('v_employee_salary')->where('id', $request->id)->get();
         $department = DB::table('department')->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.employee_salary.edit.employee_salary_edit', compact('employee_salary', 'grouped_sub_menu', 'sidebar_menu', 'department'));
     }
 
@@ -151,6 +175,8 @@ class EmployeeSalary extends Controller
         } else {
             $employee_salary = DB::table('v_employee_salary')->where('department_name', $departments)->get();
         }
+
+
         return view('layouts.admin_views.employee_salary.employee_salary', compact('employee_salary', 'grouped_sub_menu', 'show_employee', 'sidebar_menu', 'department', 'departments'));
     }
 

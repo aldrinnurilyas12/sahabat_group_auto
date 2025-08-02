@@ -24,23 +24,39 @@ use function PHPUnit\Framework\isTrue;
 class MasterMainMenuController extends Controller
 {
 
-    public function index(): View
+    public function index()
     {
         $master_menus = $this->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $main_menu = DB::table('v_main_menu')->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.menus_admin.main_menu', compact('main_menu', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     // contoh menjalankan function master display menus
 
-    public function menus_create_layout(): View
+    public function menus_create_layout()
     {
 
         $master_menus = $this->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.menus_admin.create.main_menu_create', compact('sidebar_menu', 'grouped_sub_menu'));
     }
 
@@ -117,6 +133,7 @@ class MasterMainMenuController extends Controller
         $business_dev_dept = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Business Development';
         $IT_DEV = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Information Technology';
         $OTHER_DEPT = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Lainnya';
+        $MECHANIC_SESSION = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
 
 
         if ($marketing_dept || $finance_dept || $business_dev_dept) {
@@ -155,7 +172,13 @@ class MasterMainMenuController extends Controller
                     return compact('grouped_sub_menu', 'sidebar_menu');
                 }
             }
-        } elseif (!$IT_DEV || $OTHER_DEPT) {
+        } elseif (!$IT_DEV) {
+            if ($MECHANIC_SESSION) {
+                $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->whereNotIn('id', ['2', '3', '4', '8'])->get();
+                $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->whereiN('id', ['24', '28'])->orderBy('submenu_name', 'asc')->get();
+                $grouped_sub_menu = $sub_menu->groupBy('parent_id');
+                return compact('grouped_sub_menu', 'sidebar_menu');
+            }
             if ($admin_role || $superadmin_role) {
                 $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->whereNotIn('id', ['2', '3', '4', '8'])->get();
                 $sub_menu = DB::table('submenu')->whereNotIn('id', ['17', '18', '9', '36', '37'])->orderBy('submenu_name', 'asc')->get();
@@ -200,6 +223,7 @@ class MasterMainMenuController extends Controller
             }
         }
 
+
         return [
             'sidebar_menu' => [],
             'grouped_sub_menu' => [],
@@ -225,11 +249,18 @@ class MasterMainMenuController extends Controller
      * Show the form for editing the specified resource.
      */
 
-    public function menus_edit_layout(): View
+    public function menus_edit_layout()
     {
         $master_menus = $this->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.menus_admin.edit.main_menu_edit', compact('grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -401,14 +432,27 @@ class MasterMainMenuController extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $roles = RoleModel::all();
         $employees = EmployeeModel::all();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.menus_admin.submenu', compact('roles', 'employees', 'main_menus', 'submenu_parent', 'submenu', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
 
-    public function submenu_create_layout(Request $request): View
+    public function submenu_create_layout(Request $request)
     {
         $show = DB::table('submenu')->where('parent_id', $request->id)->first();
         $main_menus = DB::table('main_menu')->where('id', $request->id)->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
 
         if ($show) {
             $master_menus = $this->master_display_menus();
@@ -431,7 +475,7 @@ class MasterMainMenuController extends Controller
     }
 
 
-    public function submenu_update_layout(Request $request): View
+    public function submenu_update_layout(Request $request)
     {
         $master_menus = $this->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -444,6 +488,12 @@ class MasterMainMenuController extends Controller
             'branch_head_role' => $check___role->branch_head_role
         ];
         $show = DB::table('submenu')->where('id', $request->id)->first();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
 
         if ($show) {
             $roles = RoleModel::all();

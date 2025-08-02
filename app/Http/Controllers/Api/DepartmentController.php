@@ -24,13 +24,21 @@ class DepartmentController extends Controller
         $this->MasterMainMenuController = $MasterMainMenuController;
     }
 
-    public function index(): View
+    public function index()
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $status_category = DB::table('status_category')->get();
         $department = DB::table('department')->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.department.department', compact('department', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -47,13 +55,21 @@ class DepartmentController extends Controller
     }
 
 
-    public function department_create_layout(): View
+    public function department_create_layout()
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $status_category = DB::table('status_category')->get();
         $department = DB::table('department')->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.department.create.department_create', compact('department', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -112,13 +128,21 @@ class DepartmentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit_layout(Request $request, string $id): View
+    public function edit_layout(Request $request, string $id)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $status_category = DB::table('status_category')->get();
         $department = DB::table('department')->where('id', $request->id)->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.department.edit.department_edit', compact('department', 'grouped_sub_menu', 'sidebar_menu'));
     }
 

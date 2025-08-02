@@ -22,7 +22,7 @@ class Blog extends Controller
         $this->MasterMainMenuController = $MasterMainMenuController;
     }
 
-    public function index(): View
+    public function index()
     {
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
@@ -30,17 +30,33 @@ class Blog extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
         $blog_data = DB::table('blog')->orderBy('created_at', 'DESC')->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.blog.blog', compact('blog_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function blog_create_layouts(): View
+    public function blog_create_layouts()
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.blog.create.blog_create', compact('grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -130,12 +146,20 @@ class Blog extends Controller
     }
 
 
-    public function edit_blog_layouts(Request $request): View
+    public function edit_blog_layouts(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $blog_data = DB::table('blog')->where('id', $request->id)->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.blog.edit.edit_blog', compact('blog_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 

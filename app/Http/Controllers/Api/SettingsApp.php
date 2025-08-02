@@ -40,7 +40,7 @@ class SettingsApp extends Controller
     }
 
 
-    public function settings_layout(): View
+    public function settings_layout()
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'] ?? [];
@@ -50,6 +50,12 @@ class SettingsApp extends Controller
         $setting_time = DB::table('settings_schedule_time')->first();
 
         $settings_data = DB::table('under_development_setting')->get();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
 
         return view('layouts.admin_views.settings', compact('grouped_sub_menu', 'sidebar_menu', 'setting_time', 'setting_app', 'settings_data'));
     }

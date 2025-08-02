@@ -70,6 +70,12 @@ class EmployeeResign extends Controller
             $employee_resign = DB::table('v_employee_resign')->orderBy('created_at', 'desc')->get();
         }
 
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
 
         return view('layouts.admin_views.employee_resign.employee_resign_main', compact('employee_resign', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'bulan', 'tahun', 'months', 'years', 'department', 'departments'));
     }

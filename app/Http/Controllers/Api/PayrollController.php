@@ -37,7 +37,7 @@ class PayrollController extends Controller
 
 
 
-    public function index(): View
+    public function index()
     {
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
@@ -47,6 +47,12 @@ class PayrollController extends Controller
         $finance_head_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Finance Operation';
         $hr_head_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource';
 
+        $allowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, ['1', '10', '11', '13']);
+
+        if (!$allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
 
         $branch_head_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations';
         if ($branch_head_login || $finance_head_session || $hr_head_session) {

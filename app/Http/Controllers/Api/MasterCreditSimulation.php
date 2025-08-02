@@ -37,7 +37,7 @@ class MasterCreditSimulation extends Controller
         ]);
     }
 
-    public function index(Request $request): View
+    public function index(Request $request)
     {
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
@@ -47,13 +47,20 @@ class MasterCreditSimulation extends Controller
         $credit_simulation = DB::table('v_credit_simulation')->get();
         $request_unit = $request->unit;
 
+        $allowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, ['1', '10', '11', '13']);
+        if (!$allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
+
         return view('layouts.admin_views.credit_simulation.index', compact('credit_simulation', 'request_unit', 'vehicle', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create_credit_simulation_layout(Request $request): View
+    public function create_credit_simulation_layout(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -61,10 +68,17 @@ class MasterCreditSimulation extends Controller
         $insurance = DB::table('insurance')->get();
         $vehicle = DB::table('v_vehicle')->where('id', $request->id)->get();
         $status_category = DB::table('status_category')->get();
+
+        $allowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, ['1', '10', '11', '13']);
+        if (!$allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.credit_simulation.create.add_credit_simulation', compact('insurance', 'vehicle', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
-    public function edit_credit_simulation_layout(Request $request): View
+    public function edit_credit_simulation_layout(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -72,6 +86,11 @@ class MasterCreditSimulation extends Controller
         $insurance = DB::table('insurance')->get();
         $credit_simulation = DB::table('v_credit_simulation')->where('id', $request->id)->get();
         $status_category = DB::table('status_category')->get();
+        $allowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, ['1', '10', '11', '13']);
+        if (!$allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.credit_simulation.edit.edit_credit_simulation', compact('insurance', 'credit_simulation', 'grouped_sub_menu', 'sidebar_menu'));
     }
 

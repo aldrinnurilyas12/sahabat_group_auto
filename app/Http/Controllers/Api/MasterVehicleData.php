@@ -32,7 +32,7 @@ class MasterVehicleData extends Controller
     }
 
 
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -43,6 +43,13 @@ class MasterVehicleData extends Controller
         $vehicle_sold = DB::table('v_vehicle')->where('status_vehicle', 'Unit Terjual')->get();
         $selectedStatus = $request->status_vehicle;
         $selectedLocation = $request->location_unit;
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.vehicle.vehicle', compact('vehicle', 'branch', 'status_category', 'vehicle_sold', 'grouped_sub_menu', 'sidebar_menu', 'selectedStatus', 'selectedLocation'));
     }
 
@@ -50,7 +57,7 @@ class MasterVehicleData extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create_vehicle_layout(): View
+    public function create_vehicle_layout()
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -60,11 +67,18 @@ class MasterVehicleData extends Controller
         $vehicle_model = DB::table('vehicle_model')->get();
         $status_category = DB::table('status_category')->get();
         $vehicle_type = DB::table('vehicle_type')->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.vehicle.create.add_vehicle', compact('vehicle_model', 'vehicle_type', 'brand', 'branch', 'status_category', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
 
-    public function detail_vehicle_layout(Request $request): View
+    public function detail_vehicle_layout(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -83,12 +97,18 @@ class MasterVehicleData extends Controller
             ->exists();
 
         $media_video = DB::table('v_vehicle_media_player')->where('media_type', 'video')->where('vehicle_id', $request->id)->get();
-
         $media_sound = DB::table('v_vehicle_media_player')->where('media_type', 'engine sound')->where('vehicle_id', $request->id)->get();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.vehicle.vehicle_detail', compact('vehicle', 'check_ads', 'images', 'status_category', 'documents', 'credit_simulation', 'grouped_sub_menu', 'sidebar_menu', 'media_video', 'media_sound'));
     }
 
-    public function edit_vehicle_layout(Request $request): View
+    public function edit_vehicle_layout(Request $request)
     {
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
@@ -104,11 +124,15 @@ class MasterVehicleData extends Controller
         $services_book = DB::table('vehicle')->distinct()->select('services_book')->get();
         $backup_key = DB::table('vehicle')->distinct()->select('backup_vehicle_key')->get();
 
-
-
         if ($request->has('id')) {
 
             $selectedBranch = DB::table('branch')->find($request->id);
+        }
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
         }
 
         $vehicle_type = DB::table('vehicle_type')->get();

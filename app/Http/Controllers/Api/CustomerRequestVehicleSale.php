@@ -26,7 +26,7 @@ class CustomerRequestVehicleSale extends Controller
     }
 
 
-    public function index(Request $request): View
+    public function index(Request $request)
     {
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
@@ -46,6 +46,13 @@ class CustomerRequestVehicleSale extends Controller
         $years = [];
         for ($year = $startYear; $year <= $endYear; $year++) {
             $years[] = (string)$year;
+        }
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
         }
 
         return view('layouts.admin_views.customer_vehicle_sale.customer_vehicle_sale', compact('customer_request_sale_data', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
@@ -81,6 +88,12 @@ class CustomerRequestVehicleSale extends Controller
             ->select('vsr.id', 'vehicle_type', 'vb.brand_name', 'vehicle_year', 'current_km', 'vehicle_color', 'name', 'email', 'phone_number', 'status', 'sending_email', 'description', 'vsr.created_at')
             ->leftJoin('vehicle_brand as vb', 'vsr.brand_id', '=', 'vb.id')->where('vsr.id', $request->id)->get();
 
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.customer_vehicle_sale.send_mail_customer_request_sale', compact('customer_request_sale_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 

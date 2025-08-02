@@ -26,6 +26,14 @@ class MasterBanner extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
         $banner_data = DB::table('banner_landingpage')->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.banner.banner', compact('banner_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -37,6 +45,14 @@ class MasterBanner extends Controller
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.banner.create.banner_create', compact('grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -106,6 +122,14 @@ class MasterBanner extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
         $banner_data = DB::table('banner_landingpage')->where('id', $request->id)->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.banner.edit.banner_edit', compact('banner_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 

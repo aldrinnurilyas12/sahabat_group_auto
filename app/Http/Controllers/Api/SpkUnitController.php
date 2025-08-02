@@ -39,7 +39,7 @@ class SpkUnitController extends Controller
         ]);
     }
 
-    public function index(Request $request): View
+    public function index(Request $request)
     {
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
@@ -64,13 +64,20 @@ class SpkUnitController extends Controller
         for ($year = $startYear; $year <= $endYear; $year++) {
             $years[] = (string)$year;
         }
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.spk_unit.spk', compact('all_spk_data', 'spk_data', 'branch', 'branch_request', 'bulan', 'tahun', 'years', 'months', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function spk_create_layout(): View
+    public function spk_create_layout()
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -79,19 +86,30 @@ class SpkUnitController extends Controller
         $vehicle_data = DB::table('v_vehicle as vhcl')
             ->where('vhcl.status_vehicle', '<>', 'Unit Terjual')
             ->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.spk_unit.create.spk_create', compact('vehicle_data', 'branch', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
 
-    public function spk_edit_layout(Request $request): View
+    public function spk_edit_layout(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
-
-
         $spk_data = DB::table('v_spk')->where('id', $request->id)->get();
         $vehicle_data = DB::table('v_vehicle')->where('status_vehicle', '<>', 'Unit Terjual')->get();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.spk_unit.edit.spk_edit', compact('spk_data', 'vehicle_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 

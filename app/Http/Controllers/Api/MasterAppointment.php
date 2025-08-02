@@ -24,7 +24,7 @@ class MasterAppointment extends Controller
         $this->MasterMainMenuController = $MasterMainMenuController;
     }
 
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -45,6 +45,12 @@ class MasterAppointment extends Controller
         }
 
         $appointment_data = DB::table('v_appointment')->where('id', '!=', '')->orderBy('created_at', 'DESC')->where('location_unit', '=', $branch)->get();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.appointment.appointment', compact('appointment_data', 'grouped_sub_menu', 'sidebar_menu', 'months', 'years', 'bulan', 'tahun'));
     }
 
@@ -137,6 +143,12 @@ class MasterAppointment extends Controller
             ->select('vr.id', 'vr.name', 'vr.email', 'vr.phone_number', 'vr.vehicle_type', 'vehicle_brand.brand_name', 'vr.year', 'vr.vehicle_color', 'vr.sending_mail', 'vr.description')
             ->leftJoin('vehicle_brand', 'vr.brand', '=', 'vehicle_brand.id')->where('vr.id', $request->id)->get();
 
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.customer_vehicle_request.send_mail_customer_request', compact('vehicle_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -215,7 +227,7 @@ class MasterAppointment extends Controller
 
     // ======================= SECTION CUSTOMER REQUEST PAGE =======================================
 
-    public function customer_vehicle_request(Request $request): View
+    public function customer_vehicle_request(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -237,6 +249,13 @@ class MasterAppointment extends Controller
             ->select('cr.id', 'cr.vehicle_type', 'cr.name', 'vb.brand_name', 'cr.year', 'cr.vehicle_color', 'cr.email', 'cr.phone_number', 'cr.created_at', 'cr.sending_mail', 'cr.description')
             ->leftJoin('vehicle_brand as vb', 'cr.brand', '=', 'vb.id')
             ->orderBy('created_at', 'DESC')->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.customer_vehicle_request.customers_request_vehicle', compact('request_vehicle_data', 'grouped_sub_menu', 'sidebar_menu', 'bulan', 'tahun', 'months', 'years'));
     }
 

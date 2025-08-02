@@ -23,7 +23,7 @@ class AgendaController extends Controller
         $this->MasterMainMenuController = $MasterMainMenuController;
     }
 
-    public function index(Request $request): View
+    public function index(Request $request)
     {
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
@@ -67,13 +67,19 @@ class AgendaController extends Controller
             )
             ->leftJoin('v_employee as ve', 'va.meeting_leader', '=', 've.nik')
             ->orderBy('created_at', 'DESC')->get();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.agenda.agenda', compact('agenda', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'bulan', 'tahun', 'months', 'years', 'department', 'departments'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function agenda_layouts(): View
+    public function agenda_layouts()
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -83,6 +89,12 @@ class AgendaController extends Controller
         $department = DB::table('department')->get();
 
         $meeting_leader = DB::table('v_employee')->get();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
 
         return view('layouts.admin_views.agenda.create.agenda_create', compact('branch', 'department', 'meeting_leader', 'grouped_sub_menu', 'sidebar_menu'));
     }
@@ -168,7 +180,7 @@ class AgendaController extends Controller
         //
     }
 
-    public function agenda_edit_layouts(Request $request): View
+    public function agenda_edit_layouts(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -182,6 +194,13 @@ class AgendaController extends Controller
 
         $find_agenda = AgendaModel::find($request->id);
         $agendas_date = Carbon::parse($find_agenda->agenda_date);
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
 
         return view('layouts.admin_views.agenda.edit.agenda_edit', compact('branch', 'agenda', 'department', 'meeting_leader', 'agendas_date', 'grouped_sub_menu', 'sidebar_menu'));
     }

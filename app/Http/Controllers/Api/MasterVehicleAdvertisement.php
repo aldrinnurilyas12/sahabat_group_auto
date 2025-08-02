@@ -35,7 +35,7 @@ class MasterVehicleAdvertisement extends Controller
 
 
 
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $months = DB::table('months')->get();
         $currentYear = date("Y");
@@ -55,19 +55,33 @@ class MasterVehicleAdvertisement extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $vehicle_data = DB::table('v_vehicle_advertisement')->orderBy('created_at', 'desc')->get();
         $availableAds = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->orderBy('updated_posted_date', 'desc')->get();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.vehicle_advertisement.main_page', compact('vehicle_data', 'availableAds', 'grouped_sub_menu', 'sidebar_menu', 'bulan', 'tahun', 'months', 'years'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function add_advertisement_layout(Request $request): View
+    public function add_advertisement_layout(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $vehicle_data = DB::table('v_vehicle_advertisement')->where('vehicle_id', $request->vehicle_id)->get();
         $vehicle_images = DB::table('vehicle_fotos')->where('vehicle_id', $request->vehicle_id)->get();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.vehicle_advertisement.create.add_ads_layout', compact('vehicle_images', 'vehicle_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -169,6 +183,8 @@ class MasterVehicleAdvertisement extends Controller
         if ($tahun === 'alldata' && $bulan === 'alldata') {
             $vehicle_data = DB::table('v_vehicle_advertisement')->orderBy('created_at', 'desc')->get();
         }
+
+
         return view('layouts.admin_views.vehicle_advertisement.main_page', compact('availableAds', 'vehicle_data', 'grouped_sub_menu', 'sidebar_menu', 'bulan', 'tahun', 'months', 'years'));
     }
 

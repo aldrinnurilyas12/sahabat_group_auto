@@ -47,7 +47,8 @@
                             {{ auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name }}
                         </h1>
                         <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+                                class="far fa-clock"></i> Session Time :
+                            {{ \Carbon\carbon::parse(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->last_seen)->format('H:i a') }}</a>
                     </div>
 
 
@@ -398,6 +399,18 @@
             title: 'Berhasil',
             text: "{{ Session::get('message_success') }}",
             icon: 'success',
+            showConfirmButton: false,
+            timer: 2000
+        });
+    </script>
+@endif
+
+@if (Session::has('failed_insert'))
+    <script>
+        Swal.fire({
+            title: 'Gagal',
+            text: "{{ Session::get('failed_insert') }}",
+            icon: 'error',
             showConfirmButton: false,
             timer: 2000
         });

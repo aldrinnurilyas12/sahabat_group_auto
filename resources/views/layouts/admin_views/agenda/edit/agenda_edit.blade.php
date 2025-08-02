@@ -118,13 +118,13 @@
                                 <div class="form-group">
                                     <label>Jam Mulai</label>
                                     <input type="time" class="form-control" value="{{ $agendas->start_time }}"
-                                        min="07:00" max="17:00" name="start_time" autocomplete="off">
+                                        min="07:00" max="22:00" name="start_time" autocomplete="off">
                                 </div>
 
                                 <div class="form-group">
                                     <label>Jam Akhir</label>
                                     <input type="time" class="form-control" value="{{ $agendas->end_time }}"
-                                        min="07:00" max="17:00" name="end_time" autocomplete="off">
+                                        min="07:00" max="22:00" name="end_time" autocomplete="off">
                                 </div>
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                             </form>

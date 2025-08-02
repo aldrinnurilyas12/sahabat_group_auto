@@ -41,19 +41,31 @@ class EmailMarketing extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
         $email_marketing = DB::table('email_marketing')->get();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.email_marketing.email_marketing', compact('email_marketing', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function email_create(): View
+    public function email_create()
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
         $email_marketing = DB::table('v_email_marketing')->get();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.email_marketing.create.email_create', compact('email_marketing', 'grouped_sub_menu', 'sidebar_menu'));
     }
 

@@ -48,7 +48,7 @@ class EmployeeController extends Controller
     }
 
 
-    public function index(Request $request): View
+    public function index(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -59,6 +59,13 @@ class EmployeeController extends Controller
         $department = DB::table('department')->get();
         $offices = $request->office;
         $departments = $request->department;
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.employee.employee_data', compact('employee', 'employee_resign', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'department', 'departments'));
     }
 
@@ -127,10 +134,6 @@ class EmployeeController extends Controller
         $job_level_position = DB::table('job_level_position')->get();
         $branch = DB::table('branch')->get();
         $banks = DB::table('bank')->get();
-
-
-
-
         return view('layouts.admin_views.employee.create.add_employee', compact('employee', 'banks', 'branch', 'job_position', 'job_level_position', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -426,8 +429,7 @@ class EmployeeController extends Controller
     public function update(Request $request)
     {
         $request->validate([
-            'nik' => 'max:16',
-            'job_level_position' => 'required'
+            'nik' => 'max:16'
         ]);
 
         date_default_timezone_set('Asia/Jakarta');
@@ -934,7 +936,7 @@ class EmployeeController extends Controller
 
 
 
-    public function users_log_activity(Request $request): View
+    public function users_log_activity(Request $request)
     {
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
@@ -946,6 +948,12 @@ class EmployeeController extends Controller
             ->leftJoin('users as us', 'us.id', '=', 'la.user_id')
             ->leftJoin('employee as e', 'us.employee_id', '=', 'e.id')
             ->orderBy('created_at', 'DESC')->get();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.users_admin.users_activity', compact('users_activity', 'grouped_sub_menu', 'sidebar_menu'));
     }
 }

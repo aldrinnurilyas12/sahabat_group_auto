@@ -87,7 +87,7 @@
                                                     @if ($ticket->approval_by_it == 'sudah konfirmasi' && $ticket->status == 'on progress')
                                                         <a class="btn btn-primary"
                                                             href="{{ route('eticket_detail', $ticket->eticket_code) }}">Lihat</a>
-                                                        <a class="btn btn-secondary"
+                                                        <a class="btn btn-info"
                                                             href="{{ route('edit_eticket', $ticket->eticket_code) }}">Ubah</a>
                                                     @elseif($ticket->approval_by_it == 'sudah konfirmasi' && $ticket->status == 'done')
                                                         <a class="btn btn-primary"
@@ -96,7 +96,7 @@
                                                     @else
                                                         <a class="btn btn-primary"
                                                             href="{{ route('eticket_detail', $ticket->eticket_code) }}">Lihat</a>
-                                                        <a class="btn btn-secondary"
+                                                        <a class="btn btn-info"
                                                             href="{{ route('edit_eticket', $ticket->eticket_code) }}">Ubah</a>
                                                     @endif
 

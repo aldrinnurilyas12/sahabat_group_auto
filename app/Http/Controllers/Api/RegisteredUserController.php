@@ -32,7 +32,7 @@ class RegisteredUserController extends Controller
         $this->MasterMainMenuController = $MasterMainMenuController;
     }
 
-    public function index(): View
+    public function index()
     {
         $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
         $sub_menu = DB::table('submenu')->get();
@@ -40,12 +40,20 @@ class RegisteredUserController extends Controller
         $users = DB::table('v_users')->get();
         $roles = RoleModel::all();
         $employees = EmployeeModel::all();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+
         return view('layouts.admin_views.users_admin.users_data', compact('users', 'grouped_sub_menu', 'roles', 'employees', 'sidebar_menu'));
     }
 
 
 
-    public function users_create_layout(): View
+    public function users_create_layout()
     {
 
         $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
@@ -58,6 +66,13 @@ class RegisteredUserController extends Controller
             ->where('users.is_active', null)
             ->where('employee.is_active', 'Y')
             ->get();
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
         return view('layouts.admin_views.users_admin.create.users_create', compact('roles', 'employees', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
@@ -134,8 +149,8 @@ class RegisteredUserController extends Controller
         }
     }
 
-
-    public function show($id): View
+    // EDIT USERS LAYOUT
+    public function show($id)
     {
         $show = User::whereId($id)->first();
 
@@ -146,6 +161,13 @@ class RegisteredUserController extends Controller
             $roles = RoleModel::all();
             $employees = EmployeeModel::all();
             $user =  DB::table('v_users')->where('id', $id)->get();
+        }
+
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
         }
         return view('layouts.admin_views.users_admin.edit.users_edit', compact('roles', 'employees', 'user', 'grouped_sub_menu', 'sidebar_menu'));
     }
@@ -240,6 +262,12 @@ class RegisteredUserController extends Controller
             ->leftJoin('job_position as jp', 'e.job_position', '=', 'jp.id')
             ->orderBy('u.last_seen', 'DESC')
             ->get();
+        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+
+        if ($allowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
 
         return view('layouts.admin_views.users_activity', compact('users_activity', 'grouped_sub_menu', 'sidebar_menu',));
     }
