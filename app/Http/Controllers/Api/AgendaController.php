@@ -67,9 +67,18 @@ class AgendaController extends Controller
             )
             ->leftJoin('v_employee as ve', 'va.meeting_leader', '=', 've.nik')
             ->orderBy('created_at', 'DESC')->get();
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -89,9 +98,18 @@ class AgendaController extends Controller
         $department = DB::table('department')->get();
 
         $meeting_leader = DB::table('v_employee')->get();
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -195,9 +213,18 @@ class AgendaController extends Controller
         $find_agenda = AgendaModel::find($request->id);
         $agendas_date = Carbon::parse($find_agenda->agenda_date);
 
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }

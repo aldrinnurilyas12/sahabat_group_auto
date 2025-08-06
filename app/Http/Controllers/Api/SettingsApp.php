@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\MasterMainMenuController;
 use App\Mail\MaintenanceNotification;
 use App\Models\BranchModel;
 use App\Models\UnderDevelopmentSetting;
+use App\Models\UsersPrivilegeModel;
 use PhpParser\Node\Stmt\Else_;
 use Psy\CodeCleaner\ReturnTypePass;
 use Illuminate\Support\Facades\Mail;
@@ -50,9 +51,18 @@ class SettingsApp extends Controller
         $setting_time = DB::table('settings_schedule_time')->first();
 
         $settings_data = DB::table('under_development_setting')->get();
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -152,17 +162,57 @@ class SettingsApp extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        //
-    }
+
+
+    public function store(Request $request) {}
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show_users_privilege(Request $request)
     {
-        //
+
+        $master_menus = $this->MasterMainMenuController->master_display_menus();
+        $sidebar_menu = $master_menus['sidebar_menu'] ?? [];
+        $grouped_sub_menu = $master_menus['grouped_sub_menu'] ?? [];
+
+        $users_privilege = DB::table('v_users_privilege')->get();
+        $employee = DB::table('v_employee')->where('is_active', '<>', 'N')->get();
+
+        // $allowedColumn = DB::table('users_privilege')
+        //     ->value('allowed');
+
+        // $disallowedColumn = DB::table('users_privilege')
+        //     ->value('disallowed');
+
+
+        // // dd($disallowedColumn);
+
+        // // Pecah string menjadi array angka
+        // $allowedData = $allowedColumn
+        //     ? array_map('intval', explode(',', $allowedColumn))
+        //     : [];
+
+        // $disallowedData = $disallowedColumn
+        //     ? array_map('intval', explode(',', $disallowedColumn))
+        //     : [];
+
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
+
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
+        return view('layouts.admin_views.users_privilege.main', compact('grouped_sub_menu', 'sidebar_menu', 'users_privilege', 'employee'));
     }
 
     /**
@@ -176,9 +226,38 @@ class SettingsApp extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
+        $request->validate([
+            'allowed' => 'array',
+            'allowed.*' => 'integer',
+            'disallowed' => 'array',
+            'disallowed.*' => 'integer',
+        ]);
+
+        $find_menu = DB::table('users_privilege')
+            ->select('allowed', 'disallowed')
+            ->where('submenu_id', $request->submenu_id)->first();
+
+        if ($find_menu) {
+            DB::table('users_privilege')->where('submenu_id', $request->submenu_id)->update([
+                'allowed' => implode(',', $request->allowed ?? []),
+                'disallowed' => implode(',', $request->disallowed ?? []),
+                'updated_at' => now(),
+                'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+            ]);
+        } else {
+            DB::table('users_privilege')->insert([
+                'allowed' => implode(',', $request->allowed ?? []),
+                'disallowed' => implode(',', $request->disallowed ?? []),
+                'created_at' => now(),
+                'created_by'   => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
+            ]);
+        }
+
+        $this->insertLogActivityUsers(__METHOD__);
+        session()->flash('message_success', 'Hak Akses Pengguna Berhasil disimpan!');
+        return redirect()->back();
     }
 
     /**

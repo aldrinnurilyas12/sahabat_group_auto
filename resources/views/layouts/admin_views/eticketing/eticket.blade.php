@@ -47,6 +47,8 @@
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
                         <h5 style="color: black;"><strong>Data E-Ticket</strong></h5>
+                        <span>[{{ app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->nik . ' - ' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name }}]</span>
+                        <br>
                         <br>
                         <div style="display: flex; flex-wrap:wrap; gap:10px;" class="component">
                             <a href="{{ route('eticket_create') }}" class="btn btn-primary">

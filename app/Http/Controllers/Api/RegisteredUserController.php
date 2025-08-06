@@ -41,9 +41,18 @@ class RegisteredUserController extends Controller
         $roles = RoleModel::all();
         $employees = EmployeeModel::all();
 
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -67,9 +76,18 @@ class RegisteredUserController extends Controller
             ->where('employee.is_active', 'Y')
             ->get();
 
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -163,9 +181,18 @@ class RegisteredUserController extends Controller
             $user =  DB::table('v_users')->where('id', $id)->get();
         }
 
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -262,9 +289,18 @@ class RegisteredUserController extends Controller
             ->leftJoin('job_position as jp', 'e.job_position', '=', 'jp.id')
             ->orderBy('u.last_seen', 'DESC')
             ->get();
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }

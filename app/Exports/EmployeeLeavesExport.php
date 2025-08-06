@@ -15,9 +15,9 @@ use Maatwebsite\Excel\Events\AfterSheet;
 class EmployeeLeavesExport implements FromCollection, WithHeadings, WithTitle, WithEvents
 {
 
-    public function __construct($offices, $bulan, $tahun)
+    public function __construct($offices, $bulan, $tahun, $employee_id)
     {
-        // $this->department = $departments;
+        $this->employee_id = $employee_id;
         $this->office = $offices;
         $this->bulan = $bulan;
         $this->tahun = $tahun;
@@ -75,6 +75,33 @@ class EmployeeLeavesExport implements FromCollection, WithHeadings, WithTitle, W
                     'updated_at'
                 )
                 ->where('location_name', [$this->office])
+                ->whereRaw('MONTH(created_at) = ?', [$this->bulan])
+                ->whereRaw('YEAR(created_at) = ?', [$this->tahun])
+                ->get();
+        } elseif ($this->bulan && $this->tahun) {
+            return DB::table('v_employee_leaves')
+                ->select(
+                    'id',
+                    'absences_code',
+                    'nik',
+                    'name',
+                    'location_name',
+                    'department_name',
+                    'position_name',
+                    'type_of_leave',
+                    'start_date',
+                    'end_date',
+                    'duration_of_leaves',
+                    'reason',
+                    'status',
+                    'branch_head_reason_of_reject',
+                    'hr_reason_of_reject',
+                    'approval_by_branch_head',
+                    'approval_by_hr_head',
+                    'created_at',
+                    'updated_at'
+                )
+                ->where('employee_id', [$this->employee_id])
                 ->whereRaw('MONTH(created_at) = ?', [$this->bulan])
                 ->whereRaw('YEAR(created_at) = ?', [$this->tahun])
                 ->get();

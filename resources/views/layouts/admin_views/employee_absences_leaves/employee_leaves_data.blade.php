@@ -82,21 +82,31 @@
                                 <form action="{{ route('filter_employee_leaves') }}" method="GET">
 
                                     <div style="display: flex;gap:10px;" class="grouped-container">
-                                        <div style="display: block" class="select-group">
-                                            <label for="">Kantor</label>
-                                            <select class="form-control" name="office" id="branch">
-                                                <option value="">--- Pilih Kantor ---</option>
-                                                <option value="alldata">Semua Kantor</option>
-                                                @foreach ($office as $kantor)
-                                                    <option value="{{ $kantor->location_name }}">
-                                                        {{ $kantor->location_name }}</option>
-                                                @endforeach
 
-                                            </select>
-                                            @if ($errors->has('month'))
-                                                <span class="text-danger">{{ $errors->first('month') }}</span>
-                                            @endif
-                                        </div>
+                                        @if (
+                                            $branch_login_session =
+                                                app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name ==
+                                                    'Head of Branch Operations' ||
+                                                ($hr_login_session =
+                                                    app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name ==
+                                                    'Head of Branch Operations'))
+                                            <div style="display: block" class="select-group">
+                                                <label for="">Kantor</label>
+                                                <select class="form-control" name="office" id="branch">
+                                                    <option value="">--- Pilih Kantor ---</option>
+                                                    <option value="alldata">Semua Kantor</option>
+                                                    @foreach ($office as $kantor)
+                                                        <option value="{{ $kantor->location_name }}">
+                                                            {{ $kantor->location_name }}</option>
+                                                    @endforeach
+
+                                                </select>
+                                                @if ($errors->has('month'))
+                                                    <span class="text-danger">{{ $errors->first('month') }}</span>
+                                                @endif
+                                            </div>
+                                        @else
+                                        @endif
 
                                         <div style="display: block" class="select-group">
                                             <label for="">Bulan</label>
@@ -118,7 +128,8 @@
                                                 <option value="">--- Pilih tahun ---</option>
                                                 <option value="alldata">Semua Data</option>
                                                 @foreach ($years as $year)
-                                                    <option value="{{ $year }}">{{ $year }}</option>
+                                                    <option value="{{ $year }}">{{ $year }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                             <x-input-error :messages="$errors->get('tahun')" class="mt-2" style="color: red;" />

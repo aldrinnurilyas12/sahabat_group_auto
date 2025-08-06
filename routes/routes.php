@@ -384,6 +384,7 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
     Route::get('edit_eticket/{eticket_code}', [EticketingController::class, 'edit_eticket_layouts'])->name('edit_eticket');
     Route::put('update_eticket/{eticket_code}', [EticketingController::class, 'update'])->name('update_eticket');
     Route::get('eticket_detail/{eticket_code}', [EticketingController::class, 'eticket_detail_layouts'])->name('eticket_detail');
+
     // Routes IT-Monitoring
     Route::get('master_it_eticketing', [EticketingController::class, 'it_eticketing_layouts'])->name('master_it_eticketing');
     Route::put('confirmed_eticket/{eticket_code}', [EticketingController::class, 'confirmed_eticket_it'])->name('confirmed_eticket');
@@ -411,4 +412,6 @@ Route::middleware(['check_maintenance', 'auth'])->group(function () {
 
     // IT ONLY ACCESS
     Route::apiResource('settings_role_permission', App\Http\Controllers\Api\SettingsApp::class);
+    Route::get('role_privilege', [SettingsApp::class, 'show_users_privilege'])->name('settings_role_privilege');
+    Route::put('add_users_privilege/{submenu_id}', [SettingsApp::class, 'update'])->name('add_users_privilege');
 });

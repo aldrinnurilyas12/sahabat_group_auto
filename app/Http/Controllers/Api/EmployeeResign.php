@@ -70,9 +70,18 @@ class EmployeeResign extends Controller
             $employee_resign = DB::table('v_employee_resign')->orderBy('created_at', 'desc')->get();
         }
 
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }

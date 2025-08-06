@@ -41,15 +41,15 @@ class DashboardController extends Controller
         $marketing_department = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Marketing';
         $business_department = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Business Development';
         $human_resource_department = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Human Resource';
+        $other_department = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Lainnya';
+
 
         $plaza_auto = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name == 'PLAZA AUTO';
         $permata_abadi_motor = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name == 'PERMATA ABADI MOTOR';
         $kurnia_abadi_motor = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name == 'KURNIA ABADI MOTOR';
         $mega_abadi_motor = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name == 'MEGA ABADI MOTOR';
 
-
         if ($it_department) {
-
             $agenda = DB::table('v_agenda')->whereNotIn('department_name', ['Finance', 'Marketing', 'Business Development', 'Human Resource', 'Lainnya'])
                 ->where(function ($query) {
                     $query->where('branch', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)->orWhere('branch', null)
@@ -89,8 +89,14 @@ class DashboardController extends Controller
                 })
                 ->whereDate('agenda_date', '=', now()->toDateString())
                 ->get();
-        } else {
-            $agenda = DB::table('v_agenda')->get();
+        } elseif ($other_department) {
+            $agenda = DB::table('v_agenda')->whereNotIn('department_name', ['Finance', 'Information Technology', 'Marketing', 'Business Development', 'Human Resource'])
+                ->where(function ($query) {
+                    $query->where('branch', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->location_name)->orWhere('branch', null)
+                        ->whereIn('department_name', ['Lainnya', null]);
+                })
+                ->whereDate('agenda_date', '=', now()->toDateString())
+                ->get();
         }
 
         $testimonial_total = TestimonialModel::count();

@@ -75,9 +75,18 @@ class Analytics extends Controller
         $appointment_total = DB::table('appointment')->count();
         $unit_request = DB::table('customer_vehicle_request')->count();
         $sale_unit_request = DB::table('vehicle_sale_request')->count();
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -326,9 +335,18 @@ class Analytics extends Controller
 
         $testimonial = DB::table('customers_testimonial')->orderBy('created_at', 'desc')->get();
 
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }

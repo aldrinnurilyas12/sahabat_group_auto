@@ -34,10 +34,9 @@ class EmployeeLeaves extends Controller
         $branch_login_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations';
         $hr_login_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations';
         $branch_id_login_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id;
+        $employee_login = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
 
         $office = DB::table('branch')->get();
-
-
         $departments = $request->department;
 
         $office = DB::table('branch')->get();
@@ -61,16 +60,22 @@ class EmployeeLeaves extends Controller
             $employee_leaves = DB::table('v_employee_leaves')->where('branch_id', $branch_id_login_session)->orderBy('created_at', 'desc')->get();
         } elseif ($hr_login_session) {
             $employee_leaves = DB::table('v_employee_leaves')->orderBy('created_at', 'desc')->get();
-        } else {
-            $employee_leaves = DB::table('v_employee_leaves')->orderBy('created_at', 'desc')->get();
+        } elseif ($employee_login) {
+            $employee_leaves = DB::table('v_employee_leaves')->where('employee_id', $employee_login)->orderBy('created_at', 'desc')->get();
         }
 
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        // $disallowedData = DB::table('users_privilege')
+        //     ->where('disallowed', '<>', '')
+        //     ->distinct()
+        //     ->pluck('disallowed')
+        //     ->toArray();
 
-        if ($allowedRoles) {
-            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
-            return redirect()->back();
-        }
+        // $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        // if ($disallowedRoles) {
+        //     session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+        //     return redirect()->back();
+        // }
 
         return view('layouts.admin_views.employee_absences_leaves.employee_leaves_data', compact('employee_leaves', 'grouped_sub_menu', 'sidebar_menu', 'office', 'offices', 'bulan', 'tahun', 'months', 'years', 'department', 'departments'));
     }
@@ -338,6 +343,7 @@ class EmployeeLeaves extends Controller
         $employee = DB::table('v_employee_leaves')->get();
         $office = DB::table('branch')->get();
         $department = DB::table('department')->get();
+        $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
         $offices = $request->office;
         $departments = $request->department;
         $bulan = $request->bulan;
@@ -359,17 +365,30 @@ class EmployeeLeaves extends Controller
                 ->whereRaw('MONTH(created_at) = ?', [$bulan])
                 ->whereRaw('YEAR(created_at) = ?', [$tahun])->get();
         }
+
+        if ($bulan && $tahun) {
+            $employee_leaves = DB::table('v_employee_leaves')
+                ->where('employee_id', $employee_id)
+                ->whereRaw('MONTH(created_at) = ?', [$bulan])
+                ->whereRaw('YEAR(created_at) = ?', [$tahun])->get();
+        }
+
+
         if ($offices === 'alldata') {
             $employee_leaves = DB::table('v_employee_leaves')->get();
         }
 
-
-
         $master_menus = $this->MasterMainMenuController->master_display_menus();
 
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -385,13 +404,15 @@ class EmployeeLeaves extends Controller
         $offices = $request->office; // Current year (e.g., 2024)
         $bulan = $request->bulan;
         $tahun = $request->tahun;
+        $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
         $fileName = 'Data_Cuti_Karyawan' . '-' . $offices . '-' . $bulan .  '-' . $tahun . '.xlsx';
 
-        return Excel::download(new EmployeeLeavesExport($offices, $bulan, $tahun), $fileName);
+        return Excel::download(new EmployeeLeavesExport($offices, $bulan, $tahun, $employee_id), $fileName);
     }
 
     public function download_employee_leaves(Request $request)
     {
+        $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
         $offices = $request->office;
         $bulan = $request->bulan;
         $tahun = $request->tahun;
@@ -412,6 +433,14 @@ class EmployeeLeaves extends Controller
                 ->whereRaw('MONTH(created_at) = ?', [$bulan])
                 ->whereRaw('YEAR(created_at) = ?', [$tahun])->get();
         }
+
+
+        if ($bulan && $tahun) {
+            $leaves = DB::table('v_employee_leaves')->where('employee_id', $employee_id)
+                ->whereRaw('MONTH(created_at) = ?', [$bulan])
+                ->whereRaw('YEAR(created_at) = ?', [$tahun])->get();
+        }
+
         if ($offices === 'alldata') {
             $leaves = DB::table('v_employee_leaves')->get();
         }

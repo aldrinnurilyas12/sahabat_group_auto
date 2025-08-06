@@ -120,11 +120,11 @@
         if (loadingSpinnerWrapper) {
             // Menampilkan spinner saat halaman dimuat
             loadingSpinnerWrapper.style.display = 'flex';
-            console.log("Spinner muncul, timer akan dimulai.");
+
 
             // Menyembunyikan spinner setelah 2 detik (2000ms)
             setTimeout(function() {
-                console.log("2 detik berlalu, menyembunyikan spinner.");
+
                 loadingSpinnerWrapper.style.display = 'none'; // Sembunyikan spinner setelah 2 detik
             }, 1000); // 2000ms = 2 detik
         } else {

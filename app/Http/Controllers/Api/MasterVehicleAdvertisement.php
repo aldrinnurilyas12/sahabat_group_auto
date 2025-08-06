@@ -55,9 +55,18 @@ class MasterVehicleAdvertisement extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $vehicle_data = DB::table('v_vehicle_advertisement')->orderBy('created_at', 'desc')->get();
         $availableAds = DB::table('v_vehicle_advertisement')->where('is_active', 'Ya')->orderBy('updated_posted_date', 'desc')->get();
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -75,9 +84,18 @@ class MasterVehicleAdvertisement extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $vehicle_data = DB::table('v_vehicle_advertisement')->where('vehicle_id', $request->vehicle_id)->get();
         $vehicle_images = DB::table('vehicle_fotos')->where('vehicle_id', $request->vehicle_id)->get();
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }

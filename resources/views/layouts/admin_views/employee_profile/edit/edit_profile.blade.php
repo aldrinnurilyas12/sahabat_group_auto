@@ -276,8 +276,14 @@
                                             @else
                                             @endif
 
-
                                         </div>
+                                        <br>
+                                        @if ($checking_absences_status)
+                                            <a class="btn btn-info" href="{{ route('employee_leaves.index') }}">Lihat
+                                                Data
+                                                Cuti </a>
+                                        @else
+                                        @endif
                                     @endif
                                 @else
                                     <div style="display: flex; gap:7px;" class="dflex-cuti">

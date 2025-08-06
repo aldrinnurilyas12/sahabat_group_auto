@@ -31,9 +31,18 @@ class MasterMainMenuController extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $main_menu = DB::table('v_main_menu')->get();
 
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -50,9 +59,18 @@ class MasterMainMenuController extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -175,7 +193,7 @@ class MasterMainMenuController extends Controller
         } elseif (!$IT_DEV) {
             if ($MECHANIC_SESSION) {
                 $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->whereNotIn('id', ['2', '3', '4', '8'])->get();
-                $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->whereiN('id', ['24', '28'])->orderBy('submenu_name', 'asc')->get();
+                $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->whereiN('id', ['8', '24', '28', '32'])->orderBy('submenu_name', 'asc')->get();
                 $grouped_sub_menu = $sub_menu->groupBy('parent_id');
                 return compact('grouped_sub_menu', 'sidebar_menu');
             }
@@ -255,9 +273,18 @@ class MasterMainMenuController extends Controller
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -432,9 +459,18 @@ class MasterMainMenuController extends Controller
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
         $roles = RoleModel::all();
         $employees = EmployeeModel::all();
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -447,9 +483,18 @@ class MasterMainMenuController extends Controller
         $show = DB::table('submenu')->where('parent_id', $request->id)->first();
         $main_menus = DB::table('main_menu')->where('id', $request->id)->get();
 
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -488,9 +533,18 @@ class MasterMainMenuController extends Controller
             'branch_head_role' => $check___role->branch_head_role
         ];
         $show = DB::table('submenu')->where('id', $request->id)->first();
-        $allowedRoles = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
+        $disallowedData = DB::table('users_privilege')
+            ->where('disallowed', '<>', '')
+            ->distinct()
+            ->pluck('disallowed')
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->toArray();
 
-        if ($allowedRoles) {
+        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+
+        if ($disallowedRoles) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
