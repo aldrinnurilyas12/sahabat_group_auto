@@ -45,15 +45,26 @@
                 {{-- content --}}
 
 
+
                 <div id="content">
 
                     <h4 style="text-align:center;color:black;font-weight:bold;">Edit Data Agenda </h4>
                     @foreach ($agenda as $agendas)
+                        @php
+                            $allowedColumn = DB::table('agenda_guests')
+                                ->where('agenda_id', $agendas->id)
+                                ->pluck('employee_id')
+                                ->toArray();
+
+                            $allowedData = $allowedColumn;
+                        @endphp
                         <div class="form-group-content">
 
                             <form class="form_input" method="POST" action="{{ route('agenda_update', $agendas->id) }}">
                                 @csrf
                                 @method('PUT')
+
+                                <input type="text" name="agenda_id" value="{{ $agendas->id }}" hidden>
 
                                 <div class="form-group">
                                     <label>Department</label>
@@ -126,6 +137,55 @@
                                     <input type="time" class="form-control" value="{{ $agendas->end_time }}"
                                         min="07:00" max="22:00" name="end_time" autocomplete="off">
                                 </div>
+
+                                <div class="form-group">
+                                    <label for="">Pilih Anggota Meeting</label>
+                                    <div style="display: flex; gap:20px;" class="btn-permission">
+                                        <button type="button" class="btn btn-primary"
+                                            onclick="checkAllAllowed()">Pilih
+                                            Semua</button>
+
+
+                                        <button type="button" class="btn btn-outline-danger"
+                                            onclick="cancelClear()">Bersihkan</button>
+                                    </div>
+                                    <br>
+                                    <div style="height: 400px;overflow:auto;" class="guests-list">
+                                        <table style="font-size: 14px; color:black;" class="table table-bordered"
+                                            id="dataTable" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Pilih</th>
+                                                    <th>Karyawan</th>
+                                                    <th>Posisi</th>
+
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <?php $no = 1; ?>
+                                                @foreach ($employee as $emp)
+                                                    <tr style="width: 200px;">
+                                                        <td><?php echo $no++; ?></td>
+                                                        <td>
+                                                            <input class="allowed-checkbox" type="checkbox"
+                                                                name="employee_id[]" value="{{ $emp->id }}"
+                                                                {{ in_array($emp->id, $allowedData) ? 'checked' : '' }}>
+                                                        </td>
+                                                        <td>{{ '[' . $emp->nik . '] ' . $emp->name }}
+                                                        </td>
+                                                        <td>{{ $emp->job_position }}</td>
+
+                                                    </tr>
+                                                @endforeach
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('employee_id')" class="mt-2" style="color: red;" />
+                                </div>
+                                <br>
                                 <button type="submit" class="btn btn-primary">Simpan</button>
                             </form>
                     @endforeach
@@ -203,6 +263,17 @@
             console.log("Elemen spinner tidak ditemukan!");
         }
     });
+
+
+    function checkAllAllowed() {
+        document.querySelectorAll('.allowed-checkbox').forEach(cb => cb.checked = true);
+        document.querySelectorAll('.disallowed-checkbox').forEach(cb => cb.checked = true);
+    }
+
+    function cancelClear() {
+        document.querySelectorAll('.allowed-checkbox').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.disallowed-checkbox').forEach(cb => cb.checked = false);
+    }
 </script>
 
 </html>

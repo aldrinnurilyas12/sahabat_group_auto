@@ -185,6 +185,7 @@
                                         <th>No</th>
                                         <th>Aksi</th>
                                         <th>Ubah Status</th>
+                                        <th>Anggota Meeting</th>
                                         <th>Kantor</th>
                                         <th>Department</th>
                                         <th>Pemimpin Meeting</th>
@@ -215,9 +216,9 @@
                                                         <a href="{{ route('agenda_edit', ['id' => $agendas->id]) }}"><i
                                                                 class="fas fa-edit"></i></a>
                                                     @endif
-                                                    <a style="size: 12px;" href="#" data-toggle="modal"
+                                                    {{-- <a style="size: 12px;" href="#" data-toggle="modal"
                                                         data-target="#deleteUnit{{ $agendas->id }}"><i
-                                                            class="fas fa-trash"></i></a>
+                                                            class="fas fa-trash"></i></a> --}}
                                             </td>
                                             <td>
                                                 @if ($agendas->status == 'canceled' || $agendas->status == 'done')
@@ -226,6 +227,10 @@
                                                     <a class="btn btn-info" href="#" data-toggle="modal"
                                                         data-target="#changeStatus{{ $agendas->id }}">Ubah</a>
                                                 @endif
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-warning" href="#" data-toggle="modal"
+                                                    data-target="#guestLists{{ $agendas->id }}">Lihat</a>
                                             </td>
 
 
@@ -382,9 +387,62 @@
         </div>
     @endforeach
 
-
-
     {{-- end --}}
+
+
+    @foreach ($agenda as $agendas)
+        @php
+            $guests_list = DB::table('agenda as a')
+                ->select('a.id', 'employee_id', 'nik', 'name', 'job_position')
+                ->leftJoin('agenda_guests as ag', 'a.id', '=', 'ag.agenda_id')
+                ->leftJoin('v_employee as e', 'ag.employee_id', '=', 'e.id')
+                ->where('a.id', $agendas->id)
+                ->get();
+        @endphp
+
+
+        <div class="modal fade" id="guestLists{{ $agendas->id }}" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalLabel{{ $agendas->id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div style="height: 500px;overflow:auto;" class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel{{ $agendas->id }}">Anggota Meeting:
+                            {{ $agendas->agenda_name }}</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+
+                    <table style="font-size: 14px; color:black;" class="table table-bordered" id="dataTable"
+                        width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Karyawan</th>
+                                <th>Posisi</th>
+                                <th>Status</th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <?php $no = 1; ?>
+                            @foreach ($guests_list as $emp)
+                                <tr style="width: 200px;">
+                                    <td><?php echo $no++; ?></td>
+                                    <td>{{ '[' . $emp->nik . '] ' . $emp->name }}
+                                    </td>
+                                    <td>{{ $emp->job_position }}</td>
+                                    <td>-</td>
+                                </tr>
+                            @endforeach
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    @endforeach
 
 
     <!-- End of Page Wrapper -->

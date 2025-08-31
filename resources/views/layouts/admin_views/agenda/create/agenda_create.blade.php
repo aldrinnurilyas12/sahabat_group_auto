@@ -113,25 +113,57 @@
                                 <x-input-error :messages="$errors->get('end_time')" class="mt-2" style="color: red;" />
                             </div>
 
+                            <div class="form-group">
+                                <label for="">Pilih Anggota Meeting</label>
+                                <div style="display: flex; gap:20px;" class="btn-permission">
+                                    <button type="button" class="btn btn-primary" onclick="checkAllAllowed()">Pilih
+                                        Semua</button>
+
+
+                                    <button type="button" class="btn btn-outline-danger"
+                                        onclick="cancelClear()">Bersihkan</button>
+                                </div>
+                                <br>
+                                <div style="height: 400px;overflow:auto;" class="guests-list">
+                                    <table style="font-size: 14px; color:black;" class="table table-bordered"
+                                        id="dataTable" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Pilih</th>
+                                                <th>Karyawan</th>
+                                                <th>Posisi</th>
+
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <?php $no = 1; ?>
+                                            @foreach ($employee as $emp)
+                                                <tr style="width: 200px;">
+                                                    <td><?php echo $no++; ?></td>
+                                                    <td>
+                                                        <input class="allowed-checkbox" type="checkbox"
+                                                            name="employee_id[]" value="{{ $emp->id }}">
+                                                    </td>
+                                                    <td>{{ '[' . $emp->nik . '] ' . $emp->name }}
+                                                    </td>
+                                                    <td>{{ $emp->job_position }}</td>
+
+                                                </tr>
+                                            @endforeach
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <x-input-error :messages="$errors->get('employee_id')" class="mt-2" style="color: red;" />
+                            </div>
+                            <br>
                             <button type="submit" class="btn btn-primary">Simpan</button>
                         </form>
 
 
-                        {{-- <div style="width: 400px; height:max-content; padding:8px;" class="card shadow mb-4">
-                            <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Informasi pembuatan akun admin</h6>
-                            </div>
-                            <div class="card-body">
-                                <ul>
-                                    <li>Pembuatan akun admin ditujukan untuk seseorang/karyawan dalam mengelola kontent website Sahabat Group</li>
-                                    <br>
-                                    <li>Pembuatan akun hanya bisa dilakukan oleh role Super Admin</li>
-                                    <br>
-                                    <li>1 (Satu) akun hanya bisa 1 akses portal website Sahabat Group</li>
-                                </ul>
-                                
-                            </div>
-                        </div> --}}
+
                     </div>
 
 
@@ -213,6 +245,18 @@
             console.log("Elemen spinner tidak ditemukan!");
         }
     });
+
+
+    // SCRIPT FOR BUTTON ALL ALLOWED :
+    function checkAllAllowed() {
+        document.querySelectorAll('.allowed-checkbox').forEach(cb => cb.checked = true);
+        document.querySelectorAll('.disallowed-checkbox').forEach(cb => cb.checked = true);
+    }
+
+    function cancelClear() {
+        document.querySelectorAll('.allowed-checkbox').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.disallowed-checkbox').forEach(cb => cb.checked = false);
+    }
 </script>
 
 </html>

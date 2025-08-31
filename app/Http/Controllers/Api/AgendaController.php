@@ -9,6 +9,7 @@ use App\Models\AgendaModel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use App\Http\Controllers\Api\MasterMainMenuController;
+use App\Models\AgendaGuestsModel;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
@@ -96,6 +97,7 @@ class AgendaController extends Controller
 
         $branch = DB::table('branch')->get();
         $department = DB::table('department')->get();
+        $employee = DB::table('v_employee')->where('is_active', 'Ya')->get();
 
         $meeting_leader = DB::table('v_employee')->get();
         $disallowedData = DB::table('users_privilege')
@@ -114,7 +116,7 @@ class AgendaController extends Controller
             return redirect()->back();
         }
 
-        return view('layouts.admin_views.agenda.create.agenda_create', compact('branch', 'department', 'meeting_leader', 'grouped_sub_menu', 'sidebar_menu'));
+        return view('layouts.admin_views.agenda.create.agenda_create', compact('branch', 'employee', 'department', 'meeting_leader', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     public function insertLogActivityUsers($log_activity)
@@ -131,6 +133,8 @@ class AgendaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'employee_id' => 'required|array',
+            'employee_id.*' => 'integer',
             'meeting_leader' => 'required',
             'agenda_name' => 'required',
             'agenda_date' => 'required',
@@ -144,7 +148,7 @@ class AgendaController extends Controller
 
         if ($SETTING_TIME->open_schedule_time == 'on') {
             if ($insertTime >= 7 && $insertTime <= 18) {
-                AgendaModel::create([
+                $agenda = AgendaModel::create([
                     'department' => $request->department,
                     'branch' => $request->branch,
                     'meeting_leader' => $request->meeting_leader,
@@ -156,6 +160,19 @@ class AgendaController extends Controller
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
+
+                $agendaId = $agenda->latest()->first()->id;
+                $guests_list = [];
+                foreach ($request->employee_id as $emp_id) {
+                    $guests_list[] = [
+                        'employee_id' => $emp_id,
+                        'agenda_id' => $agendaId,
+                        'status' => null
+                    ];
+                }
+
+                $AgendaGuestList = AgendaGuestsModel::insert($guests_list);
+
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Agenda berhasil disimpan!');
                 return redirect()->route('master_agenda.index');
@@ -164,7 +181,7 @@ class AgendaController extends Controller
                 return redirect()->route('master_blog.index');
             }
         } else {
-            AgendaModel::create([
+            $agenda =  AgendaModel::create([
                 'department' => $request->department,
                 'branch' => $request->branch,
                 'meeting_leader' => $request->meeting_leader,
@@ -176,6 +193,19 @@ class AgendaController extends Controller
                 'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
             ]);
+
+            $agendaId = $agenda->latest()->first()->id;
+            $guests_list = [];
+            foreach ($request->employee_id as $emp_id) {
+                $guests_list[] = [
+                    'employee_id' => $emp_id,
+                    'agenda_id' => $agendaId,
+                    'status' => null
+                ];
+            }
+
+            $AgendaGuestList = AgendaGuestsModel::insert($guests_list);
+
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Agenda berhasil disimpan!');
             return redirect()->route('master_agenda.index');
@@ -212,6 +242,7 @@ class AgendaController extends Controller
 
         $find_agenda = AgendaModel::find($request->id);
         $agendas_date = Carbon::parse($find_agenda->agenda_date);
+        $employee = DB::table('v_employee')->where('is_active', 'Ya')->get();
 
         $disallowedData = DB::table('users_privilege')
             ->where('disallowed', '<>', '')
@@ -229,7 +260,7 @@ class AgendaController extends Controller
             return redirect()->back();
         }
 
-        return view('layouts.admin_views.agenda.edit.agenda_edit', compact('branch', 'agenda', 'department', 'meeting_leader', 'agendas_date', 'grouped_sub_menu', 'sidebar_menu'));
+        return view('layouts.admin_views.agenda.edit.agenda_edit', compact('branch', 'agenda', 'employee', 'department', 'meeting_leader', 'agendas_date', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     /**
@@ -259,6 +290,30 @@ class AgendaController extends Controller
                     'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                     'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
                 ]);
+
+
+                // NOTE PERBAIKI JIKA DATA EMPLOYEE_ID SUDAB ADA DI TABLE JANGAN DIMASUKAN LAGI
+                $agendaId = $request->agenda_id;
+                $checkEmployeeId = AgendaGuestsModel::where('agenda_id', $agendaId)
+                    ->pluck('employee_id')
+                    ->toArray();
+
+                $guests_list = [];
+                foreach ($request->employee_id as $emp_id) {
+                    if (!in_array($emp_id, $checkEmployeeId)) {
+                        $guests_list[] = [
+                            'employee_id' => $emp_id,
+                            'agenda_id' => $agendaId,
+                            'status' => null
+                        ];
+                    }
+                }
+
+                if (!empty($guests_list)) {
+                    $AgendaGuestList = AgendaGuestsModel::insert($guests_list);
+                }
+
+
                 $this->insertLogActivityUsers(__METHOD__);
                 session()->flash('message_success', 'Data Agenda berhasil disimpan!');
                 return redirect()->route('master_agenda.index');
@@ -279,6 +334,29 @@ class AgendaController extends Controller
                 'created_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name,
                 'updated_by' => auth()->user()->nik . '-' . app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->name
             ]);
+
+
+            $agendaId = $request->agenda_id;
+            $checkEmployeeId = AgendaGuestsModel::where('agenda_id', $agendaId)
+                ->pluck('employee_id')
+                ->toArray();
+
+            $guests_list = [];
+            foreach ($request->employee_id as $emp_id) {
+                if (!in_array($emp_id, $checkEmployeeId)) {
+                    $guests_list[] = [
+                        'employee_id' => $emp_id,
+                        'agenda_id' => $agendaId,
+                        'status' => null
+                    ];
+                }
+            }
+
+            if (!empty($guests_list)) {
+                $AgendaGuestList = AgendaGuestsModel::insert($guests_list);
+            }
+
+
             $this->insertLogActivityUsers(__METHOD__);
             session()->flash('message_success', 'Data Agenda berhasil disimpan!');
             return redirect()->route('master_agenda.index');
