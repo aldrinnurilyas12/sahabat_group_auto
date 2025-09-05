@@ -78,23 +78,21 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Label Button 1</label>
+                                    <label>Button 1</label>
                                     <input type="text" class="form-control" value="{{ $banner->button_1 }}"
                                         name="button_1" autocomplete="off">
                                 </div>
-
-
-                                <div class="form-group">
-                                    <label>Label Button 2</label>
-                                    <input type="text" class="form-control" value="{{ $banner->button_2 }}"
-                                        name="button_2" autocomplete="off">
-                                </div>
-
 
                                 <div class="form-group">
                                     <label>Link Button 1</label>
                                     <input type="text" class="form-control" value="{{ $banner->link_1 }}"
                                         name="link_1" autocomplete="off">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Button 2</label>
+                                    <input type="text" class="form-control" value="{{ $banner->button_2 }}"
+                                        name="button_2" autocomplete="off">
                                 </div>
 
                                 <div class="form-group">

@@ -149,12 +149,13 @@ class MasterMainMenuController extends Controller
         $marketing_dept = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Marketing';
         $finance_dept = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Finance';
         $business_dev_dept = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Business Development';
-        $IT_DEV = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Information Technology';
+        $IT_DEPT = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Information Technology';
+        $HR_DEPT = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Human Resource';
         $OTHER_DEPT = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->department_name == 'Lainnya';
         $MECHANIC_SESSION = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position == '14';
 
 
-        if ($marketing_dept || $finance_dept || $business_dev_dept) {
+        if ($marketing_dept || $finance_dept || $business_dev_dept || $HR_DEPT) {
             if ($finance_role || $humanResource_role) {
                 if ($admin_role) {
                     $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->where('id', '<>', '4')->get();
@@ -190,7 +191,7 @@ class MasterMainMenuController extends Controller
                     return compact('grouped_sub_menu', 'sidebar_menu');
                 }
             }
-        } elseif (!$IT_DEV) {
+        } elseif (!$IT_DEPT) {
             if ($MECHANIC_SESSION) {
                 $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->whereNotIn('id', ['2', '3', '4', '8'])->get();
                 $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->whereiN('id', ['8', '24', '28', '32'])->orderBy('submenu_name', 'asc')->get();
@@ -209,7 +210,7 @@ class MasterMainMenuController extends Controller
                 return compact('grouped_sub_menu', 'sidebar_menu');
             }
         } else {
-            if ($IT_DEV) {
+            if ($IT_DEPT) {
                 if ($admin_role) {
                     $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
                     $sub_menu = DB::table('submenu')->where('admin_role', '<>', 'N')->whereNotIn('id', ['17', '18'])->orderBy('submenu_name', 'asc')->get();

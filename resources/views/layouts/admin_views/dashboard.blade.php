@@ -225,6 +225,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>No</th>
+                                                    <th>Anggota Meeting</th>
                                                     <th>Agenda</th>
                                                     <th>Department</th>
                                                     <th>Kantor</th>
@@ -243,6 +244,11 @@
                                                 @foreach ($agenda as $agendas)
                                                     <tr style="width: 200px;">
                                                         <td><?php echo $no++; ?></td>
+                                                        <td>
+                                                            <a class="btn btn-warning" href="#"
+                                                                data-toggle="modal"
+                                                                data-target="#guestLists{{ $agendas->id }}">Lihat</a>
+                                                        </td>
                                                         <td>{{ $agendas->agenda_name }}</td>
                                                         @if ($agendas->department_name == null)
                                                             <td>Semua Department</td>
@@ -294,49 +300,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Pie Chart -->
-                        {{-- <div class="col-xl-4 col-lg-5">
-                            <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Revenue Sources</h6>
-                                    <div class="dropdown no-arrow">
-                                        <a class="dropdown-toggle" href="#" role="button"
-                                            id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
-                                            aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                                            aria-labelledby="dropdownMenuLink">
-                                            <div class="dropdown-header">Dropdown Header:</div>
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">Something else here</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <div class="chart-pie pt-4 pb-2">
-                                        <canvas id="myPieChart"></canvas>
-                                    </div>
-                                    <div class="mt-4 text-center small">
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-primary"></i> Direct
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-success"></i> Social
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-info"></i> Referral
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> --}}
                     </div>
 
 
@@ -356,6 +319,61 @@
     </div>
     <!-- End of Page Wrapper -->
 
+
+    {{-- Modal Content --}}
+    @foreach ($agenda as $agendas)
+        @php
+            $guests_list = DB::table('agenda as a')
+                ->select('a.id', 'employee_id', 'nik', 'name', 'job_position')
+                ->leftJoin('agenda_guests as ag', 'a.id', '=', 'ag.agenda_id')
+                ->leftJoin('v_employee as e', 'ag.employee_id', '=', 'e.id')
+                ->where('a.id', $agendas->id)
+                ->get();
+        @endphp
+
+
+        <div class="modal fade" id="guestLists{{ $agendas->id }}" tabindex="-1" role="dialog"
+            aria-labelledby="exampleModalLabel{{ $agendas->id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div style="height: 500px;overflow:auto;" class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel{{ $agendas->id }}">Anggota Meeting:
+                            {{ $agendas->agenda_name }}</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <table style="font-size: 14px; color:black;" class="table table-bordered" id="dataTable"
+                            width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Karyawan</th>
+                                    <th>Posisi</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <?php $no = 1; ?>
+                                @foreach ($guests_list as $emp)
+                                    <tr style="width: 200px;">
+                                        <td><?php echo $no++; ?></td>
+                                        <td>{{ '[' . $emp->nik . '] ' . $emp->name }}
+                                        </td>
+                                        <td>{{ $emp->job_position }}</td>
+                                    </tr>
+                                @endforeach
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endforeach
+    {{-- end --}}
 
 
     {{-- spinner --}}

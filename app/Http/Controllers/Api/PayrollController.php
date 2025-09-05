@@ -58,10 +58,10 @@ class PayrollController extends Controller
         if ($branch_head_login || $finance_head_session || $hr_head_session) {
             $employee_data = DB::table('v_employee')
                 ->where('branch_id', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id)
-                ->orderBy('created_at', 'desc')
+                ->orderBy('created_at', 'asc')
                 ->get();
         } else {
-            $employee_data = DB::table('v_employee')->orderBy('created_at', 'desc')->get();
+            $employee_data = DB::table('v_employee')->orderBy('created_at', 'asc')->get();
         }
 
         return view('layouts.admin_views.payroll.payroll', compact('employee_data', 'grouped_sub_menu', 'sidebar_menu', 'branch_head_login', 'finance_head_session', 'hr_head_session'));
@@ -105,8 +105,12 @@ class PayrollController extends Controller
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+
+        $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id;
         $payroll_detail = DB::table('v_payroll')->where('payroll_code', $payroll_code)->orderBy('created_at', 'Desc')->get();
-        return view('layouts.admin_views.payroll.create.show_payroll_detail', compact('payroll_detail', 'grouped_sub_menu', 'sidebar_menu'));
+        $checking_signature = DB::table('employee_signature')->select('signature')->where('employee_id', $employee_id)->get();
+
+        return view('layouts.admin_views.payroll.create.show_payroll_detail', compact('payroll_detail', 'checking_signature', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
 
@@ -117,12 +121,13 @@ class PayrollController extends Controller
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
+        $employee_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id;
         $employee_data = DB::table('v_employee')->where('id', $request->id)->get();
 
 
         $payroll_detail = DB::table('v_payroll')->where('payroll_id', $request->payroll_id)->get();
 
-
+        $checking_signature = DB::table('employee_signature')->select('signature')->where('employee_id', $employee_id)->get();
 
         // new:
         // $payroll_detail = DB::table('v_payroll')->where('id', $request->id)->orderBy('payroll_approval_date', 'desc')->latest()->first();
@@ -134,7 +139,7 @@ class PayrollController extends Controller
             return view('layouts.admin_views.payroll.payroll', compact('payroll_detail', 'employee_data', 'grouped_sub_menu', 'sidebar_menu'));
         }
 
-        return view('layouts.admin_views.payroll.create.payroll_create', compact('payroll_detail', 'employee_data', 'grouped_sub_menu', 'sidebar_menu'));
+        return view('layouts.admin_views.payroll.create.payroll_create', compact('payroll_detail', 'checking_signature', 'employee_data', 'grouped_sub_menu', 'sidebar_menu'));
     }
 
     /**
@@ -246,8 +251,8 @@ class PayrollController extends Controller
             ->leftjoin('employee as e', 'es.employee_id', '=', 'e.id')
             ->leftJoin('branch as b', 'e.branch_id', '=', 'b.id')
             ->leftJoin('job_position as jp', 'e.job_position', '=', 'jp.id')
-            ->leftJoin('v_employee_resign as ver', 'b.id', '=', 'ver.branch_head_id')
-            ->where('ver.branch_head_id', '=', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id)
+            ->leftJoin('v_payroll as ver', 'b.id', '=', 'ver.emp_branch_id')
+            ->where('ver.emp_branch_id', '=', app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->branch_id)
             ->where('jp.position_name', 'Head of Branch Operations')->get();
 
 

@@ -220,8 +220,8 @@
                                             <div style="display:flex; gap:10px;" class="button-flex">
                                                 <a style="background: black; color:white;" class="btn btn-dark"
                                                     href="{{ url($banner->link_1) }}">{{ $banner->button_1 }}</a>
-                                                <a style="color: black; border:2px solid black; border-radius:4px;padding:4px;"
-                                                    href="{{ url($banner->link_2) }}">{{ $banner->button_2 }}</a>
+                                                {{-- <a style="color: black; border:2px solid black; border-radius:4px;padding:4px;"
+                                                    href="{{ url($banner->link_2) }}">{{ $banner->button_2 }}</a> --}}
                                             </div>
                                         @elseif($banner->button_2)
                                             <a class="btn btn-outline-dark"

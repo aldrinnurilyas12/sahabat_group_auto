@@ -48,13 +48,33 @@
 
 
         @php
+            use Illuminate\Support\Collection;
+
+            $emp_id = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->user_emp_id;
             $dateNow = date('Y-m-d');
 
-            $notification = DB::table('v_spk')->whereDate('spk_confirmation_date', '<>', $dateNow)->get();
-            $totalNotif = DB::table('v_spk')->count();
+            $newSpk = DB::table('v_spk')
+                ->select('id', 'unit', 'spk_confirmation_date as created_at', DB::raw("'spk' as type"))
+                ->whereDate('spk_confirmation_date', $dateNow);
 
-            $newSpk = DB::table('v_spk')->whereDate('spk_confirmation_date', $dateNow)->get();
+            $oldSpk = DB::table('v_spk')
+                ->select('id', 'unit', 'spk_confirmation_date as created_at', DB::raw("'spk' as type"))
+                ->whereDate('spk_confirmation_date', '<>', $dateNow);
+
+            $agenda_notification = DB::table('agenda as a')
+                ->select('a.id', 'a.agenda_name as unit', 'a.created_at', DB::raw("'agenda' as type"))
+                ->leftJoin('agenda_guests as ag', 'a.id', '=', 'ag.agenda_id')
+                ->where('ag.employee_id', $emp_id);
+
+            // gabung semua query
+            $allNotif = $newSpk->unionAll($oldSpk)->unionAll($agenda_notification);
+
+            // bungkus query gabungan dalam collection & urutkan terbaru
+            $notifications = DB::query()->fromSub($allNotif, 'notif')->orderBy('created_at', 'DESC')->get();
+
+            $totalNotif = $notifications->count();
         @endphp
+
         <!-- Nav Item - Alerts -->
 
 
@@ -65,41 +85,14 @@
                 <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-bell fa-fw"></i>
-                    <!-- Counter - Alerts -->
                     <span class="badge badge-danger badge-counter">{{ $totalNotif }}</span>
                 </a>
-                <!-- Dropdown - Alerts -->
                 <div style="height: 500px;overflow:auto;"
                     class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
                     aria-labelledby="alertsDropdown">
-                    <h6 class="dropdown-header">
-                        NOTIFIKASI
-                    </h6>
+                    <h6 class="dropdown-header">NOTIFIKASI</h6>
 
-
-
-                    @if ($newSpk->isNotEmpty())
-                        @foreach ($newSpk as $item)
-                            <a style="background: rgba(0, 0, 0, 0.037);" class="dropdown-item d-flex align-items-center"
-                                href="#">
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-warning">
-                                        <i class="fas fa-exclamation-triangle text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="small text-gray-500">
-                                        {{ \Carbon\Carbon::parse($item->spk_confirmation_date)->format('d F Y') }}
-                                    </div>
-                                    <span class="font-weight-bold">
-                                        Penjualan SPK unit {{ $item->unit }} telah berhasil
-                                    </span>
-                                </div>
-                            </a>
-                        @endforeach
-                    @endif
-
-                    @foreach ($notification as $item)
+                    @foreach ($notifications as $item)
                         <a class="dropdown-item d-flex align-items-center" href="#">
                             <div class="mr-3">
                                 <div class="icon-circle bg-warning">
@@ -108,81 +101,22 @@
                             </div>
                             <div>
                                 <div class="small text-gray-500">
-                                    {{ \Carbon\Carbon::parse($item->spk_confirmation_date)->format('d F Y') }}
+                                    {{ \Carbon\Carbon::parse($item->created_at)->format('d F Y') }}
                                 </div>
-                                Penjualan SPK unit <span class="font-weight-bold">{{ $item->unit }}</span> telah
-                                berhasil
+                                @if ($item->type == 'spk')
+                                    Penjualan SPK unit <span class="font-weight-bold">{{ $item->unit }}</span> telah
+                                    berhasil
+                                @else
+                                    <span class="font-weight-bold">{{ $item->unit }}</span>
+                                @endif
                             </div>
                         </a>
                     @endforeach
-
-
-                    <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
                 </div>
             </li>
+
         @endif
 
-        <!-- Nav Item - Messages -->
-        {{-- <li class="nav-item dropdown no-arrow mx-1">
-            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-envelope fa-fw"></i>
-                <!-- Counter - Messages -->
-                <span class="badge badge-danger badge-counter">7</span>
-            </a>
-            <!-- Dropdown - Messages -->
-            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                aria-labelledby="messagesDropdown">
-                <h6 class="dropdown-header">
-                    Message Center
-                </h6>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="dropdown-list-image mr-3">
-                        <img class="rounded-circle" src="" alt="...">
-                        <div class="status-indicator bg-success"></div>
-                    </div>
-                    <div class="font-weight-bold">
-                        <div class="text-truncate">Hi there! I am wondering if you can help me with a
-                            problem I've been having.</div>
-                        <div class="small text-gray-500">Emily Fowler · 58m</div>
-                    </div>
-                </a>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="dropdown-list-image mr-3">
-                        <img class="rounded-circle" src="" alt="...">
-                        <div class="status-indicator"></div>
-                    </div>
-                    <div>
-                        <div class="text-truncate">I have the photos that you ordered last month, how
-                            would you like them sent to you?</div>
-                        <div class="small text-gray-500">Jae Chun · 1d</div>
-                    </div>
-                </a>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="dropdown-list-image mr-3">
-                        <img class="rounded-circle" src="" alt="...">
-                        <div class="status-indicator bg-warning"></div>
-                    </div>
-                    <div>
-                        <div class="text-truncate">Last month's report looks great, I am very happy with
-                            the progress so far, keep up the good work!</div>
-                        <div class="small text-gray-500">Morgan Alvarez · 2d</div>
-                    </div>
-                </a>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                    <div class="dropdown-list-image mr-3">
-                        <img class="rounded-circle" src="" alt="...">
-                        <div class="status-indicator bg-success"></div>
-                    </div>
-                    <div>
-                        <div class="text-truncate">Am I a good boy? The reason I ask is because someone
-                            told me that people say this to all dogs, even if they aren't good...</div>
-                        <div class="small text-gray-500">Chicken the Dog · 2w</div>
-                    </div>
-                </a>
-                <a class="dropdown-item text-center small text-gray-500" href="#">Read More Messages</a>
-            </div>
-        </li> --}}
 
         <div class="topbar-divider d-none d-sm-block"></div>
 

@@ -51,6 +51,9 @@
                 <!-- DataTable -->
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
+                        <a style="margin-bottom: 10px;" href="{{ route('master_payroll.index') }}"
+                            class="btn btn-info"><i class="fas fa-chevron-left"></i> &nbsp;Kembali</a>
+                        <br>
                         <h5 style="color: black;"><strong>Data Payroll PT Sahabat Group Auto</strong></h5>
                         <br>
                         <div style="display: flex; flex-wrap:wrap; gap:10px;" class="component">
@@ -175,9 +178,24 @@
                                             @endif
 
                                             @if ($payroll->status == null)
-                                                <td style="color: red">belum konfirmasi</td>
+                                                <td style="color: red">
+                                                    <span class="badge badge-danger">
+                                                        belum konfirmasi
+                                                    </span>
+                                                </td>
                                             @else
-                                                <td style="color: green">{{ $payroll->status }}</td>
+                                                <td style="color: green">
+
+                                                    @if ($payroll->status == 'Menunggu Konfirmasi')
+                                                        <span class="badge badge-secondary">
+                                                            {{ $payroll->status }}
+                                                        </span>
+                                                    @else
+                                                        <span class="badge badge-success">
+                                                            {{ $payroll->status }}
+                                                        </span>
+                                                    @endif
+                                                </td>
                                             @endif
                                             <td>
 
@@ -204,22 +222,22 @@
                                             </td>
                                             <td>
                                                 @if ($payroll->approval_by_head_of_finance == 'confirmed')
-                                                    <p class="text-success">Confirmed</p>
+                                                    <p class="badge badge-success">Confirmed</p>
                                                 @else
-                                                    <p class="text-danger">Pending</p>
+                                                    <p class="badge badge-danger">Pending</p>
                                                 @endif
                                             <td>
                                                 @if ($payroll->approval_by_head_of_human_resource == 'confirmed')
-                                                    <p class="text-success">Confirmed</p>
+                                                    <p class="badge badge-success">Confirmed</p>
                                                 @else
-                                                    <p class="text-danger">Pending</p>
+                                                    <p class="badge badge-danger">Pending</p>
                                                 @endif
                                             </td>
                                             <td>
                                                 @if ($payroll->approval_by_head_of_branch == 'confirmed')
-                                                    <p class="text-success">Confirmed</p>
+                                                    <p class="badge badge-success">Confirmed</p>
                                                 @else
-                                                    <p class="text-danger">Pending</p>
+                                                    <p class="badge badge-danger">Pending</p>
                                                 @endif
                                             </td>
                                             <td>{{ $payroll->created_at }}</td>

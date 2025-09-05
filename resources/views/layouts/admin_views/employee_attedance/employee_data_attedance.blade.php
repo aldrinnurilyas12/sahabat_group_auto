@@ -264,34 +264,14 @@
                                         {{-- {{ dd([$month, $year])}} --}}
                                     </div>
                                 </div>
-
-                                {{-- OPEN CAMERA --}}
-
-                                @if (in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, ['12', '10', '5']))
-                                    <div style="display: block;" class="open-camera-scanner">
-                                        <label for=""><strong>SCAN KODE QR UNTUK PRESENSI
-                                                KEHADIRAN</strong></label>
-                                        <br>
-                                        <video id="preview" width="300" height="200" autoplay></video>
-
-                                        <div class="alert alert-warning">
-                                            <ul style="font-size: 12px;">
-                                                <li>SCAN KODE QR HANYA UNTUK PRESENSI KEHADIRAN</li>
-                                                <li>BILA SAKIT ATAU IZIN MAKA KLIK BUTTON ("PRESENSI")</li>
-                                                <li>JAM UNTUK PRESENSI HANYA DIBUKA MULAI JAM 8 PAGI s/d JAM 10 PAGI
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                @else
-                                @endif
-
-
                             </div>
 
-
-                            {{-- </div> --}}
-
+                            @if (in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, ['12', '10', '5']))
+                                <div style="display: flex; justify-content:center;" class="opencamera-attendacn">
+                                    <a class="btn btn-dark" href="#" data-toggle="modal"
+                                        data-target="#opencamera"><i class="fas fa-camera"></i> Buka Presensi</a>
+                                </div>
+                            @endif
                         </div>
 
                         <div class="card-body">
@@ -459,6 +439,49 @@
             </div>
         </div>
     @endforeach
+
+
+
+    <div class="modal fade" id="opencamera" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Presensi Kehadiran :
+                    </h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    @if (in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, ['12', '10', '5']))
+                        <div style="display: block;" class="open-camera-scanner">
+                            <label for=""><strong>SCAN KODE QR UNTUK PRESENSI
+                                    KEHADIRAN</strong></label>
+                            <br>
+                            <video id="preview" width="450" height="480" autoplay></video>
+
+                            <div class="alert alert-warning">
+                                <ul style="font-size: 12px;">
+                                    <li>SCAN KODE QR HANYA UNTUK PRESENSI KEHADIRAN</li>
+                                    <li>BILA SAKIT ATAU IZIN MAKA KLIK BUTTON ("PRESENSI")</li>
+                                    <li>JAM UNTUK PRESENSI HANYA DIBUKA MULAI JAM 8 PAGI s/d JAM 10 PAGI
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    @else
+                    @endif
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+
 
     <style>
         #loadingSpinnerWrapper {

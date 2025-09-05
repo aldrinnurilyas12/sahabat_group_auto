@@ -250,11 +250,19 @@
                                         </div>
 
 
+                                        @if ($checking_signature->isNotEmpty())
+                                            <input class="form-control" type="file" name="payroll_file"
+                                                id="">
+                                            <br>
+                                            <button type="submit" class="btn btn-primary">Simpan Payroll</button>
+                                        @else
+                                            <p class="text-danger">*Anda belum upload tanda tangan digital, harap
+                                                upload terlebih dahulu.</p>
+                                            <a class="btn btn-primary" href="{{ route('profile') }}">Upload Tanda
+                                                Tangan</a>
+                                        @endif
 
-                                        <input class="form-control" type="file" name="payroll_file"
-                                            id="">
-                                        <br>
-                                        <button type="submit" class="btn btn-primary">Simpan Payroll</button>
+
                                     </div>
 
                                 </div>

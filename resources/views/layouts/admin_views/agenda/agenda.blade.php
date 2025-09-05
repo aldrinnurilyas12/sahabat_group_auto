@@ -413,32 +413,31 @@
                         </button>
                     </div>
 
-                    <table style="font-size: 14px; color:black;" class="table table-bordered" id="dataTable"
-                        width="100%" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Karyawan</th>
-                                <th>Posisi</th>
-                                <th>Status</th>
-
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <?php $no = 1; ?>
-                            @foreach ($guests_list as $emp)
-                                <tr style="width: 200px;">
-                                    <td><?php echo $no++; ?></td>
-                                    <td>{{ '[' . $emp->nik . '] ' . $emp->name }}
-                                    </td>
-                                    <td>{{ $emp->job_position }}</td>
-                                    <td>-</td>
+                    <div class="modal-body">
+                        <table style="font-size: 14px; color:black;" class="table table-bordered" id="dataTable"
+                            width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Karyawan</th>
+                                    <th>Posisi</th>
                                 </tr>
-                            @endforeach
+                            </thead>
 
-                        </tbody>
-                    </table>
+                            <tbody>
+                                <?php $no = 1; ?>
+                                @foreach ($guests_list as $emp)
+                                    <tr style="width: 200px;">
+                                        <td><?php echo $no++; ?></td>
+                                        <td>{{ '[' . $emp->nik . '] ' . $emp->name }}
+                                        </td>
+                                        <td>{{ $emp->job_position }}</td>
+                                    </tr>
+                                @endforeach
+
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

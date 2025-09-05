@@ -252,46 +252,46 @@
                                                 style="background: white;">
                                                 <thead style="color: black;">
                                                     <tr>
-                                                        <th>Tanggal Bayar</th>
+                                                        <th>Kode Payroll</th>
                                                         <th>Status Bayar</th>
                                                         <th>HR Head</th>
-                                                        <th>FInance Head</th>
+                                                        <th>Finance Head</th>
                                                         <th>Branch Head</th>
                                                         <th>Tanggal Approval</th>
+                                                        <th>Tanggal Bayar</th>
                                                         <th>Dibayar oleh</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     <tr>
-                                                        <td>{{ $payroll_detail->first()->created_at }}
-                                                        </td>
+                                                        <td>{{ $payroll_detail->first()->payroll_code }}</td>
                                                         <td><button class="btn btn-outline-success"
                                                                 disabled>Sudah</button></td>
                                                         <td>
                                                             @if ($payroll_detail->first()->approval_by_head_of_human_resource == 'confirmed')
-                                                                <span class="text-info">Sudah
+                                                                <span class="badge badge-success">Sudah
                                                                     Konfirmasi</span>
                                                             @else
-                                                                <span class="text-danger">Belum
+                                                                <span class="badge badge-danger">Belum
                                                                     Konfirmasi</span>
                                                             @endif
                                                         </td>
                                                         <td>
                                                             @if ($payroll_detail->first()->approval_by_head_of_finance == 'confirmed')
-                                                                <span class="text-info">Sudah
+                                                                <span class="badge badge-success">Sudah
                                                                     Konfirmasi</span>
                                                             @else
-                                                                <span class="text-danger">Belum
+                                                                <span class="badge badge-danger">Belum
                                                                     Konfirmasi</span>
                                                             @endif
 
                                                         </td>
                                                         <td>
                                                             @if ($payroll_detail->first()->approval_by_head_of_branch == 'confirmed')
-                                                                <span class="text-info">Sudah
+                                                                <span class="badge badge-success">Sudah
                                                                     Konfirmasi</span>
                                                             @else
-                                                                <span class="text-danger">Belum
+                                                                <span class="badge badge-danger">Belum
                                                                     Konfirmasi</span>
                                                             @endif
                                                         </td>
@@ -308,6 +308,8 @@
 
                                                         <td>
                                                             {{ $payroll_detail->first()->created_by }}
+                                                        </td>
+                                                        <td>{{ $payroll_detail->first()->created_at }}
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -348,46 +350,47 @@
                                                                 cellspacing="0" style="background: white;">
                                                                 <thead style="color: black;">
                                                                     <tr>
-                                                                        <th>Tanggal Bayar</th>
+                                                                        <th>Kode Payroll</th>
                                                                         <th>Status Bayar</th>
                                                                         <th>HR Head</th>
                                                                         <th>FInance Head</th>
                                                                         <th>Branch Head</th>
                                                                         <th>Tanggal Approval</th>
                                                                         <th>Dibayar oleh</th>
+                                                                        <th>Tanggal Bayar</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
                                                                     <tr>
-                                                                        <td>{{ $payroll_detail->first()->created_at }}
+                                                                        <td>{{ $payroll_detail->first()->payroll_code }}
                                                                         </td>
                                                                         <td><button class="btn btn-outline-success"
                                                                                 disabled>Sudah</button></td>
                                                                         <td>
                                                                             @if ($payroll_detail->first()->approval_by_head_of_human_resource == 'confirmed')
-                                                                                <span class="text-info">Sudah
+                                                                                <span class="badge badge-success">Sudah
                                                                                     Konfirmasi</span>
                                                                             @else
-                                                                                <span class="text-danger">Belum
+                                                                                <span class="badge badge-danger">Belum
                                                                                     Konfirmasi</span>
                                                                             @endif
                                                                         </td>
                                                                         <td>
                                                                             @if ($payroll_detail->first()->approval_by_head_of_finance == 'confirmed')
-                                                                                <span class="text-info">Sudah
+                                                                                <span class="badge badge-success">Sudah
                                                                                     Konfirmasi</span>
                                                                             @else
-                                                                                <span class="text-danger">Belum
+                                                                                <span class="badge badge-danger">Belum
                                                                                     Konfirmasi</span>
                                                                             @endif
 
                                                                         </td>
                                                                         <td>
                                                                             @if ($payroll_detail->first()->approval_by_head_of_branch == 'confirmed')
-                                                                                <span class="text-info">Sudah
+                                                                                <span class="badge badge-success">Sudah
                                                                                     Konfirmasi</span>
                                                                             @else
-                                                                                <span class="text-danger">Belum
+                                                                                <span class="badge badge-danger">Belum
                                                                                     Konfirmasi</span>
                                                                             @endif
                                                                         </td>
@@ -397,13 +400,16 @@
                                                                                 <span>
                                                                                     {{ $payroll_detail->first()->payroll_approval_date }}</span>
                                                                             @else
-                                                                                <span>Belum
+                                                                                <span
+                                                                                    class="badge badge-secondary">Belum
                                                                                     dikonfirmasi</span>
                                                                             @endif
                                                                         </td>
 
                                                                         <td>
                                                                             {{ $payroll_detail->first()->created_by }}
+                                                                        </td>
+                                                                        <td>{{ $payroll_detail->first()->created_at }}
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
@@ -455,61 +461,103 @@
                                         @else
                                             @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Finance Operation' ||
                                                     app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Human Resource Staff')
-                                                <div class="confirmed">
-                                                    <h5 style="color: black;"><strong> Konfirmasi Pembayaran
-                                                            Payroll by Head of Finance </strong></h5>
-                                                    <input hidden class="form-control" value="confirmed"
-                                                        type="text" name="approval_by_head_of_finance"
-                                                        id="">
-                                                </div>
+                                                @if ($checking_signature->isNotEmpty())
+                                                    <div class="confirmed">
+                                                        <h5 style="color: black;"><strong> Konfirmasi Pembayaran
+                                                                Payroll by Head of Finance </strong></h5>
+                                                        <input hidden class="form-control" value="confirmed"
+                                                            type="text" name="approval_by_head_of_finance"
+                                                            id="">
+                                                    </div>
+                                                @else
+                                                    <p class="text-danger">*Anda belum upload tanda tangan digital,
+                                                        harap
+                                                        upload terlebih dahulu.</p>
+                                                    <a class="btn btn-primary" href="{{ route('profile') }}">Upload
+                                                        Tanda
+                                                        Tangan</a>
+                                                @endif
                                             @elseif(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource')
-                                                <div class="confirmed">
-                                                    <h5 style="color: black;"><strong> Konfirmasi Pembayaran Payroll by
-                                                            Head of Human Resource </strong></h5>
-                                                    <input hidden class="form-control" value="confirmed"
-                                                        type="text" name="approval_by_head_of_human_resource"
-                                                        id="">
-                                                </div>
+                                                @if ($checking_signature->isNotEmpty())
+                                                    <div class="confirmed">
+                                                        <h5 style="color: black;"><strong> Konfirmasi Pembayaran
+                                                                Payroll by
+                                                                Head of Human Resource </strong></h5>
+                                                        <input hidden class="form-control" value="confirmed"
+                                                            type="text" name="approval_by_head_of_human_resource"
+                                                            id="">
+                                                    </div>
+                                                @else
+                                                    <p class="text-danger">*Anda belum upload tanda tangan digital,
+                                                        harap
+                                                        upload terlebih dahulu.</p>
+                                                    <a class="btn btn-primary" href="{{ route('profile') }}">Upload
+                                                        Tanda
+                                                        Tangan</a>
+                                                @endif
                                             @elseif(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations')
-                                                <div class="confirmed">
-                                                    <input hidden class="form-control" value="confirmed"
-                                                        type="text" name="approval_by_head_of_branch"
-                                                        id="">
-                                                </div>
+                                                @if ($checking_signature->isNotEmpty())
+                                                    <div class="confirmed">
+                                                        <input hidden class="form-control" value="confirmed"
+                                                            type="text" name="approval_by_head_of_branch"
+                                                            id="">
+                                                    </div>
+                                                @else
+                                                    <p class="text-danger">*Anda belum upload tanda tangan digital,
+                                                        harap
+                                                        upload terlebih dahulu.</p>
+                                                    <a class="btn btn-primary" href="{{ route('profile') }}">Upload
+                                                        Tanda
+                                                        Tangan</a>
+                                                @endif
                                             @endif
+
                                             <br>
 
                                             @if (app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Finance Operation')
                                                 @if ($payroll_detail->first()->approval_by_head_of_finance == 'confirmed')
                                                     <p style="color: black;">Konfirmasi oleh Finance Head : <span
-                                                            class="text-info">Sudah Konfirmasi</span></p>
+                                                            class="badge badge-success">Sudah Konfirmasi</span></p>
                                                 @else
-                                                    <button type="submit" class="btn btn-primary">Konfirmasi
-                                                        Payroll by Head of Finance</button>
+                                                    @if ($checking_signature->isNotEmpty())
+                                                        <label style="color: black;" for=""><strong>Konfirmasi
+                                                                Payroll by Head of Finance</strong></label>
+                                                        <br>
+                                                        <button type="submit" class="btn btn-primary">Konfirmasi
+                                                            Payroll by Head of Finance</button>
+                                                    @else
+                                                    @endif
                                                 @endif
                                             @elseif(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource')
                                                 @if ($payroll_detail->first()->approval_by_head_of_human_resource == 'confirmed')
                                                     <p style="color: black;">Konfirmasi oleh Human Resource Head :
-                                                        <span class="text-info">Sudah Konfirmasi</span>
+                                                        <span class="badge badge-success">Sudah Konfirmasi</span>
                                                     </p>
                                                 @else
-                                                    <label style="color: black;" for=""><strong>Konfirmasi
-                                                            Payroll by Head of Human Resource</strong></label>
-                                                    <br>
-                                                    <button type="submit" class="btn btn-primary">
-                                                        Konfirmasi Payroll by Head of HR</button>
+                                                    @if ($checking_signature->isNotEmpty())
+                                                        <label style="color: black;" for=""><strong>Konfirmasi
+                                                                Payroll by Head of Human Resource</strong></label>
+                                                        <br>
+                                                        <button type="submit" class="btn btn-primary">
+                                                            Konfirmasi Payroll by Head of HR</button>
+                                                    @else
+                                                    @endif
                                                 @endif
                                             @elseif(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Branch Operations')
                                                 @if ($payroll_detail->first()->approval_by_head_of_branch == 'confirmed')
                                                     <p style="color: black;">Konfirmasi oleh Branch Head : <span
-                                                            class="text-info">Sudah Konfirmasi</span></p>
+                                                            class="badge badge-success">Sudah Konfirmasi</span></p>
                                                 @else
-                                                    <label style="color: black;" for=""><strong>Konfirmasi
-                                                            Payroll by
-                                                            Head of Branch</strong></label>
-                                                    <br>
-                                                    <button type="submit" class="btn btn-primary">Konfirmasi Payroll
-                                                        by Head of Branch</button>
+                                                    @if ($checking_signature->isNotEmpty())
+                                                        <label style="color: black;" for=""><strong>Konfirmasi
+                                                                Payroll by
+                                                                Head of Branch</strong></label>
+                                                        <br>
+                                                        <button type="submit" class="btn btn-primary">Konfirmasi
+                                                            Payroll
+                                                            by Head of Branch</button>
+                                                    @else
+                                                    @endif
                                                 @endif
                                             @endif
                                         @endif

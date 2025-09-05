@@ -72,8 +72,8 @@
                                         <th>Kantor</th>
                                         <th>Email</th>
                                         <th>Posisi</th>
-                                        <th>Sudah Bayar</th>
-                                        <th>Belum Bayar</th>
+                                        <th>Status Bayar</th>
+                                        {{-- <th>Belum Bayar</th> --}}
                                         <th>Created At</th>
                                         <th>Created By</th>
                                     </tr>
@@ -85,7 +85,18 @@
                                     ?>
 
 
+
+
                                     @foreach ($employee_data as $emp)
+                                        @php
+                                            $payment_status = DB::table('payroll')
+                                                ->select('payroll_file')
+                                                ->whereMonth('created_at', now()->month)
+                                                ->whereYear('created_at', now()->year)
+                                                ->where('employee_id', $emp->id)
+                                                ->get();
+                                        @endphp
+
                                         <tr style="width: 200px;">
                                             <td><?php echo $no++; ?></td>
 
@@ -97,8 +108,14 @@
                                             <td>{{ $emp->location_name }}</td>
                                             <td>{{ $emp->email }}</td>
                                             <td>{{ $emp->job_position }}</td>
-                                            <td>1</td>
-                                            <td>2</td>
+                                            <td>
+                                                @if ($payment_status->isNotEmpty())
+                                                    <span class="badge badge-success">Selesai</span>
+                                                @else
+                                                    <span class="badge badge-danger">Belum</span>
+                                                @endif
+                                            </td>
+                                            {{-- <td>2</td> --}}
                                             <td>{{ $emp->created_at }}</td>
                                             <td>{{ $emp->created_by }}</td>
                                         </tr>

@@ -86,16 +86,17 @@
                             </div>
 
                             <div class="form-group">
+                                <label>Link 1 (optional)</label>
+                                <input type="text" class="form-control" name="link_1" autocomplete="off"
+                                    placeholder="Masukan link didalam button 1, contoh : https:api.whatsapp.com/62097471 ">
+                            </div>
+
+                            <div class="form-group">
                                 <label>Button 2 (optional)</label>
                                 <input type="text" class="form-control" name="button_2" autocomplete="off"
                                     placeholder="Masukan teks didalam button 2">
                             </div>
 
-                            <div class="form-group">
-                                <label>Link 1 (optional)</label>
-                                <input type="text" class="form-control" name="link_1" autocomplete="off"
-                                    placeholder="Masukan link didalam button 1, contoh : https:api.whatsapp.com/62097471 ">
-                            </div>
 
                             <div class="form-group">
                                 <label>Link 2 (optional)</label>
