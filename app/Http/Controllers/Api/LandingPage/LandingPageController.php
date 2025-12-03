@@ -141,8 +141,25 @@ class LandingPageController extends Controller
                 [$request->slug]  // Menggunakan nilai slug yang diterima dari request
             )
             ->get();
-        $media_video = DB::table('v_vehicle_media_player')->where('media_type', 'video')->where('slug', $request->slug)->get();
-        $engine_sound = DB::table('v_vehicle_media_player')->where('media_type', 'engine sound')->where('slug', $request->slug)->get();
+
+
+        $media_video = DB::table('v_vehicle_media_player as vm')
+        ->leftJoin('vehicle as v', 'vm.vehicle_id', '=', 'v.id')
+        ->leftJoin('vehicle_brand as vb', 'v.brand', '=', 'vb.id')
+        ->where('media_type', 'video')
+        ->whereRaw(
+                "LOWER(CONCAT(REPLACE(vb.brand_name, ' ', ''), '-', REPLACE(v.vehicle_type, ' ', ''), '-', v.manufacture_year)) = ?",
+                [$request->slug]  // Menggunakan nilai slug yang diterima dari request
+        )->get();
+
+        $engine_sound = DB::table('v_vehicle_media_player as vm')
+         ->leftJoin('vehicle as v', 'vm.vehicle_id', '=', 'v.id')
+        ->leftJoin('vehicle_brand as vb', 'v.brand', '=', 'vb.id')
+        ->where('media_type', 'engine sound')
+        ->whereRaw(
+                "LOWER(CONCAT(REPLACE(vb.brand_name, ' ', ''), '-', REPLACE(v.vehicle_type, ' ', ''), '-', v.manufacture_year)) = ?",
+                [$request->slug]  // Menggunakan nilai slug yang diterima dari request
+        )->get();
 
         $sales_contact = DB::table('employee as e')
             ->select('e.name', DB::raw("REPLACE(e.phone_number, ' ', '') AS phone_number"), 'location_name')

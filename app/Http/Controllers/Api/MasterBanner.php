@@ -19,7 +19,7 @@ class MasterBanner extends Controller
         $this->MasterMainMenuController = $MasterMainMenuController;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -27,18 +27,25 @@ class MasterBanner extends Controller
 
         $banner_data = DB::table('banner_landingpage')->get();
 
-        $disallowedData = DB::table('users_privilege')
-            ->where('disallowed', '<>', '')
-            ->distinct()
-            ->pluck('disallowed')
-            ->flatMap(function ($item) {
-                return array_map('trim', explode(',', $item));
-            })
-            ->toArray();
+        $disallowedData = DB::table('users_privilege as up')
+        ->select('disallowed')
+        ->leftJoin('submenu as sb', 'up.submenu_id', '=', 'sb.id')
+        ->where('submenu_link', $request->segment(1))
+        ->get();
 
-        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+        // Ambil semua employee_id yang tidak diizinkan dalam bentuk array
+        $disallowedIds = [];
 
-        if ($disallowedRoles) {
+        foreach ($disallowedData as $row) {
+            $ids = array_map('trim', explode(',', $row->disallowed));
+            $disallowedIds = array_merge($disallowedIds, $ids);
+        }
+
+        // Ambil employee_id user yang sedang login
+        $currentEmployeeId = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
+
+        // Cek apakah user termasuk dalam daftar disallowed
+        if (in_array($currentEmployeeId, $disallowedIds)) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -49,24 +56,31 @@ class MasterBanner extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create_banner_layout()
+    public function create_banner_layout(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
         $grouped_sub_menu = $master_menus['grouped_sub_menu'];
 
-        $disallowedData = DB::table('users_privilege')
-            ->where('disallowed', '<>', '')
-            ->distinct()
-            ->pluck('disallowed')
-            ->flatMap(function ($item) {
-                return array_map('trim', explode(',', $item));
-            })
-            ->toArray();
+        $disallowedData = DB::table('users_privilege as up')
+        ->select('disallowed')
+        ->leftJoin('submenu as sb', 'up.submenu_id', '=', 'sb.id')
+        ->where('submenu_link', $request->segment(1))
+        ->get();
 
-        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+        // Ambil semua employee_id yang tidak diizinkan dalam bentuk array
+        $disallowedIds = [];
 
-        if ($disallowedRoles) {
+        foreach ($disallowedData as $row) {
+            $ids = array_map('trim', explode(',', $row->disallowed));
+            $disallowedIds = array_merge($disallowedIds, $ids);
+        }
+
+        // Ambil employee_id user yang sedang login
+        $currentEmployeeId = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
+
+        // Cek apakah user termasuk dalam daftar disallowed
+        if (in_array($currentEmployeeId, $disallowedIds)) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -132,7 +146,7 @@ class MasterBanner extends Controller
         //
     }
 
-    public function edit_banner_layout(Request $request, $id): View
+    public function edit_banner_layout(Request $request, $id)
     {
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
@@ -141,18 +155,25 @@ class MasterBanner extends Controller
 
         $banner_data = DB::table('banner_landingpage')->where('id', $request->id)->get();
 
-        $disallowedData = DB::table('users_privilege')
-            ->where('disallowed', '<>', '')
-            ->distinct()
-            ->pluck('disallowed')
-            ->flatMap(function ($item) {
-                return array_map('trim', explode(',', $item));
-            })
-            ->toArray();
+        $disallowedData = DB::table('users_privilege as up')
+        ->select('disallowed')
+        ->leftJoin('submenu as sb', 'up.submenu_id', '=', 'sb.id')
+        ->where('submenu_link', $request->segment(1))
+        ->get();
 
-        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+        // Ambil semua employee_id yang tidak diizinkan dalam bentuk array
+        $disallowedIds = [];
 
-        if ($disallowedRoles) {
+        foreach ($disallowedData as $row) {
+            $ids = array_map('trim', explode(',', $row->disallowed));
+            $disallowedIds = array_merge($disallowedIds, $ids);
+        }
+
+        // Ambil employee_id user yang sedang login
+        $currentEmployeeId = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
+
+        // Cek apakah user termasuk dalam daftar disallowed
+        if (in_array($currentEmployeeId, $disallowedIds)) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }

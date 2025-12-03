@@ -32,7 +32,7 @@ class RegisteredUserController extends Controller
         $this->MasterMainMenuController = $MasterMainMenuController;
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
         $sub_menu = DB::table('submenu')->get();
@@ -41,18 +41,25 @@ class RegisteredUserController extends Controller
         $roles = RoleModel::all();
         $employees = EmployeeModel::all();
 
-        $disallowedData = DB::table('users_privilege')
-            ->where('disallowed', '<>', '')
-            ->distinct()
-            ->pluck('disallowed')
-            ->flatMap(function ($item) {
-                return array_map('trim', explode(',', $item));
-            })
-            ->toArray();
+        $disallowedData = DB::table('users_privilege as up')
+        ->select('disallowed')
+        ->leftJoin('submenu as sb', 'up.submenu_id', '=', 'sb.id')
+        ->where('submenu_link', $request->segment(1))
+        ->get();
 
-        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+        // Ambil semua employee_id yang tidak diizinkan dalam bentuk array
+        $disallowedIds = [];
 
-        if ($disallowedRoles) {
+        foreach ($disallowedData as $row) {
+            $ids = array_map('trim', explode(',', $row->disallowed));
+            $disallowedIds = array_merge($disallowedIds, $ids);
+        }
+
+        // Ambil employee_id user yang sedang login
+        $currentEmployeeId = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
+
+        // Cek apakah user termasuk dalam daftar disallowed
+        if (in_array($currentEmployeeId, $disallowedIds)) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -62,7 +69,7 @@ class RegisteredUserController extends Controller
 
 
 
-    public function users_create_layout()
+    public function users_create_layout(Request $request)
     {
 
         $sidebar_menu = DB::table('main_menu')->where('location', 'admin')->get();
@@ -76,18 +83,25 @@ class RegisteredUserController extends Controller
             ->where('employee.is_active', 'Y')
             ->get();
 
-        $disallowedData = DB::table('users_privilege')
-            ->where('disallowed', '<>', '')
-            ->distinct()
-            ->pluck('disallowed')
-            ->flatMap(function ($item) {
-                return array_map('trim', explode(',', $item));
-            })
-            ->toArray();
+        $disallowedData = DB::table('users_privilege as up')
+        ->select('disallowed')
+        ->leftJoin('submenu as sb', 'up.submenu_id', '=', 'sb.id')
+        ->where('submenu_link', $request->segment(1))
+        ->get();
 
-        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+        // Ambil semua employee_id yang tidak diizinkan dalam bentuk array
+        $disallowedIds = [];
 
-        if ($disallowedRoles) {
+        foreach ($disallowedData as $row) {
+            $ids = array_map('trim', explode(',', $row->disallowed));
+            $disallowedIds = array_merge($disallowedIds, $ids);
+        }
+
+        // Ambil employee_id user yang sedang login
+        $currentEmployeeId = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
+
+        // Cek apakah user termasuk dalam daftar disallowed
+        if (in_array($currentEmployeeId, $disallowedIds)) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -168,7 +182,7 @@ class RegisteredUserController extends Controller
     }
 
     // EDIT USERS LAYOUT
-    public function show($id)
+    public function show($id, Request $request)
     {
         $show = User::whereId($id)->first();
 
@@ -181,18 +195,25 @@ class RegisteredUserController extends Controller
             $user =  DB::table('v_users')->where('id', $id)->get();
         }
 
-        $disallowedData = DB::table('users_privilege')
-            ->where('disallowed', '<>', '')
-            ->distinct()
-            ->pluck('disallowed')
-            ->flatMap(function ($item) {
-                return array_map('trim', explode(',', $item));
-            })
-            ->toArray();
+        $disallowedData = DB::table('users_privilege as up')
+        ->select('disallowed')
+        ->leftJoin('submenu as sb', 'up.submenu_id', '=', 'sb.id')
+        ->where('submenu_link', $request->segment(1))
+        ->get();
 
-        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+        // Ambil semua employee_id yang tidak diizinkan dalam bentuk array
+        $disallowedIds = [];
 
-        if ($disallowedRoles) {
+        foreach ($disallowedData as $row) {
+            $ids = array_map('trim', explode(',', $row->disallowed));
+            $disallowedIds = array_merge($disallowedIds, $ids);
+        }
+
+        // Ambil employee_id user yang sedang login
+        $currentEmployeeId = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
+
+        // Cek apakah user termasuk dalam daftar disallowed
+        if (in_array($currentEmployeeId, $disallowedIds)) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -276,7 +297,7 @@ class RegisteredUserController extends Controller
         }
     }
 
-    public function getUsersActivity()
+    public function getUsersActivity(Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'] ?? [];
@@ -289,18 +310,25 @@ class RegisteredUserController extends Controller
             ->leftJoin('job_position as jp', 'e.job_position', '=', 'jp.id')
             ->orderBy('u.last_seen', 'DESC')
             ->get();
-        $disallowedData = DB::table('users_privilege')
-            ->where('disallowed', '<>', '')
-            ->distinct()
-            ->pluck('disallowed')
-            ->flatMap(function ($item) {
-                return array_map('trim', explode(',', $item));
-            })
-            ->toArray();
+        $disallowedData = DB::table('users_privilege as up')
+        ->select('disallowed')
+        ->leftJoin('submenu as sb', 'up.submenu_id', '=', 'sb.id')
+        ->where('submenu_link', $request->segment(1))
+        ->get();
 
-        $disallowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id, $disallowedData);
+        // Ambil semua employee_id yang tidak diizinkan dalam bentuk array
+        $disallowedIds = [];
 
-        if ($disallowedRoles) {
+        foreach ($disallowedData as $row) {
+            $ids = array_map('trim', explode(',', $row->disallowed));
+            $disallowedIds = array_merge($disallowedIds, $ids);
+        }
+
+        // Ambil employee_id user yang sedang login
+        $currentEmployeeId = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
+
+        // Cek apakah user termasuk dalam daftar disallowed
+        if (in_array($currentEmployeeId, $disallowedIds)) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }

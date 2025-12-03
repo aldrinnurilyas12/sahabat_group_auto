@@ -37,7 +37,7 @@ class PayrollController extends Controller
 
 
 
-    public function index()
+    public function index(Request $request)
     {
 
         $master_menus = $this->MasterMainMenuController->master_display_menus();
@@ -47,9 +47,25 @@ class PayrollController extends Controller
         $finance_head_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Finance Operation';
         $hr_head_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Head of Human Resource';
 
-        $allowedRoles = in_array(app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->job_position, ['1', '10', '11', '13']);
+        $disallowedData = DB::table('users_privilege as up')
+        ->select('disallowed')
+        ->leftJoin('submenu as sb', 'up.submenu_id', '=', 'sb.id')
+        ->where('submenu_link', $request->segment(1))
+        ->get();
 
-        if (!$allowedRoles) {
+        // Ambil semua employee_id yang tidak diizinkan dalam bentuk array
+        $disallowedIds = [];
+
+        foreach ($disallowedData as $row) {
+            $ids = array_map('trim', explode(',', $row->disallowed));
+            $disallowedIds = array_merge($disallowedIds, $ids);
+        }
+
+        // Ambil employee_id user yang sedang login
+        $currentEmployeeId = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
+
+        // Cek apakah user termasuk dalam daftar disallowed
+        if (in_array($currentEmployeeId, $disallowedIds)) {
             session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
             return redirect()->back();
         }
@@ -116,7 +132,7 @@ class PayrollController extends Controller
 
     // ROLE : FINANCE STAFF
     // CONTROLLER MEMBUAT PAYROLL BARU
-    public function create_payroll_layout($payroll_code, Request $request): View
+    public function create_payroll_layout($payroll_code, Request $request)
     {
         $master_menus = $this->MasterMainMenuController->master_display_menus();
         $sidebar_menu = $master_menus['sidebar_menu'];
@@ -133,6 +149,29 @@ class PayrollController extends Controller
         // $payroll_detail = DB::table('v_payroll')->where('id', $request->id)->orderBy('payroll_approval_date', 'desc')->latest()->first();
 
         $finance_staff_session = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->position_name == 'Finance Staff';
+
+        $disallowedData = DB::table('users_privilege as up')
+        ->select('disallowed')
+        ->leftJoin('submenu as sb', 'up.submenu_id', '=', 'sb.id')
+        ->where('submenu_link', $request->segment(1))
+        ->get();
+
+        // Ambil semua employee_id yang tidak diizinkan dalam bentuk array
+        $disallowedIds = [];
+
+        foreach ($disallowedData as $row) {
+            $ids = array_map('trim', explode(',', $row->disallowed));
+            $disallowedIds = array_merge($disallowedIds, $ids);
+        }
+
+        // Ambil employee_id user yang sedang login
+        $currentEmployeeId = app('App\Http\Controllers\Api\LoginAdminController')->getUsers()->employee_id;
+
+        // Cek apakah user termasuk dalam daftar disallowed
+        if (in_array($currentEmployeeId, $disallowedIds)) {
+            session()->flash('failed_insert', 'Anda tidak bisa akses Modul ini');
+            return redirect()->back();
+        }
 
         if (!$finance_staff_session) {
             session()->flash('session_failed', 'Anda tidak bisa akses Modul ini');

@@ -47,7 +47,7 @@
 
                 <div id="content">
 
-                    <h4 style="text-align:center;color:black;font-weight:bold;">Edit Cabang</h4>
+                    <h4 style="text-align:center;color:black;font-weight:bold;">Edit E-Ticket</h4>
                     @foreach ($eticket_data as $ticket)
                         <div class="form-group-content">
 
